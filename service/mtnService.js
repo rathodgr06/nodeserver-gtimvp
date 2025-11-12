@@ -1,0 +1,77 @@
+const axios = require("axios");
+const credentials = require("../config/credientials");
+const helpers = require("../utilities/helper/general_helper");
+const { v4: uuidv4 } = require("uuid");
+const mtnService = {
+    token:async(primary_key,username,password,mode)=>{
+        try {
+          const basicAuthToken = await helpers.createBasicAuthToken(
+            username,
+            password
+          );
+          console.log(credentials["mtn-momo"]);
+          let url =
+            mode == "live"
+              ? credentials["mtn-momo"].base_url
+              : credentials["mtn-momo"].test_url;
+          const config = {
+            method: "post",
+            url: url + `collection/token/`,
+            headers: {
+              Authorization: basicAuthToken,
+              "Content-Type": "application/json",
+              "Ocp-Apim-Subscription-Key": primary_key,
+            },
+          };
+          const response = await axios(config);
+          const token = response.data.access_token;
+          return token;
+        } catch (error) {
+          return false;
+        }
+    },
+    pay:async(order_details,data,mid_details,mode,token)=>{
+        try {
+          let url =
+            mode == "live"
+              ? credentials["mtn-momo"].base_url
+              : credentials["mtn-momo"].test_url;
+          let x_ref_id = uuidv4();
+          let payload = {
+            amount: order_details.amount,
+            currency: order_details.currency,
+            externalId: order_details.order_id,
+            payer: {
+              partyIdType: "MSISDN",
+              partyId: `${data.paymentMethod.wallet_details.mobileCode}${data.paymentMethod.wallet_details.msisdn}`,
+            },
+            payerMessage: mid_details.statementDescriptor,
+            payeeNote: mid_details.shortenedDescriptor,
+          };
+          let headers = {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            "Ocp-Apim-Subscription-Key": mid_details.primary_key,
+            "X-Target-Environment": mode == "test" ? "sandbox" : "mtnliberia",
+            "X-Reference-Id": x_ref_id,
+          };
+          let formData = JSON.stringify(payload);
+          let config = {
+            method: "post",
+            url: `${url}collection/v1_0/requesttopay`,
+            headers: headers,
+            data: formData,
+          };
+          const final_response = await axios(config);
+          return x_ref_id;
+        } catch (error) {
+            console.log(error);
+          return false;
+        }
+    },
+    confirm:async(token,data_set,primary_key,username,password,mode)=>{
+        
+    }
+
+}
+module.exports = mtnService;

@@ -1,0 +1,27 @@
+{
+    "development": {
+        "username": "console",
+        "password": "FELQyTUM4lH%OD?Kk1!b",
+        "database": "paydart_console",
+        "host": "dev-db.cm0xoubkc5dm.me-central-1.rds.amazonaws.com",
+        "table_prefix": "pg_",
+        "table_prefix1": "fds_",
+        "timezone": "utc"
+    },
+    "test": {
+        "username": "console",
+        "password": "FELQyTUM4lH%OD?Kk1!b",
+        "database": "paydart_console",
+        "host": "dev-db.cm0xoubkc5dm.me-central-1.rds.amazonaws.com",
+        "table_prefix": "pg_",
+        "table_prefix1": "fds_"
+    },
+    "production": {
+        "username": "console",
+        "password": "FELQyTUM4lH%OD?Kk1!b",
+        "database": "paydart_console",
+        "host": "dev-db.cm0xoubkc5dm.me-central-1.rds.amazonaws.com",
+        "table_prefix": "pg_",
+        "table_prefix1": "fds_"
+    }
+}

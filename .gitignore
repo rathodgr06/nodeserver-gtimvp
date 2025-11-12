@@ -1,0 +1,5 @@
+# dependencies
+**/*.log
+node_modules/
+.env
+public/

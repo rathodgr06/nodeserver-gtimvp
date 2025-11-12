@@ -1,0 +1,27 @@
+{
+    "development": {
+        "username": "root",
+        "password": "",
+        "database": "uat",
+        "host": "localhost",
+        "table_prefix": "pg_",
+        "table_prefix1": "fds_",
+        "timezone": "utc"
+    },
+    "test": {
+        "username": "root",
+        "password": "",
+        "database": "uat",
+        "host": "localhost",
+        "table_prefix": "pg_",
+         "table_prefix1": "fds_"
+    },
+    "production": {
+        "username": "root",
+        "password": "",
+        "database": "uat",
+        "host": "localhost",
+        "table_prefix": "pg_",
+        "table_prefix1": "fds_"
+    }
+}
