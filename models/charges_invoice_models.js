@@ -1989,6 +1989,9 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
       } else if (condition.sub_merchant_id) {
         query =
           query + `WHERE t.sub_merchant_id = "${condition.sub_merchant_id}"`;
+      } else if (condition.currency) {
+        query =
+          query + `WHERE t.currency = "${condition.currency}"`;
       }
 
       let whereString = "";
@@ -2017,16 +2020,34 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
         end_date = condition.to_date;
       }
 
+      // if (condition.from_date && condition.to_date) {
+      //   query =
+      //     query +
+      //     `${whereString}${andString} t.created_at BETWEEN '${start_date}' AND '${end_date}'`;
+      // }
       if (condition.from_date && condition.to_date) {
-        query =
-          query +
-          `${whereString}${andString} t.created_at BETWEEN '${start_date}' AND '${end_date}'`;
+        const date1 = new Date(condition.from_date);
+        const date2 = new Date(condition.to_date);
+
+        if (isNaN(date1) || isNaN(date2)){
+          // throw new Error("Invalid date format");
+          console.log("Invalid date format:", date1, date2);
+        }
+
+        let start_date = date1 <= date2 ? date1 : date2;
+        let end_date = date1 <= date2 ? date2 : date1;
+
+        // Add one day to include the entire 'to_date' day
+        end_date.setDate(end_date.getDate() + 1);
+
+        query += `${whereString}${andString} t.created_at >= '${start_date.toISOString()}' AND t.created_at < '${end_date.toISOString()}'`;
       }
 
       query = query + ` ORDER BY t.created_at DESC`;
 
       // Count Total Records
       let countResult = await qb.query(query);
+      // console.log("🚀 ~ countResult:", countResult)
       totalRecordCount = countResult?.length || 0;
 
       // Apply pagination
@@ -2039,6 +2060,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
       console.log("get_wallet_statement query:", query);
 
       response = await qb.query(query);
+      console.log("🚀 ~ response:", response)
     } catch (error) {
       console.error("Database query failed:", error);
     } finally {
