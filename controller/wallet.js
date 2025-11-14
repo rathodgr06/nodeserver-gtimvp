@@ -638,7 +638,7 @@ var wallet = {
           }
 
           var response_obj = {
-            message: "Found wallet statement",
+            message: final_response_list?.length > 0 ? "Found wallet statement" : "No wallet statement found" || "",
             status: "success",
             code: "00",
             data: final_response_list,
