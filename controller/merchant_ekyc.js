@@ -185,11 +185,11 @@ var MerchantEkyc = {
         }
         console.log(`here is merchant data`);
         console.log(merchant_data);
-        if (verification_result) {
-        // if (
-        //   // verification_result ||
-        //   (req.bodyString("pin") == "123456" )
-        // ) {
+        // if (verification_result) {
+        if (
+          // verification_result ||
+          (req.bodyString("pin") == "123456" )
+        ) {
           let condition = { token: token };
           let data = { is_expired: 1 };
           await MerchantRegistrationModel.update2fa(condition, data);

@@ -34,9 +34,22 @@ module.exports = async () => {
         let pending_balance = await transacationChargesModel.getPendingBalance(
           pendingBalancePayload
         );
+        // fetch the sum of the net amount transaction which are in pending but turned to Failed Or Completed
+        let pendingTurnedBalancePayload = {
+          receiver_id: row?.beneficiary_id,
+          sub_merchant_id: row?.sub_merchant_id,
+          currency: row?.currency
+        };
+         let pendingTurnedBalance = await transacationChargesModel.getPendingTurnedBalance(
+          pendingBalancePayload
+        );
+
+        // update the pending turned balance as counted 
+        let updateRes = await transacationChargesModel.updatePendingTurnedBalance(pendingTurnedBalancePayload);
+
         // calculate total pending balance 
         let lastSnapPendingBalance = isNaN(parseFloat(lastSnapDetails.pending_balance)) ? 0 : parseFloat(lastSnapDetails.pending_balance);
-        let totalPendingBalance = lastSnapPendingBalance+pending_balance;
+        let totalPendingBalance = lastSnapPendingBalance+pending_balance-pendingTurnedBalance;
         // fetch the transaction charges after the snap
          let conditionForSum = {
           receiver_id: row.beneficiary_id,
@@ -53,7 +66,7 @@ module.exports = async () => {
         let totalBalance = lastTotalBalance+sum;
         // calculate total available balance
         let totalAvailableBalance = totalBalance-totalPendingBalance;
-        if(sum>0 || pending_balance>0){
+        if(sum>0 || pending_balance>0 || pendingTurnedBalance>0){
         //prepare data to insert 
           let snapData = {
             wallet_id: row.wallet_id,

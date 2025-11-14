@@ -1769,6 +1769,7 @@ var dbModel = {
         FROM ${table_name}
         ${final_cond}
         ${order_by}
+        ${'LIMIT 2000'}
       `;
       
       console.log("Simple query:", simple_query);

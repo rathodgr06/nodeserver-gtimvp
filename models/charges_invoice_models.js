@@ -579,7 +579,7 @@ var charges_invoice_models = {
       query = query
         .order_by("txn_charge.created_at", "DESC")
         .order_by("txn_charge.id", "DESC")
-        // .limit(pagination.limit)
+        .limit(2000)
         // .offset(pagination.offset);
 
       console.log("Generated Query:", query.get_compiled_select());
@@ -1223,7 +1223,7 @@ var charges_invoice_models = {
 
     return response || [];
   },
-  fetchWalletBalance: async (condition) => {
+  fetchWalletBalanceOld: async (condition) => {
     let response;
     let qb = await pool.get_connection();
     try {
@@ -1380,6 +1380,195 @@ LEFT JOIN pending_payouts pp ON (
     }
     return response.length > 0 ? response?.[0] : false;
   },
+  fetchWalletBalance: async (condition) => {
+  let qb;
+  try {
+    qb = await pool.get_connection();
+    
+    // ===== Query 1: Get Wallet Information =====
+    const walletConditions = [];
+    
+    if (condition.sub_merchant_id && condition.currency) {
+      const subMerchantId = typeof condition.sub_merchant_id === 'number' 
+        ? condition.sub_merchant_id 
+        : `'${condition.sub_merchant_id.replace(/'/g, "''")}'`;
+      const currency = `'${condition.currency.replace(/'/g, "''")}'`;
+      walletConditions.push(`w.sub_merchant_id = ${subMerchantId} AND w.currency = ${currency}`);
+    }
+    
+    if (condition.wallet_id) {
+      const walletId = typeof condition.wallet_id === 'number' 
+        ? condition.wallet_id 
+        : `'${condition.wallet_id.replace(/'/g, "''")}'`;
+      walletConditions.push(`w.wallet_id = ${walletId}`);
+    }
+    
+    if (condition.receiver_id && condition.currency) {
+      const receiverId = typeof condition.receiver_id === 'number' 
+        ? condition.receiver_id 
+        : `'${condition.receiver_id.replace(/'/g, "''")}'`;
+      const currency = `'${condition.currency.replace(/'/g, "''")}'`;
+      walletConditions.push(`w.beneficiary_id = ${receiverId} AND w.currency = ${currency}`);
+    }
+    
+    const walletWhereClause = walletConditions.length > 0 
+      ? `WHERE ${walletConditions.join(' OR ')}` 
+      : '';
+    
+    const walletQuery = `
+      SELECT
+        w.id, 
+        w.wallet_id, 
+        w.sub_merchant_id, 
+        w.currency, 
+        w.beneficiary_id
+      FROM pg_wallet w
+      ${walletWhereClause}
+      LIMIT 1;
+    `.trim();
+    
+    console.log('Query 1 - Wallet Info:', walletQuery);
+    const walletResult = await qb.query(walletQuery);
+    
+    if (!walletResult || walletResult.length === 0) {
+      return null;
+    }
+    
+    const wallet = walletResult[0];
+    
+    // ===== Query 2: Get Latest Snapshot Balance =====
+    const snapshotQuery = `
+      SELECT
+        s.wallet_id, 
+        s.balance, 
+        s.snap_date
+      FROM pg_wallet_snap s
+      WHERE s.wallet_id = ${wallet.wallet_id}
+        AND s.snap_date = (
+          SELECT MAX(snap_date) 
+          FROM pg_wallet_snap 
+          WHERE wallet_id = ${wallet.wallet_id}
+        )
+      LIMIT 1;
+    `.trim();
+    
+    console.log('Query 2 - Snapshot:', snapshotQuery);
+    const snapshotResult = await qb.query(snapshotQuery);
+    
+    const snapshot = snapshotResult.length > 0 ? snapshotResult[0] : null;
+    const snapshotBalance = snapshot ? (snapshot.balance || 0) : 0;
+    const snapDate = snapshot ? snapshot.snap_date : null;
+    
+    // ===== Query 3: Get Transaction Charges After Snapshot =====
+    let transactionQuery;
+    
+    if (wallet.sub_merchant_id && wallet.sub_merchant_id !== 0) {
+      // Use sub_merchant_id
+      const dateCondition = snapDate 
+        ? `AND tc.created_at > TIMESTAMP('${snapDate}', '23:59:59')` 
+        : '';
+      
+      transactionQuery = `
+        SELECT 
+          COALESCE(SUM(tc.net_amount), 0) AS net_amount_after_snapshot
+        FROM pg_transaction_charges tc
+        WHERE tc.sub_merchant_id = ${wallet.sub_merchant_id}
+          AND tc.currency = '${wallet.currency.replace(/'/g, "''")}'
+          ${dateCondition};
+      `.trim();
+    } else if (wallet.beneficiary_id && wallet.beneficiary_id !== 0) {
+      // Use beneficiary_id
+      const dateCondition = snapDate 
+        ? `AND tc.created_at > TIMESTAMP('${snapDate}', '23:59:59')` 
+        : '';
+      
+      transactionQuery = `
+        SELECT 
+          COALESCE(SUM(tc.net_amount), 0) AS net_amount_after_snapshot
+        FROM pg_transaction_charges tc
+        WHERE tc.receiver_id = ${wallet.beneficiary_id}
+          AND tc.currency = '${wallet.currency.replace(/'/g, "''")}'
+          ${dateCondition};
+      `.trim();
+    } else {
+      // No valid identifier
+      transactionQuery = `SELECT 0 AS net_amount_after_snapshot;`;
+    }
+    
+    console.log('Query 3 - Transactions:', transactionQuery);
+    const transactionResult = await qb.query(transactionQuery);
+    const netAmountAfterSnapshot = transactionResult[0]?.net_amount_after_snapshot || 0;
+    
+    // ===== Query 4: Get Pending Payouts =====
+    let payoutQuery;
+    
+    if (wallet.sub_merchant_id && wallet.sub_merchant_id !== 0) {
+      // Use sub_merchant_id
+      payoutQuery = `
+        SELECT 
+          COALESCE(SUM(pp.amount), 0) AS pending_amount
+        FROM pg_payout_pending_transactions pp
+        WHERE pp.sub_merchant_id = ${wallet.sub_merchant_id}
+          AND pp.currency = '${wallet.currency.replace(/'/g, "''")}'
+          AND pp.status = 0 
+          AND pp.order_status = 'PENDING'
+          AND NOT EXISTS (
+            SELECT 1 
+            FROM pg_transaction_charges tc
+            WHERE tc.order_id = pp.order_id
+              AND tc.currency = pp.currency
+              AND tc.sub_merchant_id = pp.sub_merchant_id
+          );
+      `.trim();
+    } else if (wallet.beneficiary_id && wallet.beneficiary_id !== 0) {
+      // Use beneficiary_id
+      payoutQuery = `
+        SELECT 
+          COALESCE(SUM(pp.amount), 0) AS pending_amount
+        FROM pg_payout_pending_transactions pp
+        WHERE pp.receiver_id = ${wallet.beneficiary_id}
+          AND pp.currency = '${wallet.currency.replace(/'/g, "''")}'
+          AND pp.status = 0 
+          AND pp.order_status = 'PENDING'
+          AND NOT EXISTS (
+            SELECT 1 
+            FROM pg_transaction_charges tc
+            WHERE tc.order_id = pp.order_id
+              AND tc.currency = pp.currency
+              AND tc.receiver_id = pp.receiver_id
+          );
+      `.trim();
+    } else {
+      // No valid identifier
+      payoutQuery = `SELECT 0 AS pending_amount;`;
+    }
+    
+    console.log('Query 4 - Pending Payouts:', payoutQuery);
+    const payoutResult = await qb.query(payoutQuery);
+    const pendingAmount = payoutResult[0]?.pending_amount || 0;
+    
+    // ===== Manual Calculation =====
+    const totalBalance = snapshotBalance + netAmountAfterSnapshot;
+    const finalBalance = totalBalance - pendingAmount;
+    
+    // ===== Return Result in Same Format as Original =====
+    return {
+      wallet_id: wallet.wallet_id,
+      sub_merchant_id: wallet.sub_merchant_id === 0 ? 'null' : wallet.sub_merchant_id,
+      receiver_id: wallet.beneficiary_id === 0 ? 'null' : wallet.beneficiary_id,
+      currency: wallet.currency,
+      total_balance: totalBalance,
+      pending_balance: pendingAmount,
+      balance: finalBalance
+    };
+    
+  } catch (error) {
+    console.error('Database query failed:', error);
+    throw error;
+  } finally {
+    if (qb) qb.release();
+  }
+},
   addCharges: async (data) => {
     let qb = await pool.get_connection();
     let response;
@@ -2181,6 +2370,44 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
         }else{
       return 0;
     }
+  },
+   getPendingTurnedBalance: async (condition) => {
+    if (!condition?.receiver_id) {
+      return 0;
+    }
+    let response;
+    let qb = await pool.get_connection();
+    try {
+      let query = `SELECT SUM(amount) AS pending_turned_balance FROM pg_payout_pending_transactions WHERE sub_merchant_id = ${condition.sub_merchant_id} AND receiver_id = ${condition.receiver_id} AND currency = '${condition.currency}' AND (order_status = 'COMPLETED' OR order_status='FAILED') AND status = 0`;
+      response = await qb.query(query);
+    } catch (error) {
+      console.error("Database query failed:", error);
+    } finally {
+      qb.release();
+    }
+
+    if (response.length > 0) {
+      return response[0]?.pending_turned_balance || 0;
+        }else{
+      return 0;
+    }
+  },
+  updatePendingTurnedBalance: async (condition) => {
+    if (!condition?.receiver_id) {
+      return 0;
+    }
+    let response;
+    let qb = await pool.get_connection();
+    try {
+      let query = `UPDATE pg_payout_pending_transactions SET status=1 WHERE sub_merchant_id = ${condition.sub_merchant_id} AND receiver_id = ${condition.receiver_id} AND currency = '${condition.currency}' AND (order_status = 'COMPLETED' OR order_status='FAILED') AND status = 0`;
+      response = await qb.query(query);
+    } catch (error) {
+      console.error("Database query failed:", error);
+    } finally {
+      qb.release();
+    }
+
+    return true;
   },
   get_charges_analytics: async (condition, date_condition) => {
     

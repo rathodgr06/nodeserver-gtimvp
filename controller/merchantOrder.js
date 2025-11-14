@@ -14594,19 +14594,21 @@ var MerchantOrder = {
     console.log(`the credentials are here`);
     console.log(req.credentials);
     console.log(`the user details are below`);
-    console.log(req.user);
+    console.log(req.credentials.merchant_id);
     console.log(req.body);
 
     let order_id = req.bodyString("order_id");
     let mode = "";
     let invoke_type = "";
     let sub_merchant_id = "";
-    if (req.credentials) {
+    if (req.credentials.merchant_id>0) {
       mode = req.credentials.type;
       invoke_type = "API";
       sub_merchant_id = req.credentials.merchant_id;
       order_id = req.bodyString("p_order_id");
     }
+    console.log(mode,order_id); 
+
     if (req.user) {
       if (req.user.type == "admin") {
         invoke_type = "Admin-Portal";
@@ -14618,7 +14620,7 @@ var MerchantOrder = {
         mode = req.bodyString("mode");
       }
     }
-
+  
     try {
       let table_name = mode == "test" ? "test_orders" : "orders";
       let order_details_psp = "";
@@ -14631,7 +14633,7 @@ var MerchantOrder = {
       } else {
         order_details_psp = await merchantOrderModel.selectDynamicONE(
           "psp,terminal_id,status as order_status",
-          { order_id: order_id, merchant_id: sub_merchant_id },
+          { order_id: `${order_id}`, merchant_id: sub_merchant_id },
           table_name
         );
       }

@@ -4956,7 +4956,7 @@ app.post("/get-wallet", WalletValidator.get_wallet, wallet.get_wallet);
 app.post("/load-wallet", WalletValidator.load_wallet, wallet.load_wallet);
 app.post('/add-bulk-funding-details',APIAuth,fundingDetials.add_bulk,submerchant.addBulkFundingMethod);
 app.post('/verify-bulk-funding-details',APIAuth,CheckHeader,fundingDetials.verify_bulk,submerchant.verifyBulkFundingDetails);
-app.post("/confirm-payment",CheckHeader,CheckMerchantCred,MerchantOrder.confirm_wallet_payment);
+app.post("/confirm-payment",CheckMerchantCred,MerchantOrder.confirm_wallet_payment);
 app.post("/orders/expire-details",MerchantOrder.fetchOrderDetails);
 app.post("/unload-wallet", WalletValidator.unload_wallet, wallet.unload_wallet);
 app.post("/get-wallet-statement", WalletValidator.get_wallet_statement, wallet.get_wallet_statement);

@@ -1369,6 +1369,7 @@ const charges_invoice_controller = {
   },
   addPayout: async (req, res) => {
     let submerchant_id = req.bodyString("submerchant_id");
+    let order_id = req.bodyString("order_id");
     console.log("🚀 ~ submerchant_id:", submerchant_id);
     let receiver_id = req.bodyString("receiver_id");
     try {
@@ -1380,6 +1381,13 @@ const charges_invoice_controller = {
         );
       } else if (receiver_id) {
         result = await charges_invoice_models.validate_receiver(receiver_id);
+      }
+      // check if order id exits and it is pending 
+      let orderExits = await charges_invoice_models.new_select_one({order_id:order_id,order_status:'PENDING',status:0},'payout_pending_transactions');
+      if(!orderExits){
+        return res
+          .status(statusCode.badRequest)
+          .send(response.errormsg("Invalid order id"));
       }
       if (result) {
         // lets check the order status
@@ -1412,7 +1420,7 @@ const charges_invoice_controller = {
               transaction_id: req.bodyString("transaction_id"),
               currency: req.bodyString("currecny"),
               amount: amt,
-              status: 1,
+              status: 0,
               created_at: moment().format("YYYY-MM-DD HH:mm:ss"),
               updated_at: moment().format("YYYY-MM-DD HH:mm:ss"),
             };
@@ -1422,6 +1430,22 @@ const charges_invoice_controller = {
             break;
 
           case "FAILED":
+             order_status = "PAYOUT-REVERSAL";
+            let dataCharges = {
+              sub_merchant_id: null == submerchant_id ? 0 : submerchant_id,
+              receiver_id: null == receiver_id ? 0 : receiver_id,
+              order_id: req.bodyString("order_id"),
+              order_status: "PAYOUT-REVERSAL",
+              transaction_id: req.bodyString("transaction_id"),
+              currency: req.bodyString("currecny"),
+              amount: amt,
+              net_amount: amt,
+              transaction_status: "AUTHORISED",
+              status: 0,
+              created_at: moment().format("YYYY-MM-DD HH:mm:ss"),
+              updated_at: moment().format("YYYY-MM-DD HH:mm:ss"),
+            };
+            await charges_invoice_models.addCharges(dataCharges);
             order_status = "FAILED";
             let failedData = {
               sub_merchant_id: null == submerchant_id ? 0 : submerchant_id,
@@ -1431,7 +1455,7 @@ const charges_invoice_controller = {
               transaction_id: req.bodyString("transaction_id"),
               currency: req.bodyString("currecny"),
               amount: amt,
-              status: 1,
+              status: 0,
               created_at: moment().format("YYYY-MM-DD HH:mm:ss"),
               updated_at: moment().format("YYYY-MM-DD HH:mm:ss"),
             };
