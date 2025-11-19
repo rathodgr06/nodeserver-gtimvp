@@ -630,6 +630,7 @@ async function getMidData(data) {
   return response?.[0];
 }
 
+
 module.exports = {
   getMerchantSellRate,
   storeTransaction,

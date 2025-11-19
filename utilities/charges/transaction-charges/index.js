@@ -8,6 +8,7 @@ const winston = require('../../logmanager/winston');
 const walletDBModel = require("../../../models/wallet");
 const charges_invoice_controller = require("../../../controller/charges_invoice_controller");
 
+
 dotenv.config({ path: "../.env" });
 
 const constantOrderStatus = {
@@ -56,8 +57,26 @@ module.exports = async (order_details) => {
 
         switch(order_details.order_status){
             case 'CAPTURED':
-                const { sellRate } = await calculateRates(order_details, is_domestic_international);
-                await storeTransactionData(order_details, sellRate, is_domestic_international);
+                let checkOrderAlreadyExits = await merchantOrderModel.checkOrderExits({
+                  order_id: order_details.order_id,
+                  order_status: "CAPTURED",
+                });
+                console.log(`this is the result`);
+                console.log(checkOrderAlreadyExits);
+                if (!checkOrderAlreadyExits) {
+                  const { sellRate } = await calculateRates(
+                    order_details,
+                    is_domestic_international
+                  );
+
+                  await storeTransactionData(
+                    order_details,
+                    sellRate,
+                    is_domestic_international
+                  );
+                } else {
+                  return true;
+                }
             break;
             case 'REFUNDED':
                 await storeRefundData(order_details,is_domestic_international);

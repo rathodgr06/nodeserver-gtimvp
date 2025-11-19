@@ -645,8 +645,9 @@ var dbModel = {
     let qb = await pool.get_connection();
     let response;
     try{
-      response = await qb.query(`INSERT INTO pg_merchant_payment_methods(sub_merchant_id, methods, others, sequence, is_visible, mode, created_at) SELECT  ${new_sub_merchant_id},methods,others,sequence,is_visible,mode,now() from pg_merchant_payment_methods WHERE sub_merchant_id=${primary_submerchant_id};`)
-      
+      response = await qb.query(`INSERT INTO pg_merchant_payment_methods(sub_merchant_id, methods, others, sequence, is_visible, mode, created_at) SELECT  ${new_sub_merchant_id},methods,others,sequence,is_visible,mode,now() from pg_merchant_payment_methods WHERE sub_merchant_id=${primary_submerchant_id};`);
+      // logging 
+      console.log(`INSERT INTO pg_merchant_payment_methods(sub_merchant_id, methods, others, sequence, is_visible, mode, created_at) SELECT  ${new_sub_merchant_id},methods,others,sequence,is_visible,mode,now() from pg_merchant_payment_methods WHERE sub_merchant_id=${primary_submerchant_id};`);
     }catch(error){
       console.error("Database query failed:", error);
     }finally{
@@ -658,8 +659,9 @@ var dbModel = {
     let qb = await pool.get_connection();
     let response;
     try{
-      response = await qb.query(`INSERT INTO pg_merchant_draft_payment_methods(submerchant_id, methods, others, sequence, is_visible, mode, created_at) SELECT  ${new_sub_merchant_id},methods,others,sequence,is_visible,mode,now() from pg_merchant_draft_payment_methods WHERE submerchant_id=${primary_submerchant_id};`)
-      
+      response = await qb.query(`INSERT INTO pg_merchant_draft_payment_methods(submerchant_id, methods, others, sequence, is_visible, mode, created_at) SELECT  ${new_sub_merchant_id},methods,others,sequence,is_visible,mode,now() from pg_merchant_draft_payment_methods WHERE submerchant_id=${primary_submerchant_id};`);
+      // logging
+       console.log(`INSERT INTO pg_merchant_draft_payment_methods(submerchant_id, methods, others, sequence, is_visible, mode, created_at) SELECT  ${new_sub_merchant_id},methods,others,sequence,is_visible,mode,now() from pg_merchant_draft_payment_methods WHERE submerchant_id=${primary_submerchant_id};`);
     }catch(error){
       console.error("Database query failed:", error);
     }finally{

@@ -65,8 +65,8 @@ var walletDBModel = {
 
       page = parseInt(page);
       limit = parseInt(limit);
-
-      let offset = (page - 1) * limit;
+      page=page-1;
+      let offset = page * limit;
 
       // 1. Get total count
       const countResult = await qb
@@ -86,7 +86,7 @@ var walletDBModel = {
 
       const query = ` SELECT * FROM pg_wallet WHERE ${whereClause} ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}; `;
       data = await qb.query(query);
-
+      console.log(query);
       response = {
       status: 200,
       message: "Data fetched successfully",

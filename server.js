@@ -6,6 +6,7 @@ const moment = require('moment');
 const momentTZ = require('moment-timezone');
 const OrderModal = require('./models/merchantOrder');
 const merchantOrderController = require('./controller/merchantOrder');
+const logger = require('./config/logger');
 
 
 const port = process.env.PORT || 4008;
@@ -97,4 +98,39 @@ app.post('/api/v1/mobile-payment/update-status', (req, res) => {
 //debug the issue
 server.listen(port, process.env.SERVER_ADDR);
 console.log(process.env.SERVER_ADDR + ':' + port);
+// added rejections logs
+process.on('unhandledRejection', (reason, promise) => {
+    logger.error('Unhandled Rejection at:', {
+        promise: promise,
+        reason: reason,
+        stack: reason?.stack
+    });
+    
+    // Optionally exit the process
+    // server.close(() => {
+    //     process.exit(1);
+    // });
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+    logger.error('Uncaught Exception:', {
+        message: error.message,
+        stack: error.stack,
+        error: error
+    });
+    
+    // Exit the process as the app is in an undefined state
+    server.close(() => {
+        process.exit(1);
+    });
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+    logger.info('SIGTERM signal received: closing HTTP server');
+    server.close(() => {
+        logger.info('HTTP server closed');
+    });
+});
 

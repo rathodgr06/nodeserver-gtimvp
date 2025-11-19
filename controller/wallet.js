@@ -114,13 +114,14 @@ var wallet = {
           .send(response.errormsg(error.message));
       });
   },
-  list: async (req, res) => {
+  // renamed this function to check the performance of the DB
+  list_old: async (req, res) => {
     console.log("🚀 ~ req:", req.body);
     let receiver_id = req.bodyString("receiver_id");
     let sub_merchant_id = req.bodyString("sub_merchant_id");
     let currency = req.bodyString("currency");
     let page = req.bodyString("page");
-    let per_page = req.bodyString("per_page");
+    let per_page = 50;
     try {
       let condition = {
         deleted: 0,
@@ -156,12 +157,16 @@ var wallet = {
               .send(response.successmsg(result?.message));
           } else {
             let updatedWallets;
+            console.log(`calling from wallet list API`)
             try {
               updatedWallets = await Promise.all(
                 result?.data?.map(async (wallet) => {
 
                   const condition = {
                     wallet_id: wallet?.wallet_id,
+                    sub_merchant_id:0,
+                    receiver_id:0,
+                    currency:null
                   };
                   let balance_result = await charges_invoice_models.fetchWalletBalance(condition);
 
@@ -183,7 +188,7 @@ var wallet = {
             } catch (err) {
               console.error("Failed to edit wallets:", err);
             }
-
+            console.log(updatedWallets.length);
             let final_response = {
               wallets: updatedWallets,
               total_count: result?.totalCount,
@@ -209,6 +214,269 @@ var wallet = {
         .send(response.errormsg(error.message));
     }
   },
+  // new function with the batch size and other issue fixation
+  listWithBatch: async (req, res) => {
+    console.log("🚀 ~ req:", req.body);
+    let receiver_id = req.bodyString("receiver_id");
+    let sub_merchant_id = req.bodyString("sub_merchant_id");
+    let currency = req.bodyString("currency");
+    let page = req.bodyString("page");
+    let per_page = 50;
+    
+    try {
+      let condition = {
+        deleted: 0,
+      };
+      let limit = {
+        page: 1,
+        per_page: 20,
+      };
+      
+      // filters and pagination
+      if (sub_merchant_id) {
+        // this needs to also ask to Harshal why we are checking the length of submerchant id
+        if (sub_merchant_id.length > 10) {
+          sub_merchant_id =  encrypt_decrypt('decrypt', sub_merchant_id);
+        }
+        condition.sub_merchant_id = sub_merchant_id;
+      }
+      if (receiver_id) {
+        condition.beneficiary_id = parseInt(receiver_id);
+      }
+      if (currency) {
+        condition.currency = currency;
+      }
+      if (page) {
+        limit.page = page;
+      }
+      if (per_page) {
+        limit.per_page = per_page;
+      }
+      
+      const result = await WalletModel.list(condition, page, per_page);
+      
+      if (result?.status == 400) {
+        return res
+          .status(statusCode.badRequest)
+          .send(response.successmsg(result?.message));
+      }
+      
+      // Process wallets in batches to avoid connection pool exhaustion
+      const BATCH_SIZE = 5; // Adjust based on your pool size
+      let updatedWallets = [];
+      
+      console.log(`calling from wallet list API`);
+      
+      for (let i = 0; i < result?.data?.length; i += BATCH_SIZE) {
+        const batch = result.data.slice(i, i + BATCH_SIZE);
+        
+        const batchResults = await Promise.allSettled(
+          batch.map(async (wallet) => {
+            try {
+              const condition = {
+                wallet_id: wallet?.wallet_id,
+                sub_merchant_id: wallet?.sub_merchant_id || null,
+                receiver_id: wallet?.beneficiary_id || null,
+                currency: wallet?.currency
+              };
+              
+              let balance_result = await charges_invoice_models.fetchWalletBalance(condition);
+              
+              wallet.sub_merchant_id = wallet?.sub_merchant_id == '0' ? null : wallet?.sub_merchant_id;
+              
+              return {
+                wallet_id: balance_result?.wallet_id || wallet?.wallet_id,
+                receiver_id: wallet?.beneficiary_id,
+                ...wallet,
+                total_balance: balance_result?.total_balance || 0,
+                available_balance: balance_result?.balance || 0,
+                pending_balance: balance_result?.pending_balance || 0,
+              };
+            } catch (err) {
+              console.error(`Failed to fetch balance for wallet ${wallet?.wallet_id}:`, err);
+              // Return wallet with default balances on error
+              return {
+                wallet_id: wallet?.wallet_id,
+                receiver_id: wallet?.beneficiary_id,
+                ...wallet,
+                total_balance: 0,
+                available_balance: 0,
+                pending_balance: 0,
+                error: true
+              };
+            }
+          })
+        );
+        
+        // Extract fulfilled values
+        batchResults.forEach(result => {
+          if (result.status === 'fulfilled') {
+            const payload = { ...result.value };
+            delete payload.id;
+            delete payload.beneficiary_id;
+            updatedWallets.push(payload);
+          }
+        });
+      }
+      
+      console.log(updatedWallets.length);
+      
+      let final_response = {
+        wallets: updatedWallets,
+        total_count: result?.totalCount,
+        page: result?.page,
+        per_page: result?.limit,
+      };
+
+      res
+        .status(statusCode.ok)
+        .send(response.successdatamsg(final_response, "Wallet list"));
+        
+    } catch (error) {
+      console.error(error);
+      res
+        .status(statusCode.internalError)
+        .send(response.errormsg(error.message));
+    }
+  },
+  // new function with single query instead of 50 queries
+  list: async (req, res) => {
+  console.log("🚀 ~ req:", req.body);
+  let receiver_id = req.bodyString("receiver_id");
+  let sub_merchant_id = req.bodyString("sub_merchant_id");
+  let currency = req.bodyString("currency");
+  let page = req.bodyString("page");
+  let per_page = 50;
+  
+  try {
+    let condition = {
+      deleted: 0,
+    };
+    let limit = {
+      page: 1, // Default Values
+      per_page: 20, // Default Values
+    };
+    
+    // filters and pagination
+    if (sub_merchant_id) {
+      if (sub_merchant_id.length > 10) {
+        sub_merchant_id = await encrypt_decrypt('decrypt', sub_merchant_id);
+      }
+      condition.sub_merchant_id = sub_merchant_id;
+    }
+    if (receiver_id) {
+      condition.beneficiary_id = parseInt(receiver_id);
+    }
+    if (currency) {
+      condition.currency = currency;
+    }
+    if (page) {
+      limit.page = page;
+    }
+    if (per_page) {
+      limit.per_page = per_page;
+    }
+    
+    const result = await WalletModel.list(condition, page, per_page);
+    
+    if (result?.status == 400) {
+      return res
+        .status(statusCode.badRequest)
+        .send(response.successmsg(result?.message));
+    }
+    
+    console.log(`calling from wallet list API`);
+    
+    let updatedWallets = [];
+    
+    try {
+      // Extract all wallet IDs
+      const walletIds = result?.data?.map(wallet => wallet?.wallet_id).filter(Boolean);
+      
+      if (walletIds.length === 0) {
+        return res
+          .status(statusCode.ok)
+          .send(response.successdatamsg({
+            wallets: [],
+            total_count: result?.totalCount,
+            page: result?.page,
+            per_page: result?.limit,
+          }, "Wallet list"));
+      }
+      
+      // Fetch all balances in a single query
+      const balances = await charges_invoice_models.fetchWalletBalances(walletIds);
+      
+      // Create a map for quick lookup
+      const balanceMap = new Map(
+        balances.map(balance => [balance.wallet_id, balance])
+      );
+      
+      // Merge wallet data with balance data
+      updatedWallets = result?.data?.map(wallet => {
+        const balance_result = balanceMap.get(wallet?.wallet_id);
+        
+        wallet.sub_merchant_id = wallet?.sub_merchant_id == '0' ? null : wallet?.sub_merchant_id;
+        
+        return {
+          wallet_id: balance_result?.wallet_id || wallet?.wallet_id,
+          receiver_id: wallet?.beneficiary_id,
+          sub_merchant_id: wallet?.sub_merchant_id,
+          currency: wallet?.currency,
+          total_balance: balance_result?.total_balance || 0,
+          available_balance: balance_result?.balance || 0,
+          pending_balance: balance_result?.pending_balance || 0,
+          active:wallet?.active,
+          deleted:wallet?.deleted,  
+          created_at: wallet?.created_at,
+          updated_at: wallet?.updated_at,
+          // Add any other wallet fields you need
+        };
+      });
+      
+    } catch (err) {
+      console.error("Failed to fetch wallet balances:", err);
+      
+      // Fallback: return wallets with zero balances
+      updatedWallets = result?.data?.map(wallet => {
+        wallet.sub_merchant_id = wallet?.sub_merchant_id == '0' ? null : wallet?.sub_merchant_id;
+        
+        return {
+          wallet_id: wallet?.wallet_id,
+          receiver_id: wallet?.beneficiary_id,
+          sub_merchant_id: wallet?.sub_merchant_id,
+          currency: wallet?.currency,
+          total_balance: 0,
+          available_balance: 0,
+          pending_balance: 0,
+          created_at: wallet?.created_at,
+          updated_at: wallet?.updated_at,
+          error: true,
+          error_message: "Failed to fetch balance"
+        };
+      });
+    }
+    
+    console.log(`Processed ${updatedWallets.length} wallets`);
+    
+    let final_response = {
+      wallets: updatedWallets,
+      total_count: result?.totalCount,
+      page: result?.page,
+      per_page: result?.limit,
+    };
+
+    res
+      .status(statusCode.ok)
+      .send(response.successdatamsg(final_response, "Wallet list"));
+      
+  } catch (error) {
+    console.error("Error in wallet list:", error);
+    res
+      .status(statusCode.internalError)
+      .send(response.errormsg(error.message));
+  }
+},
   manage: async (req, res) => {
     try {
       let action = req.bodyString("action");

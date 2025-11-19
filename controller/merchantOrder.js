@@ -14591,17 +14591,13 @@ var MerchantOrder = {
     return res.status(200).send(response);
   },
   confirm_wallet_payment: async (req, res) => {
-    console.log(`the credentials are here`);
-    console.log(req.credentials);
-    console.log(`the user details are below`);
-    console.log(req.credentials.merchant_id);
-    console.log(req.body);
+    
 
     let order_id = req.bodyString("order_id");
     let mode = "";
     let invoke_type = "";
     let sub_merchant_id = "";
-    if (req.credentials.merchant_id>0) {
+    if (req?.credentials?.merchant_id>0) {
       mode = req.credentials.type;
       invoke_type = "API";
       sub_merchant_id = req.credentials.merchant_id;
@@ -14637,7 +14633,6 @@ var MerchantOrder = {
           table_name
         );
       }
-      console.log(`calling from Admin Portal`);
       let psp = order_details_psp?.psp;
       console.log(`order_details_psp is ${JSON.stringify(order_details_psp)}`);
       console.log(`psp is ${psp}`);

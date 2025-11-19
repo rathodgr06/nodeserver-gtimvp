@@ -1380,193 +1380,317 @@ LEFT JOIN pending_payouts pp ON (
     }
     return response.length > 0 ? response?.[0] : false;
   },
-  fetchWalletBalance: async (condition) => {
+ fetchWalletBalance: async (condition) => {
   let qb;
   try {
     qb = await pool.get_connection();
     
-    // ===== Query 1: Get Wallet Information =====
-    const walletConditions = [];
+    // Helper function to safely escape values
+    const escapeValue = (value) => {
+      if (value === null || value === undefined) {
+        return 'NULL';
+      }
+      if (typeof value === 'number') {
+        return value;
+      }
+      // Escape string values
+      return qb.escape(value);
+    };
+    
+    // Build WHERE conditions
+    const conditionsArr = [];
     
     if (condition.sub_merchant_id && condition.currency) {
-      const subMerchantId = typeof condition.sub_merchant_id === 'number' 
-        ? condition.sub_merchant_id 
-        : `'${condition.sub_merchant_id.replace(/'/g, "''")}'`;
-      const currency = `'${condition.currency.replace(/'/g, "''")}'`;
-      walletConditions.push(`w.sub_merchant_id = ${subMerchantId} AND w.currency = ${currency}`);
+      conditionsArr.push(
+        `naf.sub_merchant_id = ${escapeValue(condition.sub_merchant_id)} AND naf.currency = ${escapeValue(condition.currency)}`
+      );
     }
     
     if (condition.wallet_id) {
-      const walletId = typeof condition.wallet_id === 'number' 
-        ? condition.wallet_id 
-        : `'${condition.wallet_id.replace(/'/g, "''")}'`;
-      walletConditions.push(`w.wallet_id = ${walletId}`);
+      conditionsArr.push(`naf.wallet_id = ${escapeValue(condition.wallet_id)}`);
     }
     
-    if (condition.receiver_id && condition.currency) {
-      const receiverId = typeof condition.receiver_id === 'number' 
-        ? condition.receiver_id 
-        : `'${condition.receiver_id.replace(/'/g, "''")}'`;
-      const currency = `'${condition.currency.replace(/'/g, "''")}'`;
-      walletConditions.push(`w.beneficiary_id = ${receiverId} AND w.currency = ${currency}`);
+    if (condition.receiver_id && condition.currency && !condition.sub_merchant_id) {
+      conditionsArr.push(
+        `naf.beneficiary_id = ${escapeValue(condition.receiver_id)} AND naf.currency = ${escapeValue(condition.currency)}`
+      );
     }
     
-    const walletWhereClause = walletConditions.length > 0 
-      ? `WHERE ${walletConditions.join(' OR ')}` 
-      : '';
+    // Require at least one condition
+    if (conditionsArr.length === 0) {
+      throw new Error('At least one condition (sub_merchant_id, wallet_id, or receiver_id) is required');
+    }
     
-    const walletQuery = `
+    const whereClause = `WHERE ${conditionsArr.join(' OR ')}`;
+    
+    // Build complete query
+    const query = `
+      WITH latest_snap AS (
+        SELECT
+          w.id, w.wallet_id, w.sub_merchant_id, w.currency, w.beneficiary_id,
+          s.balance, s.snap_date, s.total_balance, s.pending_balance
+        FROM pg_wallet w
+        LEFT JOIN (
+          SELECT
+            s1.wallet_id, s1.balance, s1.snap_date, s1.total_balance, s1.pending_balance
+          FROM pg_wallet_snap s1
+          INNER JOIN (
+            SELECT wallet_id, MAX(snap_date) AS snap_date
+            FROM pg_wallet_snap
+            GROUP BY wallet_id
+          ) s2 ON s1.wallet_id = s2.wallet_id AND s1.snap_date = s2.snap_date
+        ) s ON w.wallet_id = s.wallet_id
+      ),
+      transaction_charges_after_snap AS (
+        SELECT
+          ls.id, 
+          ls.wallet_id, 
+          ls.sub_merchant_id, 
+          ls.currency,
+          ls.balance AS snap_balance, 
+          ls.total_balance AS snap_total_balance,
+          ls.pending_balance AS snap_pending_balance,
+          ls.snap_date, 
+          ls.beneficiary_id,
+          COALESCE(SUM(
+            CASE
+              WHEN ls.snap_date IS NOT NULL AND tc.created_at > TIMESTAMP(ls.snap_date, '23:59:59') 
+                THEN tc.net_amount
+              WHEN ls.snap_date IS NULL 
+                THEN tc.net_amount
+              ELSE 0
+            END
+          ), 0) AS transaction_charges_after_snap
+        FROM latest_snap ls
+        LEFT JOIN pg_transaction_charges tc ON (
+          tc.currency = ls.currency
+          AND (
+            (ls.sub_merchant_id IS NOT NULL AND ls.sub_merchant_id != 0 
+              AND tc.sub_merchant_id = ls.sub_merchant_id)
+            OR 
+            ((ls.sub_merchant_id IS NULL OR ls.sub_merchant_id = 0) 
+              AND ls.beneficiary_id IS NOT NULL AND ls.beneficiary_id != 0 
+              AND tc.receiver_id = ls.beneficiary_id)
+          )
+        )
+        GROUP BY
+          ls.id, ls.wallet_id, ls.sub_merchant_id, ls.currency,
+          ls.balance, ls.total_balance, ls.pending_balance, ls.snap_date, ls.beneficiary_id
+      ),
+      pending_payouts_after_snap AS (
+        SELECT
+          naf.id,
+          COALESCE(SUM(
+            CASE
+              WHEN naf.snap_date IS NOT NULL AND pp.created_at > TIMESTAMP(naf.snap_date, '23:59:59')
+                THEN pp.amount
+              WHEN naf.snap_date IS NULL
+                THEN pp.amount
+              ELSE 0
+            END
+          ), 0) AS pending_payouts_after_snap
+        FROM transaction_charges_after_snap naf
+        LEFT JOIN pg_payout_pending_transactions pp ON (
+          pp.status = 0 
+          AND pp.order_status = 'PENDING'
+          AND pp.currency = naf.currency
+          AND (
+            (naf.sub_merchant_id IS NOT NULL AND naf.sub_merchant_id != 0 
+              AND pp.sub_merchant_id = naf.sub_merchant_id)
+            OR 
+            ((naf.sub_merchant_id IS NULL OR naf.sub_merchant_id = 0) 
+              AND naf.beneficiary_id IS NOT NULL AND naf.beneficiary_id != 0 
+              AND pp.receiver_id = naf.beneficiary_id)
+          )
+          AND NOT EXISTS (
+            SELECT 1 
+            FROM pg_transaction_charges tx
+            WHERE tx.order_id = pp.order_id
+              AND tx.currency = pp.currency
+              AND (
+                (pp.sub_merchant_id != 0 AND tx.sub_merchant_id = pp.sub_merchant_id)
+                OR
+                (pp.sub_merchant_id = 0 AND pp.receiver_id != 0 AND tx.receiver_id = pp.receiver_id)
+              )
+          )
+        )
+        GROUP BY naf.id
+      )
       SELECT
-        w.id, 
-        w.wallet_id, 
-        w.sub_merchant_id, 
-        w.currency, 
-        w.beneficiary_id
-      FROM pg_wallet w
-      ${walletWhereClause}
-      LIMIT 1;
+        naf.wallet_id, 
+        CASE WHEN naf.sub_merchant_id = 0 THEN NULL ELSE naf.sub_merchant_id END as sub_merchant_id,
+        CASE WHEN naf.beneficiary_id = 0 THEN NULL ELSE naf.beneficiary_id END as receiver_id, 
+        naf.currency,
+        COALESCE(naf.snap_total_balance, 0) + naf.transaction_charges_after_snap AS total_balance,
+        COALESCE(naf.snap_pending_balance, 0) + COALESCE(pp.pending_payouts_after_snap, 0) AS pending_balance,
+        (COALESCE(naf.snap_total_balance, 0) + naf.transaction_charges_after_snap) 
+          - (COALESCE(naf.snap_pending_balance, 0) + COALESCE(pp.pending_payouts_after_snap, 0)) AS balance
+      FROM transaction_charges_after_snap naf
+      LEFT JOIN pending_payouts_after_snap pp ON naf.id = pp.id
+      ${whereClause}
+      ORDER BY naf.id 
+      LIMIT 1
     `.trim();
+    console.log('Executing wallet balance query with conditions:', condition);
+    const response = await qb.query(query);
     
-    console.log('Query 1 - Wallet Info:', walletQuery);
-    const walletResult = await qb.query(walletQuery);
-    
-    if (!walletResult || walletResult.length === 0) {
+    if (response.length === 0) {
+      console.log('No wallet found for conditions:', condition);
       return null;
     }
     
-    const wallet = walletResult[0];
-    
-    // ===== Query 2: Get Latest Snapshot Balance =====
-    const snapshotQuery = `
-      SELECT
-        s.wallet_id, 
-        s.balance, 
-        s.snap_date
-      FROM pg_wallet_snap s
-      WHERE s.wallet_id = ${wallet.wallet_id}
-        AND s.snap_date = (
-          SELECT MAX(snap_date) 
-          FROM pg_wallet_snap 
-          WHERE wallet_id = ${wallet.wallet_id}
-        )
-      LIMIT 1;
-    `.trim();
-    
-    console.log('Query 2 - Snapshot:', snapshotQuery);
-    const snapshotResult = await qb.query(snapshotQuery);
-    
-    const snapshot = snapshotResult.length > 0 ? snapshotResult[0] : null;
-    const snapshotBalance = snapshot ? (snapshot.balance || 0) : 0;
-    const snapDate = snapshot ? snapshot.snap_date : null;
-    
-    // ===== Query 3: Get Transaction Charges After Snapshot =====
-    let transactionQuery;
-    
-    if (wallet.sub_merchant_id && wallet.sub_merchant_id !== 0) {
-      // Use sub_merchant_id
-      const dateCondition = snapDate 
-        ? `AND tc.created_at > TIMESTAMP('${snapDate}', '23:59:59')` 
-        : '';
-      
-      transactionQuery = `
-        SELECT 
-          COALESCE(SUM(tc.net_amount), 0) AS net_amount_after_snapshot
-        FROM pg_transaction_charges tc
-        WHERE tc.sub_merchant_id = ${wallet.sub_merchant_id}
-          AND tc.currency = '${wallet.currency.replace(/'/g, "''")}'
-          ${dateCondition};
-      `.trim();
-    } else if (wallet.beneficiary_id && wallet.beneficiary_id !== 0) {
-      // Use beneficiary_id
-      const dateCondition = snapDate 
-        ? `AND tc.created_at > TIMESTAMP('${snapDate}', '23:59:59')` 
-        : '';
-      
-      transactionQuery = `
-        SELECT 
-          COALESCE(SUM(tc.net_amount), 0) AS net_amount_after_snapshot
-        FROM pg_transaction_charges tc
-        WHERE tc.receiver_id = ${wallet.beneficiary_id}
-          AND tc.currency = '${wallet.currency.replace(/'/g, "''")}'
-          ${dateCondition};
-      `.trim();
-    } else {
-      // No valid identifier
-      transactionQuery = `SELECT 0 AS net_amount_after_snapshot;`;
-    }
-    
-    console.log('Query 3 - Transactions:', transactionQuery);
-    const transactionResult = await qb.query(transactionQuery);
-    const netAmountAfterSnapshot = transactionResult[0]?.net_amount_after_snapshot || 0;
-    
-    // ===== Query 4: Get Pending Payouts =====
-    let payoutQuery;
-    
-    if (wallet.sub_merchant_id && wallet.sub_merchant_id !== 0) {
-      // Use sub_merchant_id
-      payoutQuery = `
-        SELECT 
-          COALESCE(SUM(pp.amount), 0) AS pending_amount
-        FROM pg_payout_pending_transactions pp
-        WHERE pp.sub_merchant_id = ${wallet.sub_merchant_id}
-          AND pp.currency = '${wallet.currency.replace(/'/g, "''")}'
-          AND pp.status = 0 
-          AND pp.order_status = 'PENDING'
-          AND NOT EXISTS (
-            SELECT 1 
-            FROM pg_transaction_charges tc
-            WHERE tc.order_id = pp.order_id
-              AND tc.currency = pp.currency
-              AND tc.sub_merchant_id = pp.sub_merchant_id
-          );
-      `.trim();
-    } else if (wallet.beneficiary_id && wallet.beneficiary_id !== 0) {
-      // Use beneficiary_id
-      payoutQuery = `
-        SELECT 
-          COALESCE(SUM(pp.amount), 0) AS pending_amount
-        FROM pg_payout_pending_transactions pp
-        WHERE pp.receiver_id = ${wallet.beneficiary_id}
-          AND pp.currency = '${wallet.currency.replace(/'/g, "''")}'
-          AND pp.status = 0 
-          AND pp.order_status = 'PENDING'
-          AND NOT EXISTS (
-            SELECT 1 
-            FROM pg_transaction_charges tc
-            WHERE tc.order_id = pp.order_id
-              AND tc.currency = pp.currency
-              AND tc.receiver_id = pp.receiver_id
-          );
-      `.trim();
-    } else {
-      // No valid identifier
-      payoutQuery = `SELECT 0 AS pending_amount;`;
-    }
-    
-    console.log('Query 4 - Pending Payouts:', payoutQuery);
-    const payoutResult = await qb.query(payoutQuery);
-    const pendingAmount = payoutResult[0]?.pending_amount || 0;
-    
-    // ===== Manual Calculation =====
-    const totalBalance = snapshotBalance + netAmountAfterSnapshot;
-    const finalBalance = totalBalance - pendingAmount;
-    
-    // ===== Return Result in Same Format as Original =====
-    return {
-      wallet_id: wallet.wallet_id,
-      sub_merchant_id: wallet.sub_merchant_id === 0 ? 'null' : wallet.sub_merchant_id,
-      receiver_id: wallet.beneficiary_id === 0 ? 'null' : wallet.beneficiary_id,
-      currency: wallet.currency,
-      total_balance: totalBalance,
-      pending_balance: pendingAmount,
-      balance: finalBalance
-    };
+    return response?.[0];
     
   } catch (error) {
-    console.error('Database query failed:', error);
-    throw error;
+    console.error('Failed to fetch wallet balance:', {
+      error: error.message,
+      condition,
+      stack: error.stack
+    });
+    throw new Error(`Wallet balance fetch failed: ${error.message}`);
   } finally {
-    if (qb) qb.release();
+      qb.release();
+  }
+},
+fetchWalletBalances: async (walletIds) => {
+  let qb;
+  try {
+    qb = await pool.get_connection();
+    
+    // Validate input
+    if (!walletIds || walletIds.length === 0) {
+      console.log('No wallet IDs provided');
+      return [];
+    }
+    
+    // Escape wallet IDs for safe SQL
+    const escapedIds = walletIds.map(id => qb.escape(id)).join(',');
+    
+    // Build complete query
+    const query = `
+      WITH latest_snap AS (
+        SELECT
+          w.id, w.wallet_id, w.sub_merchant_id, w.currency, w.beneficiary_id,
+          s.balance, s.snap_date, s.total_balance, s.pending_balance
+        FROM pg_wallet w
+        LEFT JOIN (
+          SELECT
+            s1.wallet_id, s1.balance, s1.snap_date, s1.total_balance, s1.pending_balance
+          FROM pg_wallet_snap s1
+          INNER JOIN (
+            SELECT wallet_id, MAX(snap_date) AS snap_date
+            FROM pg_wallet_snap
+            GROUP BY wallet_id
+          ) s2 ON s1.wallet_id = s2.wallet_id AND s1.snap_date = s2.snap_date
+        ) s ON w.wallet_id = s.wallet_id
+        WHERE w.wallet_id IN (${escapedIds})
+      ),
+      transaction_charges_after_snap AS (
+        SELECT
+          ls.id, 
+          ls.wallet_id, 
+          ls.sub_merchant_id, 
+          ls.currency,
+          ls.balance AS snap_balance, 
+          ls.total_balance AS snap_total_balance,
+          ls.pending_balance AS snap_pending_balance,
+          ls.snap_date, 
+          ls.beneficiary_id,
+          COALESCE(SUM(
+            CASE
+              WHEN ls.snap_date IS NOT NULL AND tc.created_at > TIMESTAMP(ls.snap_date, '23:59:59') 
+                THEN tc.net_amount
+              WHEN ls.snap_date IS NULL 
+                THEN tc.net_amount
+              ELSE 0
+            END
+          ), 0) AS transaction_charges_after_snap
+        FROM latest_snap ls
+        LEFT JOIN pg_transaction_charges tc ON (
+          tc.currency = ls.currency
+          AND (
+            (ls.sub_merchant_id IS NOT NULL AND ls.sub_merchant_id != 0 
+              AND tc.sub_merchant_id = ls.sub_merchant_id)
+            OR 
+            ((ls.sub_merchant_id IS NULL OR ls.sub_merchant_id = 0) 
+              AND ls.beneficiary_id IS NOT NULL AND ls.beneficiary_id != 0 
+              AND tc.receiver_id = ls.beneficiary_id)
+          )
+        )
+        GROUP BY
+          ls.id, ls.wallet_id, ls.sub_merchant_id, ls.currency,
+          ls.balance, ls.total_balance, ls.pending_balance, ls.snap_date, ls.beneficiary_id
+      ),
+      pending_payouts_after_snap AS (
+        SELECT
+          naf.id,
+          COALESCE(SUM(
+            CASE
+              WHEN naf.snap_date IS NOT NULL AND pp.created_at > TIMESTAMP(naf.snap_date, '23:59:59')
+                THEN pp.amount
+              WHEN naf.snap_date IS NULL
+                THEN pp.amount
+              ELSE 0
+            END
+          ), 0) AS pending_payouts_after_snap
+        FROM transaction_charges_after_snap naf
+        LEFT JOIN pg_payout_pending_transactions pp ON (
+          pp.status = 0 
+          AND pp.order_status = 'PENDING'
+          AND pp.currency = naf.currency
+          AND (
+            (naf.sub_merchant_id IS NOT NULL AND naf.sub_merchant_id != 0 
+              AND pp.sub_merchant_id = naf.sub_merchant_id)
+            OR 
+            ((naf.sub_merchant_id IS NULL OR naf.sub_merchant_id = 0) 
+              AND naf.beneficiary_id IS NOT NULL AND naf.beneficiary_id != 0 
+              AND pp.receiver_id = naf.beneficiary_id)
+          )
+          AND NOT EXISTS (
+            SELECT 1 
+            FROM pg_transaction_charges tx
+            WHERE tx.order_id = pp.order_id
+              AND tx.currency = pp.currency
+              AND (
+                (pp.sub_merchant_id != 0 AND tx.sub_merchant_id = pp.sub_merchant_id)
+                OR
+                (pp.sub_merchant_id = 0 AND pp.receiver_id != 0 AND tx.receiver_id = pp.receiver_id)
+              )
+          )
+        )
+        GROUP BY naf.id
+      )
+      SELECT
+        naf.wallet_id, 
+        CASE WHEN naf.sub_merchant_id = 0 THEN NULL ELSE naf.sub_merchant_id END as sub_merchant_id,
+        CASE WHEN naf.beneficiary_id = 0 THEN NULL ELSE naf.beneficiary_id END as receiver_id, 
+        naf.currency,
+        COALESCE(naf.snap_total_balance, 0) + naf.transaction_charges_after_snap AS total_balance,
+        COALESCE(naf.snap_pending_balance, 0) + COALESCE(pp.pending_payouts_after_snap, 0) AS pending_balance,
+        (COALESCE(naf.snap_total_balance, 0) + naf.transaction_charges_after_snap) 
+          - (COALESCE(naf.snap_pending_balance, 0) + COALESCE(pp.pending_payouts_after_snap, 0)) AS balance
+      FROM transaction_charges_after_snap naf
+      LEFT JOIN pending_payouts_after_snap pp ON naf.id = pp.id
+      ORDER BY naf.wallet_id
+    `.trim();
+    
+    console.log(`Executing wallet balance query for ${walletIds.length} wallets`);
+    const response = await qb.query(query);
+    
+    console.log(`Fetched balances for ${response.length} wallets`);
+    return response;
+    
+  } catch (error) {
+    console.error('Failed to fetch wallet balances:', {
+      error: error.message,
+      walletCount: walletIds?.length,
+      stack: error.stack
+    });
+    throw new Error(`Wallet balance fetch failed: ${error.message}`);
+  } finally {
+    if (qb) {
+      qb.release();
+    }
   }
 },
   addCharges: async (data) => {

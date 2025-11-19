@@ -1,3 +1,4 @@
+require('express-async-errors'); 
 var cors = require('cors');
 var isMultipart = /^multipart\//i;
 const express = require('express');
@@ -5,6 +6,9 @@ const app = express();
 const morgan = require("morgan");
 const winston = require("./utilities/logmanager/winston");
 const { prettyString } = require("./utilities/logmanager/utils");
+const httpStatus = require('http-status');
+const { errorConverter, errorHandler } = require('./middlewares/error');
+const ApiError = require('./helper/ApiError');
 
 app.use(morgan("short", { stream: winston.stream }));
 var useragent = require('express-useragent');
@@ -43,7 +47,66 @@ app.use((req, res, next) => {
 res.setHeader('X-Content-Type-Options', 'nosniff');
   next();
 });
+// logger before route
+// Add response logging middleware HERE (before routes)
+app.use((req, res, next) => {
+    const originalSend = res.send;
+    const originalJson = res.json;
 
+    // Override res.send
+    res.send = function (data) {
+        // Log before sending
+        logResponse(req, res, data);
+        originalSend.call(this, data);
+    };
+
+    // Override res.json
+    res.json = function (data) {
+        // Log before sending
+        logResponse(req, res, data);
+        originalJson.call(this, data);
+    };
+
+    function logResponse(req, res, body) {
+        const statusCode = res.statusCode;
+        
+        // Parse body if it's a string
+        let parsedBody = body;
+        if (typeof body === 'string') {
+            try {
+                parsedBody = JSON.parse(body);
+            } catch (e) {
+                parsedBody = body;
+            }
+        }
+
+        const logData = {
+            method: req.method,
+            url: req.originalUrl,
+            statusCode: statusCode,
+            ip: req.ip || req.connection.remoteAddress,
+            userAgent: req.get('user-agent'),
+            timestamp: new Date().toISOString(),
+            responseBody: parsedBody
+        };
+        console.log(`the status code of ${statusCode}`)
+        // Log based on status code
+        if (statusCode >= 500) {
+            winston.error('Server Error Response:', logData);
+            logger.error(statusCode, logData);
+        } else if (statusCode >= 400) {
+            winston.warn('Client Error Response:', logData);
+            logger.error(statusCode, logData);
+        } else if (statusCode >= 300) {
+            winston.info('Redirect Response:', logData);
+            logger.error(statusCode, logData);
+        } else {
+            winston.info('Success Response:', logData);
+        }
+    }
+
+    next();
+});
 
 // using static files 
 app.use('/static', express.static(path.join(__dirname, 'public')))
@@ -52,18 +115,20 @@ const route = require('./routes/api/v1/index');
 const mtnRoute = require("./utilities/sandbox/mtn/mtn_routes");
 const orangeRoute = require("./utilities/sandbox/orange/index");
 const alpayRoute = require("./utilities/sandbox/alpay");
+const logger = require('./config/logger');
 app.use('/momo-sandbox',mtnRoute);
 app.use('/orange',orangeRoute);
 app.use('/al',alpayRoute);
 app.use('/api/v1', route);
 
-// Logs for error
-// Capture 500 errors
-app.use((err, _req, res, _next) => {
-    winston.error(err);
-    // console.log(err);
-    // res.status(err.status);
-    res.send(err.message);
-  });
+// send back a 404 error for any unknown api request
+app.use((req, res, next) => {
+    next(new ApiError(404, 'Not found'));
+});
+
+app.use(errorConverter);
+
+// handle error
+app.use(errorHandler);
 
 module.exports = app;

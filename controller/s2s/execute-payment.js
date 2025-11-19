@@ -2321,7 +2321,7 @@ async function mpgsSessionAndAuth(req, order_id, mode, psp_name) {
         channel: "PAYER_BROWSER",
         redirectResponseUrl:
           process.env.SERVER_LOAD +
-          "/api/v1/status-mpgs?order_id=" +
+          ":4008/api/v1/status-mpgs?order_id=" +
           order_id +
           "&mode=" +
           mode,

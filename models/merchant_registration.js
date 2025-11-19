@@ -609,12 +609,18 @@ var MerchantRegistrationModel = {
     }
     let qb = await pool.get_connection();
     let response;
-    try {
-      response = await qb.query(`INSERT INTO pg_master_merchant_draft 
-(submerchant_id, brand_color, accent_color, language, payment_methods, card_show, font_name, card_payment, stored_card, created_at, test_card_payment_scheme, test_stored_card_scheme) 
-SELECT ${merchant_id}, brand_color, accent_color, language, payment_methods, card_show, font_name, card_payment, stored_card, NOW(),  test_card_payment_scheme, test_stored_card_scheme 
-FROM pg_master_merchant_draft 
-WHERE submerchant_id = ${immediate_sub_merchant_id};`);
+      try {
+        response = await qb.query(`INSERT INTO pg_master_merchant_draft 
+  (submerchant_id, brand_color, accent_color, language, payment_methods, card_show, font_name, card_payment, stored_card, created_at, test_card_payment_scheme, test_stored_card_scheme) 
+  SELECT ${merchant_id}, brand_color, accent_color, language, payment_methods, card_show, font_name, card_payment, stored_card, NOW(),  test_card_payment_scheme, test_stored_card_scheme 
+  FROM pg_master_merchant_draft 
+  WHERE submerchant_id = ${immediate_sub_merchant_id};`);
+        // logging
+        console.log(`INSERT INTO pg_master_merchant_draft 
+  (submerchant_id, brand_color, accent_color, language, payment_methods, card_show, font_name, card_payment, stored_card, created_at, test_card_payment_scheme, test_stored_card_scheme) 
+  SELECT ${merchant_id}, brand_color, accent_color, language, payment_methods, card_show, font_name, card_payment, stored_card, NOW(),  test_card_payment_scheme, test_stored_card_scheme 
+  FROM pg_master_merchant_draft 
+  WHERE submerchant_id = ${immediate_sub_merchant_id};`);
     } catch (error) {
       console.error("Database query failed:", error);
     } finally {

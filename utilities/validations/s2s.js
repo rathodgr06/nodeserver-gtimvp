@@ -159,12 +159,15 @@ const S2SValidator = {
                     .pattern(/^[a-zA-Z]+ [a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/)
                     .min(1)
                     .max(50)
-                    .required()
+                    // .required()
+                    .allow("")
+                    .optional()
                     .error(() => new Error("Name not valid/not supplied (First and Last name required)")),
                 email: Joi.string()
                     .email()
                     .max(50)
-                    .required()
+                   .allow("")
+                    .optional()
                     .error(() => new Error("Email not valid/not supplied")),
                 code:Joi.string().allow(""),// Joi.alternatives().conditional("mobile", {
                 //     is: "",

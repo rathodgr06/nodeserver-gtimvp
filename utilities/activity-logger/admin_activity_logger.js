@@ -4,6 +4,7 @@ const env = process.env.ENVIRONMENT;
 const config = require("../../config/config.json")[env];
 const pool = require("../../config/database");
 const moment = require("moment");
+const logger = require('../../config/logger');
 var AdminActivityLogger = {
   admin_login_attempted: async (module_and_user, title, headers) => {
     let added_at = moment().format("YYYY-MM-DD HH:mm:ss");
@@ -30,7 +31,7 @@ var AdminActivityLogger = {
         .returning("id")
         .insert(config.table_prefix + "admin_logs", data);
     } catch (error) {
-      console.error("Database query failed:", error);
+        logger.error(500,{message: error,stack: error.stack});
     } finally {
       qb.release();
     }

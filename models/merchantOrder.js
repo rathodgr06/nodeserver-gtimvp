@@ -610,5 +610,22 @@ var merchantOrderModel = {
     }
     return response?.[0];
   },
+ checkOrderExits:async(condition)=> {
+  let qb = await pool.get_connection();
+  let response;
+  try {
+    response = await qb
+      .select("id")
+      .from(`${config.table_prefix}transaction_charges`)
+      .where(condition)
+      .get();
+  } catch (error) {
+    console.error("Database query failed:", error);
+  } finally {
+    qb.release();
+  }
+
+  return response?.[0]?.id || 0;
+}
 };
 module.exports = merchantOrderModel;

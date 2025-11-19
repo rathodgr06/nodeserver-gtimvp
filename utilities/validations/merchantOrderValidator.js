@@ -13,10 +13,11 @@ const qrGenerateModule = require("../../models/qrGenerateModule");
 const merchantOrderModel = require("../../models/merchantOrder");
 const helpers = require("../helper/general_helper");
 const encrypt_decrypt = require("../decryptor/encrypt_decrypt");
+const logger = require('../../config/logger');
 const MerchantOrderValidator = {
     create: async (req, res, next) => {
 
-        console.log(req.body);
+        try{
 
         let classType = req.body.data.class;
         if (classType === 'ECOM' || classType === 'CONT') {
@@ -708,7 +709,13 @@ const MerchantOrderValidator = {
                             }
                         }
                     } catch (err) {
-                        console.log(err);
+                        logger.error(
+                         400,
+                          {
+                            message: err,
+                            stack: err.stack,
+                          }
+                        );
                         res.status(StatusCode.badRequest).send(
                             ServerResponse.validationResponse(err)
                         );
@@ -731,6 +738,13 @@ const MerchantOrderValidator = {
                     common_err.response[0].response_code
                 )
             );
+        }
+        }catch(error){
+            logger.error('Error in merchantOrderValidator.create:', {
+            message: error.message,
+            stack: error.stack
+        });
+        throw error;
         }
     },
 

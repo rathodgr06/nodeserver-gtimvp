@@ -720,21 +720,21 @@ const qr_generate = {
           result.sub_merchant_id, result?.mode
         );
         data.merchant_details = {
-          theme: rlt.theme,
-          icon: process.env.STATIC_URL + "/static/files/" + rlt.icon,
-          logo: process.env.STATIC_URL + "/static/files/" + rlt.logo,
-          use_logo: rlt.use_logo,
+          theme: rlt?.theme,
+          icon: process.env.STATIC_URL + "/static/files/" + rlt?.icon,
+          logo: process.env.STATIC_URL + "/static/files/" + rlt?.logo,
+          use_logo: rlt?.use_logo,
           we_accept_image:
-            process.env.STATIC_URL + "/static/files/" + rlt.we_accept_image,
-          brand_color: rlt.brand_color,
-          accent_color: rlt.accent_color,
-          font_name: rlt.font_name,
+            process.env.STATIC_URL + "/static/files/" + rlt?.we_accept_image,
+          brand_color: rlt?.brand_color,
+          accent_color: rlt?.accent_color,
+          font_name: rlt?.font_name,
           sub_merchant_id: await enc_dec.cjs_encrypt(result.sub_merchant_id),
           merchant_name: company_name[result.sub_merchant_id]
             ? company_name[result.sub_merchant_id]
             : "",
-          use_logo_instead_icon: rlt.use_logo,
-          branding_language: enc_dec.cjs_encrypt(rlt.branding_language),
+          use_logo_instead_icon: rlt?.use_logo,
+          branding_language: rlt?.branding_language?enc_dec.cjs_encrypt(rlt?.branding_language):'',
           currencies: currencies,
           company_details: {
             fav_icon: image_path + company_details.fav_icon,
@@ -755,12 +755,13 @@ const qr_generate = {
           type: result.type_of_qr_code,
         };
 
-        (data.prefer_lang = enc_dec.cjs_encrypt(rlt.branding_language)),
+        data.prefer_lang =rlt?.branding_language? enc_dec.cjs_encrypt(rlt.branding_language):"",
           res
             .status(statusCode.ok)
             .send(response.successansmsg(data, "Details fetch successfully."));
       })
       .catch((error) => {
+        console.log(error);
         winston.error(error);
         res
           .status(statusCode.internalError)

@@ -1343,6 +1343,9 @@ const charges_invoice_controller = {
     }
   },
   walletBalance: async (req, res) => {
+    console.log(`fetch wallet balance from API or Payout service`);
+    const ip = req.headers['x-forwarded-for'];
+    console.log(ip);
     let condition = {
       currency: req.bodyString("currency"),
       sub_merchant_id: req.bodyString("sub_merchant_id"),
@@ -1384,11 +1387,11 @@ const charges_invoice_controller = {
       }
       // check if order id exits and it is pending 
       let orderExits = await charges_invoice_models.new_select_one({order_id:order_id,order_status:'PENDING',status:0},'payout_pending_transactions');
-      if(!orderExits){
-        return res
-          .status(statusCode.badRequest)
-          .send(response.errormsg("Invalid order id"));
-      }
+      // if(!orderExits){
+      //   return res
+      //     .status(statusCode.badRequest)
+      //     .send(response.errormsg("Invalid order id"));
+      // }
       if (result) {
         // lets check the order status
         let order_status = req.bodyString("order_status");
@@ -1430,22 +1433,22 @@ const charges_invoice_controller = {
             break;
 
           case "FAILED":
-             order_status = "PAYOUT-REVERSAL";
-            let dataCharges = {
-              sub_merchant_id: null == submerchant_id ? 0 : submerchant_id,
-              receiver_id: null == receiver_id ? 0 : receiver_id,
-              order_id: req.bodyString("order_id"),
-              order_status: "PAYOUT-REVERSAL",
-              transaction_id: req.bodyString("transaction_id"),
-              currency: req.bodyString("currecny"),
-              amount: amt,
-              net_amount: amt,
-              transaction_status: "AUTHORISED",
-              status: 0,
-              created_at: moment().format("YYYY-MM-DD HH:mm:ss"),
-              updated_at: moment().format("YYYY-MM-DD HH:mm:ss"),
-            };
-            await charges_invoice_models.addCharges(dataCharges);
+            //  order_status = "PAYOUT-REVERSAL";
+            // let dataCharges = {
+            //   sub_merchant_id: null == submerchant_id ? 0 : submerchant_id,
+            //   receiver_id: null == receiver_id ? 0 : receiver_id,
+            //   order_id: req.bodyString("order_id"),
+            //   order_status: "PAYOUT-REVERSAL",
+            //   transaction_id: req.bodyString("transaction_id"),
+            //   currency: req.bodyString("currecny"),
+            //   amount: amt,
+            //   net_amount: amt,
+            //   transaction_status: "AUTHORISED",
+            //   status: 0,
+            //   created_at: moment().format("YYYY-MM-DD HH:mm:ss"),
+            //   updated_at: moment().format("YYYY-MM-DD HH:mm:ss"),
+            // };
+            // await charges_invoice_models.addCharges(dataCharges);
             order_status = "FAILED";
             let failedData = {
               sub_merchant_id: null == submerchant_id ? 0 : submerchant_id,
