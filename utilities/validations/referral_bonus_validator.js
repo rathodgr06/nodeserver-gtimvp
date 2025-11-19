@@ -7,6 +7,7 @@ const ServerResponse = require("../response/ServerResponse");
 const StatusCode = require("../statuscode/index");
 const checkRecordExits = require("../validations/checkifrecordexist");
 const checkifrecordexist = require("./checkifrecordexist");
+const logger = require('../../config/logger');
 
 const Referral_Bonus_Validator = {
     update: async (req, res, next) => {
@@ -40,7 +41,7 @@ const Referral_Bonus_Validator = {
                 }
             }
         } catch (error) {
-            
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );

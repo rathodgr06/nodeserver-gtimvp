@@ -10,6 +10,7 @@ const encrypt_decrypt = require('../decryptor/encrypt_decrypt');
 const checkifrecordexistandexpiration = require('./checkifrecordexistandexpiration');
 const helpers = require('../helper/general_helper');
 const checkifaccountblock = require('./checkifaccountblock');
+const logger = require('../../config/logger');
 
 const MerchantEkyc = {
     login: async (req, res, next) => {
@@ -52,6 +53,7 @@ const MerchantEkyc = {
                 }
             }
         } catch (error) {
+                    logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -79,6 +81,7 @@ const MerchantEkyc = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
 
@@ -143,6 +146,7 @@ const MerchantEkyc = {
 
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -747,6 +751,7 @@ const MerchantEkyc = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -1007,6 +1012,7 @@ const MerchantEkyc = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -1418,6 +1424,7 @@ const MerchantEkyc = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -1729,6 +1736,7 @@ const MerchantEkyc = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error?.message));
         }
@@ -1800,6 +1808,7 @@ const MerchantEkyc = {
                 next()
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error?.message));
         }
@@ -1827,6 +1836,7 @@ const MerchantEkyc = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -2129,6 +2139,7 @@ const MerchantEkyc = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -2192,6 +2203,7 @@ const MerchantEkyc = {
 
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -2288,6 +2300,7 @@ const MerchantEkyc = {
                 next()
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -2312,6 +2325,7 @@ const MerchantEkyc = {
                     next()
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -2336,6 +2350,7 @@ const MerchantEkyc = {
                     next()
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
     },
@@ -2358,6 +2373,7 @@ const MerchantEkyc = {
                     next()
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -2384,6 +2400,7 @@ const MerchantEkyc = {
                     next()
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
     },
@@ -2409,6 +2426,7 @@ const MerchantEkyc = {
                     next()
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
     },
@@ -2437,6 +2455,7 @@ const MerchantEkyc = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
 
@@ -2467,6 +2486,7 @@ const MerchantEkyc = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
 

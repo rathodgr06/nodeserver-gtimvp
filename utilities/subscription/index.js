@@ -5,6 +5,7 @@ const config = require("../../config/config.json")[env];
 const helper = require('../helper/general_helper');
 const moment = require('moment');
 const helpers = require("../helper/general_helper");
+const logger = require('../../config/logger');
 
 const merchantOrderModel = require("../../models/merchantOrder");
 const subscription_card_expired_model = require('../../models/subscription_card_expired_model');
@@ -228,13 +229,13 @@ module.exports = async (res_order_data, payment_status, updated_at, payment_id,c
     //                             )
     //                             .then((result) => {})
     //                             .catch((error) => {
-    //                                 
+    //                                 logger.error(500,{message: error,stack: error?.stack});
     //                             });
     //                     }    
     //             }     
     //         })
     //         .catch((error) => {
-    
+    //              logger.error(500,{message: error,stack: error?.stack});
     //         });
     // }
 }

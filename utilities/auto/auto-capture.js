@@ -8,6 +8,8 @@ const helpers = require('../../utilities/helper/general_helper');
 const axios = require('axios')
 const xml2js = require('xml2js')
 let psp_url_credentials = require('../../config/credientials')
+const logger = require('../../config/logger');
+
 async function captureTelr(transactionToCaptureTelr) {
     let captureResponse = [];
     for (let transaction of transactionToCaptureTelr) {
@@ -386,6 +388,7 @@ module.exports = async () => {
         let [capturedDetails_Telr, captureDatails_NI,capturedDetails_Paytabs] = await Promise.all([captureTelr(transactionToCaptureTelr), captureNI(transactionToCaptureNI),capturePaytabs(transactionToCapturePaytabs)]);
         return [capturedDetails_Telr, captureDatails_NI,capturedDetails_Paytabs];
     }catch (error) {
+        logger.error(500,{message: error,stack: error.stack});
         return error;
     }
 }

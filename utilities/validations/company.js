@@ -2,6 +2,8 @@ const Joi = require("joi").extend(require("@joi/date"));
 const ServerResponse = require("../response/ServerResponse");
 const StatusCode = require("../statuscode/index");
 const checkEmpty = require("./emptyChecker");
+const logger = require('../../config/logger');
+
 const Company = {
     updatelogo: async (req, res, next) => {
         const schema = Joi.object().keys({
@@ -21,6 +23,7 @@ const Company = {
                 next();
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest)
                 .send(ServerResponse.validationResponse(error));
         }
@@ -47,6 +50,7 @@ const Company = {
                     next();
                 }
             } catch (error) {
+                logger.error(500,{message: error,stack: error?.stack});
                 res
                     .status(StatusCode.badRequest)
                     .send(ServerResponse.validationResponse(error));

@@ -4,7 +4,7 @@ const StatusCode = require('../statuscode/index');
 const checkEmpty = require('./emptyChecker');
 const checkifrecordexist = require('./checkifrecordexist')
 const enc_dec = require("../decryptor/decryptor");
-
+const logger = require('../../config/logger');
 
 
 const MerchantCharges = {
@@ -52,7 +52,7 @@ const MerchantCharges = {
                 }
 
             } catch (error) {
-
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
             }
 
@@ -86,7 +86,7 @@ const MerchantCharges = {
                 }
 
             } catch (error) {
-
+logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
             }
 
@@ -145,7 +145,7 @@ const MerchantCharges = {
                 }
 
             } catch (error) {
-
+logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
             }
 
@@ -182,6 +182,7 @@ const MerchantCharges = {
                 }
 
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
             }
 
@@ -215,6 +216,7 @@ const MerchantCharges = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
             }
 

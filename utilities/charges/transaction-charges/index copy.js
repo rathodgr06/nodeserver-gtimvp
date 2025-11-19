@@ -4,7 +4,7 @@ const merchantOrderModel = require("../../../models/merchantOrder");
 const dotenv = require("dotenv");
 const helper = require('../../helper/general_helper');
 const momentDatePicker = require('../../date_formatter/index');
-const winston = require('../../logmanager/winston');
+const logger = require('../../../config/logger');
 
 dotenv.config({ path: "../.env" });
 
@@ -65,8 +65,8 @@ module.exports = async (order_details) => {
             await storeRefundData(order_details,is_domestic_international);
         } */
     } catch (error) {
-        // winston.error(err);
         console.log('transaction error', error);
+        logger.error(500,{message: error,stack: error?.stack});
         return true;
     }
 

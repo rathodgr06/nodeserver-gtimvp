@@ -7,6 +7,8 @@ const config = require("../../config/config.json")[env];
 const pool = require("../../config/database");
 const jwt = require('jsonwebtoken');
 const encrypt_decrypt = require('../decryptor/encrypt_decrypt');
+const logger = require('../../config/logger');
+
 module.exports = async (req, res, next) => {
   console.log(`at this API`);
   let merchant_key = req.headers["merchant-key"]; //authHeader.merchant_key;
@@ -79,6 +81,7 @@ module.exports = async (req, res, next) => {
           .get();
       } catch (error) {
         console.error("Database query failed:", error);
+        logger.error(500,{message: error,stack: error?.stack});
       } finally {
         qb.release();
       }
@@ -100,5 +103,6 @@ module.exports = async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
+    logger.error(500,{message: error,stack: error?.stack});
   }
 };

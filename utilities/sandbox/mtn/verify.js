@@ -3,6 +3,7 @@
 // =============================
 const JWT_SECRET = "mock_secret_key"; // for mock signing
 const jwt = require("jsonwebtoken");  
+const logger = require('../../../config/logger');
 
 function verifyToken(req, res, next){
   const authHeader = req.header("Authorization");
@@ -31,7 +32,8 @@ function verifyToken(req, res, next){
     // Attach session info to request for later use
     req.session = decoded;
     next();
-  } catch (err) {
+  } catch (error) {
+    logger.error(500,{message: error,stack: error?.stack});
     return res.status(401).json({
       error: "Unauthorized",
       message: "Invalid or expired token"

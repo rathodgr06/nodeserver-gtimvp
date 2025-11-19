@@ -12,6 +12,7 @@ const merchantOrderModel = require('../../models/merchantOrder');
 const enc_dec = require('../../utilities/decryptor/decryptor')
 const orderTransactionModel = require('../../models/order_transaction');
 const order_logs = require("../../models/order_logs");
+const logger = require('../../config/logger');
 module.exports = async (req, res, next, redirectTrue = false) => {
   let url = process.env.FRAUD_ENGINE_URL;
   let data = req.body;
@@ -267,6 +268,7 @@ module.exports = async (req, res, next, redirectTrue = false) => {
 
 } catch (error) {
   console.log(error);
+  logger.error(500,{message: error,stack: error?.stack});
 }
 }
 

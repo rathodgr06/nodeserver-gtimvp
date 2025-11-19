@@ -5,6 +5,7 @@ const enc_dec = require("../decryptor/decryptor");
 const ServerResponse = require("../response/ServerResponse");
 const StatusCode = require("../statuscode/index");
 const checkifrecordexist = require("./checkifrecordexist");
+const logger = require('../../config/logger');
 
 const charges_invoice_validator = {
     add: async (req, res, next) => {
@@ -50,7 +51,7 @@ const charges_invoice_validator = {
                 }
             }
         } catch (error) {
-            
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -92,7 +93,7 @@ const charges_invoice_validator = {
                 }
             }
         } catch (error) {
-            
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -134,7 +135,7 @@ const charges_invoice_validator = {
                 }
             }
         } catch (error) {
-            
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -177,7 +178,7 @@ const charges_invoice_validator = {
                 }
             }
         } catch (error) {
-
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -219,7 +220,7 @@ const charges_invoice_validator = {
                 }
             }
         } catch (error) {
-
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );

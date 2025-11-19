@@ -3,9 +3,9 @@ const dotenv = require("dotenv");
 //const momentDatePicker = require('../../date_formatter');
 const momentDatePicker = require('../date_formatter');
 const helper = require('../helper/general_helper');
-const winston = require('../logmanager/winston');
 //config file
 dotenv.config({ path: "../.env" });
+const logger = require('../../config/logger');
 
 //model table
 const SubmerchantModel = require('../../models/submerchantmodel');
@@ -151,8 +151,8 @@ module.exports = async (submerchant_id, psp, req_payment_method, req) => {
         } 
 
     } catch (error) {
-        winston.error(error);
         console.log('something went wrong', error);
+        logger.error(500,{message: error,stack: error?.stack});
     }
 
     return true;

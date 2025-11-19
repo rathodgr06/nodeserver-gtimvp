@@ -5,6 +5,7 @@ const config = require("../../config/config.json")[env];
 const pool = require("../../config/database");
 const helper = require("../helper/general_helper");
 const moment = require("moment");
+const logger = require('../../config/logger');
 
 module.exports = async (order_details, referrer_code) => {
   let condition = {
@@ -23,6 +24,7 @@ module.exports = async (order_details, referrer_code) => {
       .get(config.table_prefix + "referrers");
   } catch (error) {
     console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error?.stack});
   } finally {
     qb.release();
   }
@@ -72,6 +74,7 @@ module.exports = async (order_details, referrer_code) => {
           .insert(config.table_prefix + "referral_bonus", bonusData);
       } catch (error) {
         console.error("Database query failed:", error);
+        logger.error(500,{message: error,stack: error?.stack});
       } finally {
         qb.release();
       }

@@ -6,7 +6,7 @@ const transactionChargesModel = require('../transaction-charges/transactionCharg
 const helper = require('../../helper/general_helper');
 //config file
 dotenv.config({ path: "../.env" });
-const winston = require('../../logmanager/winston');
+const logger = require('../../../config/logger');
 
 module.exports = async (order_detail) => {
     try {
@@ -21,8 +21,7 @@ module.exports = async (order_detail) => {
         await storeSetUpData(order_detail, merchant_data);
 
     } catch (error) {
-        winston.error(err);
-        //console.log('feature error', error);
+        logger.error(500,{message: error,stack: error?.stack});
         return true;
     }
     

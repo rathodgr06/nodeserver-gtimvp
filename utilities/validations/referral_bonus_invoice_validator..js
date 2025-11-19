@@ -6,6 +6,7 @@ const helpers = require("../helper/general_helper");
 const ServerResponse = require("../response/ServerResponse");
 const StatusCode = require("../statuscode/index");
 const checkifrecordexist = require("./checkifrecordexist");
+const logger = require('../../config/logger');
 
 const ReferralBonusInvoiceValidator = {
     add: async (req, res, next) => {
@@ -67,7 +68,7 @@ const ReferralBonusInvoiceValidator = {
                 }
             }
         } catch (error) {
-            
+            logger.error(400, { message: error, stack: error?.stack });
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -159,7 +160,7 @@ const ReferralBonusInvoiceValidator = {
                 next();
             }
         } catch (error) {
-            
+            logger.error(400, { message: error, stack: error?.stack });
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -381,6 +382,7 @@ const ReferralBonusInvoiceValidator = {
                     next();
             }
         } catch (error) {
+            logger.error(400, { message: error, stack: error?.stack });
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error.message)
             );

@@ -10,6 +10,7 @@ const multer = require('multer');
 const helpers = require('../helper/general_helper');
 const fs = require('fs');
 const encrypt_decrypt = require("../../utilities/decryptor/encrypt_decrypt");
+const logger = require('../../config/logger');
 
 const { join } = require('path');
 const customer_validations = {
@@ -48,6 +49,7 @@ const customer_validations = {
                 }
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
 
@@ -83,6 +85,7 @@ const customer_validations = {
                 // }
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
 
@@ -118,6 +121,7 @@ const customer_validations = {
                 }
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
 
@@ -144,6 +148,7 @@ const customer_validations = {
                 }
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
 
@@ -177,6 +182,7 @@ const customer_validations = {
                 }
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
 
@@ -202,6 +208,7 @@ const customer_validations = {
                 }
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
 
@@ -244,6 +251,7 @@ const customer_validations = {
                 }
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
 
@@ -283,6 +291,7 @@ const customer_validations = {
                 }
 
             } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
                 
                 res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
             }
@@ -330,6 +339,7 @@ const customer_validations = {
                 }
 
             } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
                 
                 res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
             }
@@ -359,6 +369,7 @@ const customer_validations = {
                 }
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             res.status(StatusCode.ok).send(ServerResponse.validationResponse(error));
         }
 
@@ -403,6 +414,7 @@ const customer_validations = {
                 }
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error.message));
         }
 
@@ -429,6 +441,7 @@ const customer_validations = {
                 }
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
 
@@ -458,6 +471,7 @@ const customer_validations = {
                 }
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
 
@@ -486,6 +500,7 @@ const customer_validations = {
                 }
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
 
@@ -542,6 +557,7 @@ const customer_validations = {
                 }
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -573,6 +589,7 @@ const customer_validations = {
             }
 
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -608,6 +625,7 @@ const customer_validations = {
                 }
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
 
@@ -639,6 +657,7 @@ const customer_validations = {
             }
 
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -672,6 +691,7 @@ const customer_validations = {
                 }
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
 
@@ -712,6 +732,7 @@ const customer_validations = {
             }
 
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -726,6 +747,7 @@ const customer_validations = {
                 res.status(StatusCode.ok).send(ServerResponse.validationResponse("Customer account already deleted."));
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse("Unable to process."));
         }
     },

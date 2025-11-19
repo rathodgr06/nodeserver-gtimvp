@@ -3,6 +3,7 @@ const { default: axios } = require("axios");
 const ServerResponse = require("../response/ServerResponse");
 const StatusCode = require("../statuscode/index");
 const checkifrecordexist = require("./checkifrecordexist");
+const logger = require('../../config/logger');
 
 const fundingMethodValidator = {
   update: async (req, res, next) => {
@@ -35,11 +36,12 @@ const fundingMethodValidator = {
       } else {
         next();
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
+      logger.error(500,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
-        .send(ServerResponse.validationResponse(err));
+        .send(ServerResponse.validationResponse(error));
     }
   },
   add: async (req, res, next) => {
@@ -86,11 +88,12 @@ const fundingMethodValidator = {
       } else {
         next();
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
+      logger.error(500,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
-        .send(ServerResponse.validationResponse(err));
+        .send(ServerResponse.validationResponse(error));
     }
   },
   verify: async (req, res, next) => {
@@ -110,11 +113,12 @@ const fundingMethodValidator = {
       } else {
         next();
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
+      logger.error(500,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
-        .send(ServerResponse.validationResponse(err));
+        .send(ServerResponse.validationResponse(error));
     }
   },
   manage_funding: async (req, res, next) => {
@@ -135,11 +139,12 @@ const fundingMethodValidator = {
       } else {
         next();
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
+      logger.error(500,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
-        .send(ServerResponse.validationResponse(err));
+        .send(ServerResponse.validationResponse(error));
     }
   },
   list: async (req, res, next) => {
@@ -161,11 +166,12 @@ const fundingMethodValidator = {
       } else {
         next();
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
+      logger.error(500,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
-        .send(ServerResponse.validationResponse(err));
+        .send(ServerResponse.validationResponse(error));
     }
   },
   get: async (req, res, next) => {
@@ -191,11 +197,12 @@ const fundingMethodValidator = {
           next();
         }
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
+      logger.error(500,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
-        .send(ServerResponse.validationResponse(err));
+        .send(ServerResponse.validationResponse(error));
     }
   },
   add_bulk: async (req, res, next) => {
@@ -308,10 +315,11 @@ const fundingMethodValidator = {
 
       // All checks passed for all requests
       return next();
-    } catch (err) {
-      console.error("Error in add_bulk:", err);
+    } catch (error) {
+      console.error("Error in add_bulk:", error);
+      logger.error(500,{message: error,stack: error?.stack});
       return res
-        .status(StatusCode.internalServerError)
+        .status(StatusCode.internalError)
         .send(ServerResponse.validationResponse("Internal Server Error"));
     }
   },
@@ -333,11 +341,12 @@ const fundingMethodValidator = {
       } else {
         next();
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
+      logger.error(500,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
-        .send(ServerResponse.validationResponse(err));
+        .send(ServerResponse.validationResponse(error));
     }
   },
 };

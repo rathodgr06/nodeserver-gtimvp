@@ -5,6 +5,8 @@ const checkEmpty = require('./emptyChecker');
 const idChecker = require('./idchecker');
 const checkifrecordexist = require('./checkifrecordexist');
 const { mode } = require('crypto-js');
+const logger = require('../../config/logger');
+
 const DapiValidator = {
     login: async(req, res, next) => {
             const schema = Joi.object().keys({
@@ -44,6 +46,7 @@ const DapiValidator = {
                    
                 }
             } catch (error) {
+                        logger.error(500,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
             }
 
@@ -102,6 +105,7 @@ const DapiValidator = {
                
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
     },
@@ -141,6 +145,7 @@ const DapiValidator = {
                    
                 }
             } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
             }
 

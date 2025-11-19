@@ -6,6 +6,7 @@ const idChecker = require("./idchecker");
 const checkifrecordexist = require("./checkifrecordexist");
 const enc_dec = require("../../utilities/decryptor/decryptor");
 const helpers = require("../helper/general_helper");
+const logger = require('../../config/logger');
 
 const pricing_plan_validator = {
 
@@ -128,6 +129,7 @@ const pricing_plan_validator = {
                 next();
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -300,6 +302,7 @@ const pricing_plan_validator = {
                 next();
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -382,6 +385,7 @@ const pricing_plan_validator = {
                 next();
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -521,6 +525,7 @@ const pricing_plan_validator = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -560,6 +565,7 @@ const pricing_plan_validator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -602,6 +608,7 @@ const pricing_plan_validator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );

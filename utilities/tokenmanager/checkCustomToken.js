@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const logger = require('../../config/logger');
 
 module.exports =  async (req_token) => {
     const token = req_token;
@@ -24,7 +25,7 @@ module.exports =  async (req_token) => {
             });
             return res;
         } catch(error){
-            
+            logger.error(500,{message: error,stack: error?.stack});
             
             return res
         }

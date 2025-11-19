@@ -3,6 +3,7 @@ require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../../config/config.json")[env];
 const pool = require("../../config/database");
+const logger = require('../../config/logger');
 
 const subscription_recurring_table =
   config.table_prefix + "subscription_recurring";
@@ -21,6 +22,7 @@ async function checkForSubscriptionRecurring(subscription_id) {
   try {
     response = await qb.query(sql);
   } catch (error) {
+    logger.error(400,{message: error,stack: error?.stack});
     console.error("Database query failed:", error);
   } finally {
     qb.release();
@@ -36,6 +38,7 @@ async function getSubscription(email, plan_id) {
   try {
     response = await qb.query(sql);
   } catch (error) {
+    logger.error(400,{message: error,stack: error?.stack});
     console.error("Database query failed:", error);
   } finally {
     qb.release();

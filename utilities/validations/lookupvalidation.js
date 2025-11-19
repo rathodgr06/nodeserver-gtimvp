@@ -1,6 +1,8 @@
 const Joi = require('joi').extend(require('@joi/date'));
 const ServerResponse = require('../response/ServerResponse');
 const StatusCode = require('../statuscode/index');
+const logger = require('../../config/logger');
+
 const lookup ={
     bin:async(req,res,next)=>{
         const schema = Joi.object().keys({
@@ -20,6 +22,7 @@ const lookup ={
               next()
             }
          } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
          }
       
@@ -43,6 +46,7 @@ const lookup ={
               next()
             }
          } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
          }
       

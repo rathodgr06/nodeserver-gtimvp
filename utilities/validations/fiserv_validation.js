@@ -4,6 +4,8 @@ const StatusCode = require("../statuscode/index");
 const checkifrecordexist = require("./checkifrecordexist");
 const enc_dec = require("../decryptor/decryptor");
 const merchantOrderModel = require("../../models/merchantOrder");
+const logger = require('../../config/logger');
+
 const FiservPay = {
   primary_transaction: async (req, res, next) => {
     try {
@@ -139,6 +141,7 @@ const FiservPay = {
         }
       }
     } catch (error) {
+      logger.error(500,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));

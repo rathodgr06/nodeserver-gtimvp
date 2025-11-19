@@ -4,6 +4,7 @@ const StatusCode = require("../statuscode/index");
 const checkifrecordexist = require("./checkifrecordexist");
 const enc_dec = require("../decryptor/decryptor");
 const merchantOrderModel = require("../../models/merchantOrder");
+const logger = require('../../config/logger');
 
 const path = require("path");
 require("dotenv").config({ path: "../../.env" });
@@ -106,6 +107,7 @@ const WalletValidator = {
               })
               .get(config.table_prefix + "master_merchant_key_and_secret");
           } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             console.error("Database query failed:", error);
           } finally {
             qb.release();
@@ -131,6 +133,7 @@ const WalletValidator = {
         }
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -160,6 +163,7 @@ const WalletValidator = {
         next();
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -203,6 +207,7 @@ const WalletValidator = {
           .send(ServerResponse.errormsg(result.error.message));
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -303,7 +308,7 @@ const WalletValidator = {
                 }
               })
               .catch((error) => {
-                winston.error(error);
+                logger.error(400,{message: error,stack: error?.stack});
                 return res
                   .status(StatusCode.internalError)
                   .send(response.errormsg(error.message));
@@ -357,6 +362,7 @@ const WalletValidator = {
               })
               .get(config.table_prefix + "master_merchant_key_and_secret");
           } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             console.error("Database query failed:", error);
           } finally {
             qb.release();
@@ -436,6 +442,7 @@ const WalletValidator = {
               })
               .catch((error) => {
                 console.log("🚀 ~ error:", error);
+                logger.error(400,{message: error,stack: error?.stack});
                 return res
                   .status(StatusCode.internalError)
                   .send(response.errormsg(error.message));
@@ -444,6 +451,7 @@ const WalletValidator = {
         }
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -469,6 +477,7 @@ const WalletValidator = {
       }
       // If one of the schemas is valid, continue processing
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -508,6 +517,7 @@ const WalletValidator = {
     //           .where(where)
     //           .get(config.table_prefix + "master_merchant_key_and_secret");
     //       } catch (error) {
+    // logger.error(400,{message: error,stack: error?.stack});
     //         console.error("Database query failed:", error);
     //       } finally {
     //         qb.release();
@@ -555,6 +565,7 @@ const WalletValidator = {
     //           .where(where)
     //           .get(config.table_prefix + "master_currency");
     //       } catch (error) {
+    // logger.error(400,{message: error,stack: error?.stack});
     //         console.error("Database query failed:", error);
     //       } finally {
     //         qb.release();
@@ -659,6 +670,7 @@ const WalletValidator = {
     //           })
     //           .get(config.table_prefix + "master_merchant_key_and_secret");
     //       } catch (error) {
+    // logger.error(400,{message: error,stack: error?.stack});
     //         console.error("Database query failed:", error);
     //       } finally {
     //         qb.release();
@@ -694,6 +706,7 @@ const WalletValidator = {
     //     }
     //   }
     // } catch (error) {
+    // logger.error(400,{message: error,stack: error?.stack});
     //   return res
     //     .status(StatusCode.badRequest)
     //     .send(ServerResponse.validationResponse(error?.message));
@@ -721,6 +734,7 @@ const WalletValidator = {
           .send(ServerResponse.errormsg(result.error.message));
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -744,6 +758,7 @@ const WalletValidator = {
           );
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -768,6 +783,7 @@ const WalletValidator = {
           .send(ServerResponse.validationResponse(result.error.message));
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -797,6 +813,7 @@ const WalletValidator = {
               .where(where)
               .get(config.table_prefix + "master_merchant_key_and_secret");
           } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             console.error("Database query failed:", error);
           } finally {
             qb.release();
@@ -854,6 +871,7 @@ const WalletValidator = {
               })
               .get(config.table_prefix + "master_merchant_key_and_secret");
           } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             console.error("Database query failed:", error);
           } finally {
             qb.release();
@@ -889,6 +907,7 @@ const WalletValidator = {
         }
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -909,6 +928,7 @@ const WalletValidator = {
           .send(ServerResponse.validationResponse(result.error.message));
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -932,6 +952,7 @@ const WalletValidator = {
           );
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -952,6 +973,7 @@ const WalletValidator = {
           .send(ServerResponse.validationResponse(result.error.message));
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -975,6 +997,7 @@ const WalletValidator = {
           );
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -1119,6 +1142,7 @@ const WalletValidator = {
                   );
               }
             } catch (error) {
+              logger.error(400,{message: error,stack: error?.stack});
               console.log("Error: ", error?.message);
               return res
                 .status(StatusCode.unauthorized)
@@ -1159,6 +1183,7 @@ const WalletValidator = {
               })
               .get(config.table_prefix + "master_merchant_key_and_secret");
           } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             console.error("Database query failed:", error);
           } finally {
             qb.release();
@@ -1238,6 +1263,7 @@ const WalletValidator = {
                   );
               }
             } catch (error) {
+              logger.error(400,{message: error,stack: error?.stack});
               console.log("Error: ", error?.message);
               return receiver_response = {
                 status: 400,
@@ -1255,6 +1281,7 @@ const WalletValidator = {
         }
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -1351,7 +1378,7 @@ const WalletValidator = {
               }
             })
             .catch((error) => {
-              winston.error(error);
+              logger.error(400,{message: error,stack: error?.stack});
               return res
                 .status(StatusCode.internalError)
                 .send(response.errormsg(error.message));
@@ -1381,6 +1408,7 @@ const WalletValidator = {
               })
               .get(config.table_prefix + "master_merchant_key_and_secret");
           } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             console.error("Database query failed:", error);
           } finally {
             qb.release();
@@ -1440,7 +1468,7 @@ const WalletValidator = {
               }
             })
             .catch((error) => {
-              winston.error(error);
+              logger.error(400,{message: error,stack: error?.stack});
               return res
                 .status(StatusCode.internalError)
                 .send(response.errormsg(error.message));
@@ -1448,6 +1476,7 @@ const WalletValidator = {
         }
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -1555,6 +1584,7 @@ const WalletValidator = {
               })
               .get(config.table_prefix + "master_merchant_key_and_secret");
           } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             console.error("Database query failed:", error);
           } finally {
             qb.release();
@@ -1594,6 +1624,7 @@ const WalletValidator = {
         }
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -1709,7 +1740,7 @@ const WalletValidator = {
               }
             })
             .catch((error) => {
-              winston.error(error);
+              logger.error(400,{message: error,stack: error?.stack});
               return res
                 .status(StatusCode.internalError)
                 .send(response.errormsg(error.message));
@@ -1771,6 +1802,7 @@ const WalletValidator = {
                   );
               }
             } catch (error) {
+              logger.error(400,{message: error,stack: error?.stack});
               console.log("Error: ", error?.message);
               return res
                 .status(StatusCode.unauthorized)
@@ -1810,6 +1842,7 @@ const WalletValidator = {
               })
               .get(config.table_prefix + "master_merchant_key_and_secret");
           } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             console.error("Database query failed:", error);
           } finally {
             qb.release();
@@ -1864,7 +1897,7 @@ const WalletValidator = {
                 }
               })
               .catch((error) => {
-                winston.error(error);
+                logger.error(400,{message: error,stack: error?.stack});
                 return res
                   .status(StatusCode.internalError)
                   .send(response.errormsg(error.message));
@@ -1923,6 +1956,7 @@ const WalletValidator = {
                   );
               }
             } catch (error) {
+              logger.error(400,{message: error,stack: error?.stack});
               console.log("Error: ", error?.message);
               return receiver_response = {
                 status: 400,
@@ -1936,6 +1970,7 @@ const WalletValidator = {
         }
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -2054,7 +2089,7 @@ const WalletValidator = {
               }
             })
             .catch((error) => {
-              winston.error(error);
+              logger.error(400,{message: error,stack: error?.stack});
               return res
                 .status(StatusCode.internalError)
                 .send(response.errormsg(error.message));
@@ -2116,6 +2151,7 @@ const WalletValidator = {
                   );
               }
             } catch (error) {
+              logger.error(400,{message: error,stack: error?.stack});
               console.log("Error: ", error?.message);
               return res
                 .status(StatusCode.unauthorized)
@@ -2155,6 +2191,7 @@ const WalletValidator = {
               })
               .get(config.table_prefix + "master_merchant_key_and_secret");
           } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             console.error("Database query failed:", error);
           } finally {
             qb.release();
@@ -2210,7 +2247,7 @@ const WalletValidator = {
                 }
               })
               .catch((error) => {
-                winston.error(error);
+                logger.error(400,{message: error,stack: error?.stack});
                 return res
                   .status(StatusCode.internalError)
                   .send(response.errormsg(error.message));
@@ -2269,6 +2306,7 @@ const WalletValidator = {
                   );
               }
             } catch (error) {
+              logger.error(400,{message: error,stack: error?.stack});
               console.log("Error: ", error?.message);
               return receiver_response = {
                 status: 400,
@@ -2282,6 +2320,7 @@ const WalletValidator = {
         }
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));

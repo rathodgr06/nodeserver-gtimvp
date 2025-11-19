@@ -7,6 +7,7 @@ const port = process.env.SERVER_PORT;
 const DBRun = require("../../models/DBRun");
 const fs = require("fs");
 const enc_dec = require("../../utilities/decryptor/decryptor");
+const logger = require('../../config/logger');
 
 const AppCache = require("./AppCache");
 const KEY_ALL_LANGUAGE_LIST = "key_all_lang_list";
@@ -41,8 +42,9 @@ let nodeCache = {
             path.resolve("public/language/" + languageItem.file)
           );
         }
-      } catch (err) {
-        console.error("Error reading file:", err.message);
+      } catch (error) {
+        console.error("Error reading file:", error.message);
+        logger.error(500,{message: error,stack: error?.stack});
       }
 
       let langData = {

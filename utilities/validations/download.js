@@ -4,6 +4,8 @@ const StatusCode = require('../statuscode/index');
 const checkEmpty = require('./emptyChecker');
 const idChecker = require('./idchecker');
 const checkifrecordexist = require('./checkifrecordexist');
+const logger = require('../../config/logger');
+
 const DownloadValidator = {
     invoice: async (req, res, next) => {
         const schema = Joi.object().keys({
@@ -24,6 +26,7 @@ const DownloadValidator = {
 
             }
         } catch (error) {
+                    logger.error(500,{message: error,stack: error?.stack});
 
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -47,6 +50,7 @@ const DownloadValidator = {
 
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
 
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -70,6 +74,7 @@ const DownloadValidator = {
 
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
 
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -93,6 +98,7 @@ const DownloadValidator = {
 
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error.message));
         }
     },
@@ -115,6 +121,7 @@ const DownloadValidator = {
 
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
 
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -138,6 +145,7 @@ const DownloadValidator = {
 
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
 
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -161,6 +169,7 @@ const DownloadValidator = {
 
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
 
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -184,6 +193,7 @@ const DownloadValidator = {
 
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
 
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -207,6 +217,7 @@ const DownloadValidator = {
 
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
 
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -230,6 +241,7 @@ const DownloadValidator = {
 
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
 
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -254,6 +266,7 @@ const DownloadValidator = {
 
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
 
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -277,6 +290,7 @@ const DownloadValidator = {
 
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
 
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -300,6 +314,7 @@ const DownloadValidator = {
 
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
 
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }
@@ -323,6 +338,7 @@ const DownloadValidator = {
 
             }
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
 
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
         }

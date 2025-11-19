@@ -3,6 +3,8 @@ const credentials = require("../config/credientials");
 const helpers = require("../utilities/helper/general_helper");
 const { v4: uuidv4 } = require("uuid");
 const https = require('https');
+const logger = require('../config/logger');
+
 const orangeService = {
     pay:async(order_details,data,mid_details,mode)=>{
         try {
@@ -42,6 +44,7 @@ const orangeService = {
          console.log(final_response.data);
          return final_response;
         } catch (error) {
+          logger.error(400,{message: error,stack: error?.stack});
          return false;
         }
     },

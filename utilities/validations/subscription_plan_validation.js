@@ -16,6 +16,8 @@ const subscription_check = require("../validations/subscription_check");
 const statusCode = require("../../utilities/statuscode/index");
 const response = require("../../utilities/response/ServerResponse");
 const moment = require("moment");
+const logger = require('../../config/logger');
+
 const SubscriptionPlan = {
     add: async (req, res, next) => {
         const billing_freq = ["yearly", "monthly", "weekly", "daily"];
@@ -152,6 +154,7 @@ const SubscriptionPlan = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -324,6 +327,7 @@ const SubscriptionPlan = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -368,6 +372,7 @@ const SubscriptionPlan = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -413,6 +418,7 @@ const SubscriptionPlan = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -570,6 +576,7 @@ const SubscriptionPlan = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -616,6 +623,7 @@ const SubscriptionPlan = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -662,6 +670,7 @@ const SubscriptionPlan = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -722,6 +731,7 @@ const SubscriptionPlan = {
                 //   }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error.message)
             );
@@ -778,6 +788,7 @@ const SubscriptionPlan = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
@@ -823,6 +834,7 @@ const SubscriptionPlan = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -868,6 +880,7 @@ const SubscriptionPlan = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -913,6 +926,7 @@ const SubscriptionPlan = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -980,6 +994,7 @@ const SubscriptionPlan = {
 
 
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             return res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -1114,6 +1129,7 @@ const SubscriptionPlan = {
                     // next();
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 return res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -1428,6 +1444,7 @@ const SubscriptionPlan = {
                 next();
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error.message)
             );
@@ -1486,6 +1503,7 @@ const SubscriptionPlan = {
             }
            
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -1529,6 +1547,7 @@ const SubscriptionPlan = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -1596,6 +1615,7 @@ const SubscriptionPlan = {
             }
            
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -1638,6 +1658,7 @@ const SubscriptionPlan = {
             }
             next();
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             return res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -1727,6 +1748,7 @@ const SubscriptionPlan = {
             //send to next
             next();
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             return res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -2003,6 +2025,7 @@ const SubscriptionPlan = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -2047,6 +2070,7 @@ const SubscriptionPlan = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -2342,6 +2366,7 @@ const SubscriptionPlan = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -2396,6 +2421,7 @@ const SubscriptionPlan = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -2450,6 +2476,7 @@ const SubscriptionPlan = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -2493,6 +2520,7 @@ const SubscriptionPlan = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -2540,6 +2568,7 @@ const SubscriptionPlan = {
                 next();
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error.message)
             );
@@ -2652,6 +2681,7 @@ const SubscriptionPlan = {
            
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error.message)
             );
@@ -2696,6 +2726,7 @@ const SubscriptionPlan = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -2829,6 +2860,7 @@ const SubscriptionPlan = {
                 next();
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error.message)
             );
@@ -2871,6 +2903,7 @@ const SubscriptionPlan = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)

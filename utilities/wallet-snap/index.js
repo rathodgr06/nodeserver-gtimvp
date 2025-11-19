@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const moment = require("moment");
 const transacationChargesModel = require("../../models/charges_invoice_models");
 const currency = require("../../controller/currency");
+const logger = require('../../config/logger');
 
 module.exports = async () => {
   console.log("Wallet Snap  Started");
@@ -87,6 +88,7 @@ module.exports = async () => {
   }
     return;
   } catch (error) {
+    logger.error(400,{message: error,stack: error?.stack});
     console.error("Error in auto capture:", error);
   }
   console.log("Wallet Snap  Ended");

@@ -3,6 +3,8 @@ require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../../config/config.json")[env];
 const pool = require("../../config/database");
+const logger = require('../../config/logger');
+
 module.exports = async (dial, table_name, mobile) => {
   let qb = await pool.get_connection();
   let response;
@@ -12,6 +14,7 @@ module.exports = async (dial, table_name, mobile) => {
       .where({ dial: dial })
       .get(config.table_prefix + table_name);
   } catch (error) {
+    logger.error(400,{message: error,stack: error?.stack});
     console.error("Database query failed:", error);
   } finally {
     qb.release();

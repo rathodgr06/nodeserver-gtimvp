@@ -5,6 +5,7 @@ const helpers = require("../../utilities/helper/general_helper");
 const ServerResponse = require("../../utilities/response/ServerResponse");
 const StatusCode = require("../../utilities/statuscode/index");
 const enc_dec = require("../../utilities/decryptor/decryptor");
+const logger = require('../../config/logger');
 module.exports = async (req, res, next) => {
   try {
     
@@ -132,7 +133,7 @@ module.exports = async (req, res, next) => {
         );
     }
   } catch (error) {
-    
+    logger.error(500,{message: error,stack: error?.stack});
     return res
       .status(StatusCode.internalError)
       .send(ServerResponse.errormsg(error?.message));

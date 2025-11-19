@@ -1,6 +1,7 @@
 const Joi = require("joi").extend(require("@joi/date")).extend(require("joi-currency-code"));;
 const ServerResponse = require("../response/ServerResponse");
 const StatusCode = require("../statuscode/index");
+const logger = require('../../config/logger');
 
 const payoutValidator = {
     add: async (req, res, next) => {
@@ -50,6 +51,7 @@ const payoutValidator = {
                 next();
             }
         } catch (err) {
+          logger.error(400,{message: err,stack: err?.stack});
             console.log(err);
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(err)

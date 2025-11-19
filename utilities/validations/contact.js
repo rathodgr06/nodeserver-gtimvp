@@ -4,6 +4,8 @@ const StatusCode = require('../statuscode/index');
 const checkEmpty = require('./emptyChecker');
 const idChecker = require('./idchecker');
 const checkifrecordexist = require('./checkifrecordexist');
+const logger = require('../../config/logger');
+
 const ContactValidator = {
     store: async(req, res, next) => {
             const schema = Joi.object().keys({
@@ -90,6 +92,7 @@ const ContactValidator = {
                    
                 }
             } catch (error) {
+                logger.error(500,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
             }
 
@@ -177,7 +180,7 @@ const ContactValidator = {
                     next();
                 }
             } catch (error) {
-
+                logger.error(500,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
             }
 
@@ -207,7 +210,7 @@ const ContactValidator = {
                     next();
                 }
             } catch (error) {
-
+                logger.error(500,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
             }
 
@@ -232,7 +235,7 @@ const ContactValidator = {
                     next();
                 }
             } catch (error) {
-
+                logger.error(500,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
             }
 

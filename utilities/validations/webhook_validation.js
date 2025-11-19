@@ -2,7 +2,7 @@ const Joi = require("joi");
 const ServerResponse = require("../response/ServerResponse");
 const StatusCode = require('../statuscode/index');
 const checkEmpty = require('./emptyChecker');
-
+const logger = require('../../config/logger');
 
 const webHookValidator = {
     add_update: async (req, res, next) => {
@@ -40,7 +40,7 @@ const webHookValidator = {
                 }
 
             } catch (error) {
-
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
             }
 

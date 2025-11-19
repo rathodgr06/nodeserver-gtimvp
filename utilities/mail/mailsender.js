@@ -25,6 +25,7 @@ const server_addr = process.env.SERVER_LOAD;
 const port = process.env.SERVER_PORT;
 var html_to_pdf = require('html-pdf-node');
 const card_expiry = require("../mail-template/card_expiry");
+const logger = require('../../config/logger');
 
 var mailSender = {
     welcomeMail: async (mail, subject, url) => {
@@ -292,63 +293,62 @@ var mailSender = {
 
     CardExpiryMail: async (data) => {
         try {
-             let transporterAndCompanyDetails = await getTransporterDetails();
-            let smtp_details = transporterAndCompanyDetails.smtp_details;
-            
-            let title = await helpers.get_title();
-            let transporter = transporterAndCompanyDetails.transporter;
-            let image_path = server_addr  + "/static/images/";
-            let logo = image_path + smtp_details.company_logo;
-            let info = await transporter.sendMail({
-                from: smtp_details.smtp_from, // sender address
-                to: data.mail_to, // list of receivers
-                subject: "Card will expire soon.", // Subject line
-                html: "please change your payment method. Card will expire soon. Thanks.", // html body
-            });
+          let transporterAndCompanyDetails = await getTransporterDetails();
+          let smtp_details = transporterAndCompanyDetails.smtp_details;
+
+          let title = await helpers.get_title();
+          let transporter = transporterAndCompanyDetails.transporter;
+          let image_path = server_addr + "/static/images/";
+          let logo = image_path + smtp_details.company_logo;
+          let info = await transporter.sendMail({
+            from: smtp_details.smtp_from, // sender address
+            to: data.mail_to, // list of receivers
+            subject: "Card will expire soon.", // Subject line
+            html: "please change your payment method. Card will expire soon. Thanks.", // html body
+          });
         } catch (error) {
-            
+          logger.error(500, { message: error, stack: error?.stack });
         }
     },
     CardExpiryMailToMerchant: async (data) => {
          let transporterAndCompanyDetails = await getTransporterDetails();
         try {
-            
-            let mail_to = data.email;
-            let subject = data.subject;
-            let smtp_details = transporterAndCompanyDetails.smtp_details;
-            
-            let title = await helpers.get_title();
-            let transporter = transporterAndCompanyDetails.transporter;
-            let image_path = server_addr + "/static/images/";
-            let logo = image_path + smtp_details.company_logo;
-            let info = await transporter.sendMail({
-                from: smtp_details.smtp_from, // sender address
-                to: mail_to, // list of receivers
-                subject: subject, // Subject line
-                html: card_expiry(data, logo, title), // html body
-            });
+          let mail_to = data.email;
+          let subject = data.subject;
+          let smtp_details = transporterAndCompanyDetails.smtp_details;
+
+          let title = await helpers.get_title();
+          let transporter = transporterAndCompanyDetails.transporter;
+          let image_path = server_addr + "/static/images/";
+          let logo = image_path + smtp_details.company_logo;
+          let info = await transporter.sendMail({
+            from: smtp_details.smtp_from, // sender address
+            to: mail_to, // list of receivers
+            subject: subject, // Subject line
+            html: card_expiry(data, logo, title), // html body
+          });
         } catch (error) {
-            
+          logger.error(500, { message: error, stack: error?.stack });
         }
     },
     CardExpiryMailToCustomer: async (data) => {
         try {
-             let transporterAndCompanyDetails = await getTransporterDetails();
-            let mail_to = data.customer_email;
-            let smtp_details = transporterAndCompanyDetails.smtp_details;
-            
-            let title = await helpers.get_title();
-            let transporter = transporterAndCompanyDetails.transporter;
-            let image_path = server_addr + "/static/images/";
-            let logo = image_path + smtp_details.company_logo;
-            let info = await transporter.sendMail({
-                from: smtp_details.smtp_from, // sender address
-                to: mail_to, // list of receivers
-                subject: data.subject, // Subject line
-                html: card_expiry(data, logo, title), // html body
-            });
+          let transporterAndCompanyDetails = await getTransporterDetails();
+          let mail_to = data.customer_email;
+          let smtp_details = transporterAndCompanyDetails.smtp_details;
+
+          let title = await helpers.get_title();
+          let transporter = transporterAndCompanyDetails.transporter;
+          let image_path = server_addr + "/static/images/";
+          let logo = image_path + smtp_details.company_logo;
+          let info = await transporter.sendMail({
+            from: smtp_details.smtp_from, // sender address
+            to: mail_to, // list of receivers
+            subject: data.subject, // Subject line
+            html: card_expiry(data, logo, title), // html body
+          });
         } catch (error) {
-            
+          logger.error(500, { message: error, stack: error?.stack });
         }
     },
     referral_mail: async (data) => {

@@ -14,6 +14,8 @@ const env = process.env.ENVIRONMENT;
 const config = require("../../config/config.json")[env];
 const pool = require("../../config/database");
 let moment = require("moment");
+const logger = require('../../config/logger');
+
 const payment_validation = {
   refund: async (req, res, next) => {
     const schema = Joi.object({
@@ -81,6 +83,7 @@ const payment_validation = {
         }
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -146,6 +149,7 @@ const payment_validation = {
         }
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -209,6 +213,7 @@ const payment_validation = {
         }
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -271,6 +276,7 @@ const payment_validation = {
         }
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -355,10 +361,11 @@ const payment_validation = {
             .send(ServerResponse.errormsg("Invalid transaction id"));
         }
       }
-    } catch (err) {
+    } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
-        .send(ServerResponse.validationResponse(err.message));
+        .send(ServerResponse.validationResponse(error.message));
     }
   },
 
@@ -396,6 +403,7 @@ const payment_validation = {
         next();
       }
     } catch (err) {
+      logger.error(400,{message: err,stack: err?.stack});
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(err.message));
@@ -428,6 +436,7 @@ const payment_validation = {
         next();
       }
     } catch (err) {
+      logger.error(400,{message: err,stack: err?.stack});
       console.log(err);
       res
         .status(StatusCode.badRequest)
@@ -529,6 +538,7 @@ const payment_validation = {
         }
       }
     } catch (err) {
+      logger.error(400,{message: err,stack: err?.stack});
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(err.message));
@@ -646,6 +656,7 @@ const payment_validation = {
           break;
       }
     } catch (err) {
+      logger.error(400,{message: err,stack: err?.stack});
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(err.message));
@@ -675,6 +686,7 @@ async function checkActionAllowed(mode, txn, action) {
       .where({ "t1.txn": txn, [action_str]: 1 })
       .get();
   } catch (error) {
+    logger.error(400,{message: error,stack: error?.stack});
     console.error("Database query failed:", error);
   } finally {
     qb.release();
@@ -707,6 +719,7 @@ async function getTxnTimeAndVoidTime(mode, txn) {
       .where({ "t1.txn": txn })
       .get();
   } catch (error) {
+    logger.error(400,{message: error,stack: error?.stack});
     console.error("Database query failed:", error);
   } finally {
     qb.release();
