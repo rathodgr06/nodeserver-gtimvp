@@ -1,4 +1,5 @@
 const path = require("path");
+const logger = require('../config/logger');
 require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
@@ -18,7 +19,7 @@ const qr_module = {
     try {
       response = await qb.returning("id").insert(db_table, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -30,7 +31,7 @@ const qr_module = {
     try {
       response = await qb.returning("id").insert(db_collection, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -43,7 +44,7 @@ const qr_module = {
     try {
       response = await qb.set(data).where(condition).update(db_collection);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -56,7 +57,7 @@ const qr_module = {
     try {
       response = await qb.select("*").where(condition).get(db_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -74,7 +75,7 @@ const qr_module = {
         .where(condition)
         .get(merchant_deta);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -90,7 +91,7 @@ const qr_module = {
         .from(merchant_table)
         .get(data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -107,7 +108,7 @@ const qr_module = {
     try {
       response = await qb.select("*").where(condition).get(merchant_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -120,7 +121,7 @@ const qr_module = {
     try {
       response = await qb.select("*").where(condition).get(db_collection);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -133,7 +134,7 @@ const qr_module = {
     try {
       response = await qb.select("*").where(condition).get(db_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -145,7 +146,7 @@ const qr_module = {
     try {
       response = await qb.set(data).where(condition).update(db_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -160,7 +161,7 @@ const qr_module = {
       qb.limit(limit.perpage, limit.start);
       response = await qb.get(db_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -203,7 +204,7 @@ const qr_module = {
           .get(db_table);
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -233,7 +234,7 @@ const qr_module = {
           .get(db_collection);
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -251,7 +252,7 @@ const qr_module = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -268,7 +269,7 @@ const qr_module = {
         .from(merchant_table)
         .get(data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -284,7 +285,7 @@ const qr_module = {
     try {
       response = await qb.select("id,code").from(merchant_deta).get(data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -300,7 +301,7 @@ const qr_module = {
     try {
       response = await qb.select("id,mobile_no").from(merchant_deta).get(data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -316,7 +317,7 @@ const qr_module = {
     try {
       response = await qb.select("id,logo").from(merchant_deta).get(data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -344,7 +345,7 @@ const qr_module = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -365,7 +366,7 @@ const qr_module = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -380,7 +381,7 @@ const qr_module = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -405,7 +406,7 @@ const qr_module = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -430,7 +431,7 @@ const qr_module = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -444,7 +445,7 @@ const qr_module = {
     try {
       response = await qb.select("*").where(condition).get(db_collection);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -474,7 +475,7 @@ const qr_module = {
         .where(condition)
         .get(config.table_prefix + table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -497,7 +498,7 @@ const qr_module = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -520,7 +521,7 @@ const qr_module = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -544,7 +545,7 @@ const qr_module = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -557,7 +558,7 @@ const qr_module = {
     try {
       response = await qb.returning("id").insert(pay_mail, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -582,7 +583,7 @@ const qr_module = {
         .order_by("qr.transaction_date", "desc")
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -598,7 +599,7 @@ const qr_module = {
         .where(condition)
         .get(config.table_prefix + table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }

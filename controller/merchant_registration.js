@@ -18,7 +18,7 @@ var uuid = require("uuid");
 const mailSender = require("../utilities/mail/mailsender");
 const { authenticator } = require("otplib");
 const QRCode = require("qrcode");
-const winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 
 require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
@@ -201,7 +201,7 @@ var MerchantRegistration = {
         );
       })
       .catch((error) => {
-        winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -257,7 +257,7 @@ var MerchantRegistration = {
     /**
      * Register merchant
      */
-    await MerchantRegistrationModel.register(psp_data)
+     MerchantRegistrationModel.register(psp_data)
       .then(async (result) => {
         let created_at = moment().format("YYYY-MM-DD HH:mm:ss");
         let tc_obj = {
@@ -676,7 +676,7 @@ var MerchantRegistration = {
                                 );
                             })
                             .catch((error) => {
-                              winston.error(error);
+                               logger.error(500,{message: error,stack: error.stack}); 
                               console.log("Error: ", error);
                             });
                           //--------------------------------------------------------------
@@ -685,12 +685,12 @@ var MerchantRegistration = {
                     }
                   })
                   .catch((error) => {
-                    winston.error(error);
+                     logger.error(500,{message: error,stack: error.stack}); 
                     console.log("Error: ", error);
                   });
               })
               .catch((error) => {
-                winston.error(error);
+                 logger.error(500,{message: error,stack: error.stack}); 
                 console.log("Error: ", error);
               });
 
@@ -701,7 +701,7 @@ var MerchantRegistration = {
         //--------------------------------------------------------------
       })
       .catch((error) => {
-        winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -755,7 +755,7 @@ var MerchantRegistration = {
               );
             })
             .catch((error) => {
-              winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error));
@@ -766,8 +766,8 @@ var MerchantRegistration = {
             .send(response.errormsg("Account is not active or deleted."));
         }
       })
-      .catch((err) => {
-        winston.error(err);
+      .catch((error) => {
+         logger.error(500,{message: err,stack: err.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(err));
       });
   },
@@ -820,7 +820,7 @@ var MerchantRegistration = {
               );
             })
             .catch((error) => {
-              winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error));
@@ -831,8 +831,8 @@ var MerchantRegistration = {
             .send(response.errormsg("Account is not active or deleted."));
         }
       })
-      .catch((err) => {
-        winston.error(err);
+      .catch((error) => {
+         logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -895,12 +895,12 @@ var MerchantRegistration = {
               );
           })
           .catch((error) => {
-            winston.error(error);
+             logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error));
           });
       })
       .catch((error) => {
-        winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -937,7 +937,7 @@ var MerchantRegistration = {
         }
       })
       .catch((error) => {
-        winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -1067,7 +1067,7 @@ var MerchantRegistration = {
         }
       })
       .catch((error) => {
-        winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -1118,7 +1118,7 @@ var MerchantRegistration = {
                   );
               })
               .catch((error) => {
-                winston.error(error);
+                 logger.error(500,{message: error,stack: error.stack}); 
                 res
                   .status(statusCode.internalError)
                   .send(response.errormsg(error));
@@ -1156,7 +1156,7 @@ var MerchantRegistration = {
                   );
               })
               .catch((error) => {
-                winston.error(error);
+                 logger.error(500,{message: error,stack: error.stack}); 
                 res
                   .status(statusCode.internalError)
                   .send(response.errormsg(error));
@@ -1168,8 +1168,8 @@ var MerchantRegistration = {
             .send(response.errormsg("Account is not active or deleted."));
         }
       })
-      .catch((err) => {
-        winston.error(err);
+      .catch((error) => {
+         logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -1197,7 +1197,7 @@ var MerchantRegistration = {
           )
         );
     } catch (error) {
-      winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1230,7 +1230,7 @@ var MerchantRegistration = {
           )
         );
     } catch (error) {
-      winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1427,7 +1427,7 @@ var MerchantRegistration = {
           )
         );
     } catch (error) {
-      console.log(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1448,7 +1448,7 @@ var MerchantRegistration = {
         .status(statusCode.ok)
         .send(response);
     } catch (error) {
-      console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1468,7 +1468,7 @@ var MerchantRegistration = {
         .status(statusCode.ok)
         .send(response);
     } catch (error) {
-      console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1556,7 +1556,7 @@ var MerchantRegistration = {
 
 
     }catch(error){
-      console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
        res
         .status(statusCode.badRequest)
         .send(response.validationResponse(error.message));
@@ -1566,6 +1566,7 @@ var MerchantRegistration = {
 };
 module.exports = MerchantRegistration;
 async function addTestMid(merchant_id, super_merchant_id) {
+  try{
   console.log("Test MID add function call");
   let psp_id = 1;
   let currency_id = await helpers.get_currency_id_by_name("AED");
@@ -1627,4 +1628,8 @@ async function addTestMid(merchant_id, super_merchant_id) {
   }
   const created_mid = await SubmerchantModel.add_bulk_mid(testMID, "mid");
   return true;
+}catch(error){
+  logger.error(500,{message: error,stack: error.stack}); 
+  return false;
+}
 }

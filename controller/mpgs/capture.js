@@ -10,6 +10,7 @@ const moment = require('moment');
 const enc_dec = require("../../utilities/decryptor/decryptor");
 const { v4: uuidv4 } = require('uuid');
 const calculateTransactionCharges = require("../../utilities/charges/transaction-charges/index");
+const logger = require('../../config/logger');
 const mpgs_capture = async (req, res) => {
     try {
         let transaction_id = req.bodyString("transaction_id");
@@ -239,7 +240,7 @@ const mpgs_capture = async (req, res) => {
         }
     }
     catch (error) {
-        console.error("Error during capture:", error);
+    logger.error(500,{message: error,stack: error.stack});
         let resp_dump = {
             order_id: req.bodyString("p_order_id"),
             type: "CAPTURE",

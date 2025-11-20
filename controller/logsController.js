@@ -5,7 +5,7 @@ const helpers = require("../utilities/helper/general_helper");
 const enc_dec = require("../utilities/decryptor/decryptor");
 const order_logs = require("../models/order_logs");
 const date_formatter = require("../utilities/date_formatter/index"); // date formatter module
-const winston = require('../utilities/logmanager/winston');
+const errlogger = require('../config/logger');
 
 var logger = {
     list: async (req, res) => {
@@ -56,7 +56,7 @@ var logger = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+                  errlogger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -93,7 +93,7 @@ var logger = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+                  errlogger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );

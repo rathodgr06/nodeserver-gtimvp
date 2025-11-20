@@ -59,8 +59,8 @@ const MerchantOrderValidator = {
 
                             res.status(StatusCode.badRequest).send(
                                 ServerResponse.common_error_msg(
-                                    common_err.response[0].response_details,
-                                    common_err.response[0].response_code
+                                    common_err.response?.[0]?.response_details,
+                                    common_err.response?.[0]?.response_code
                                 )
                             );
                         } else {
@@ -84,8 +84,8 @@ const MerchantOrderValidator = {
 
                                 res.status(StatusCode.badRequest).send(
                                     ServerResponse.common_error_msg(
-                                        common_err.response[0].response_details,
-                                        common_err.response[0].response_code
+                                        common_err.response?.[0]?.response_details,
+                                        common_err.response?.[0]?.response_code
                                     )
                                 );
                             }
@@ -117,8 +117,8 @@ const MerchantOrderValidator = {
                             let common_err = await helpers.get_common_response(payload);
                             res.status(StatusCode.badRequest).send(
                                 ServerResponse.common_error_msg(
-                                    common_err.response[0].response_details,
-                                    common_err.response[0].response_code
+                                    common_err.response?.[0]?.response_details,
+                                    common_err.response?.[0]?.response_code
                                 )
                             );
                         }
@@ -131,8 +131,8 @@ const MerchantOrderValidator = {
                             let common_err = await helpers.get_common_response(payload);
                             res.status(StatusCode.badRequest).send(
                                 ServerResponse.common_error_msg(
-                                    common_err.response[0].response_details,
-                                    common_err.response[0].response_code
+                                    common_err.response?.[0]?.response_details,
+                                    common_err.response?.[0]?.response_code
                                 )
                             );
                         }
@@ -144,8 +144,8 @@ const MerchantOrderValidator = {
                             let common_err = await helpers.get_common_response(payload);
                             res.status(StatusCode.badRequest).send(
                                 ServerResponse.common_error_msg(
-                                    common_err.response[0].response_details,
-                                    common_err.response[0].response_code
+                                    common_err.response?.[0]?.response_details,
+                                    common_err.response?.[0]?.response_code
                                 )
                             );
                         }
@@ -158,8 +158,8 @@ const MerchantOrderValidator = {
                             let common_err = await helpers.get_common_response(payload);
                             res.status(StatusCode.badRequest).send(
                                 ServerResponse.common_error_msg(
-                                    common_err.response[0].response_details,
-                                    common_err.response[0].response_code
+                                    common_err.response?.[0]?.response_details,
+                                    common_err.response?.[0]?.response_code
                                 )
                             );
                         }
@@ -171,8 +171,8 @@ const MerchantOrderValidator = {
                             let common_err = await helpers.get_common_response(payload);
                             res.status(StatusCode.badRequest).send(
                                 ServerResponse.common_error_msg(
-                                    common_err.response[0].response_details,
-                                    common_err.response[0].response_code
+                                    common_err.response?.[0]?.response_details,
+                                    common_err.response?.[0]?.response_code
                                 )
                             );
                         }
@@ -184,8 +184,8 @@ const MerchantOrderValidator = {
                             let common_err = await helpers.get_common_response(payload);
                             res.status(StatusCode.badRequest).send(
                                 ServerResponse.common_error_msg(
-                                    common_err.response[0].response_details,
-                                    common_err.response[0].response_code
+                                    common_err.response?.[0]?.response_details,
+                                    common_err.response?.[0]?.response_code
                                 )
                             );
                         }
@@ -488,8 +488,8 @@ const MerchantOrderValidator = {
                             if (common_err?.response[0]?.response_details) {
                                 res.status(StatusCode.badRequest).send(
                                     ServerResponse.common_error_msg(
-                                        common_err.response[0].response_details,
-                                        common_err.response[0].response_code
+                                        common_err.response?.[0]?.response_details,
+                                        common_err.response?.[0]?.response_code
                                     )
                                 )
                             } else {
@@ -510,8 +510,8 @@ const MerchantOrderValidator = {
                             if (common_err?.response[0]?.response_details) {
                                 res.status(StatusCode.badRequest).send(
                                     ServerResponse.common_error_msg(
-                                        common_err.response[0].response_details,
-                                        common_err.response[0].response_code
+                                        common_err.response?.[0]?.response_details,
+                                        common_err.response?.[0]?.response_code
                                     )
                                 )
                             } else {
@@ -533,8 +533,8 @@ const MerchantOrderValidator = {
                             if (common_err?.response[0]?.response_details) {
                                 res.status(StatusCode.badRequest).send(
                                     ServerResponse.common_error_msg(
-                                        common_err.response[0].response_details,
-                                        common_err.response[0].response_code
+                                        common_err.response?.[0]?.response_details,
+                                        common_err.response?.[0]?.response_code
                                     )
                                 )
                             } else {
@@ -559,8 +559,8 @@ const MerchantOrderValidator = {
                             if (common_err?.response[0]?.response_details) {
                                 res.status(StatusCode.badRequest).send(
                                     ServerResponse.common_error_msg(
-                                        common_err.response[0].response_details,
-                                        common_err.response[0].response_code
+                                        common_err.response?.[0]?.response_details,
+                                        common_err.response?.[0]?.response_code
                                     )
                                 )
                             } else {
@@ -585,8 +585,8 @@ const MerchantOrderValidator = {
                             if (common_err?.response[0]?.response_details) {
                                 res.status(StatusCode.badRequest).send(
                                     ServerResponse.common_error_msg(
-                                        common_err.response[0].response_details,
-                                        common_err.response[0].response_code
+                                        common_err.response?.[0]?.response_details,
+                                        common_err.response?.[0]?.response_code
                                     )
                                 )
                             } else {
@@ -626,8 +626,8 @@ const MerchantOrderValidator = {
 
                             res.status(StatusCode.badRequest).send(
                                 ServerResponse.common_error_msg(
-                                    common_err.response[0].response_details,
-                                    common_err.response[0].response_code
+                                    common_err.response?.[0]?.response_details,
+                                    common_err.response?.[0]?.response_code
                                 )
                             );
                         } else if (customer_details.mobile.length != mobile_length) {
@@ -645,8 +645,8 @@ const MerchantOrderValidator = {
 
                             res.status(StatusCode.badRequest).send(
                                 ServerResponse.common_error_msg(
-                                    common_err.response[0].response_details,
-                                    common_err.response[0].response_code
+                                    common_err.response?.[0]?.response_details,
+                                    common_err.response?.[0]?.response_code
                                 )
                             );
                         } else if (result5.error) {
@@ -734,8 +734,8 @@ const MerchantOrderValidator = {
 
             res.status(StatusCode.badRequest).send(
                 ServerResponse.common_error_msg(
-                    common_err.response[0].response_details,
-                    common_err.response[0].response_code
+                    common_err.response?.[0]?.response_details,
+                    common_err.response?.[0]?.response_code
                 )
             );
         }

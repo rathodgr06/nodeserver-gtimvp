@@ -9,6 +9,7 @@ const merchantOrderModel = require("../../models/merchantOrder");
 const moment = require('moment');
 const enc_dec = require("../../utilities/decryptor/decryptor");
 const { v4: uuidv4 } = require('uuid');
+const logger = require('../../config/logger');
 const token = async(data) =>{
     try {
         const req_data = {
@@ -43,8 +44,7 @@ const token = async(data) =>{
         return response.data.token;
     }
     catch (error) {
-        console.log(error);
-        console.log(`inside token catch`)
+        logger.error(500,{message: error,stack: error.stack}); 
       return '';
     }
 }

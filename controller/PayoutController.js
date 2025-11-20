@@ -1,6 +1,6 @@
 const helpers = require("../utilities/helper/general_helper");
 const moment = require("moment");
-const winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 const statusCode = require("../utilities/statuscode/index");
 const response = require("../utilities/response/ServerResponse");
 const EventEmitter = require("events");
@@ -159,7 +159,7 @@ let PayoutController = {
       }
     } catch (error) {
       console.error("Error in payout processing:", error);
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       return response.errormsg(error?.message);
     }
   },
@@ -190,7 +190,7 @@ async function check_overrided_plan(sub_merchant_id) {
 
     return {status: response?.status, message: response?.message, data: response?.data};
   } catch (error) {
-    console.log(error.message);
+   logger.error(500,{message: error,stack: error.stack}); 
     return {status: 400, message: error.message, data: null};
   }
 }
@@ -214,7 +214,7 @@ async function get_receiver_by_sub_merchant_id_api_call(sub_merchant_id) {
 
     return response?.data;
   } catch (error) {
-    console.log(error);
+   logger.error(500,{message: error,stack: error.stack}); 
     return null;
   }
 }
@@ -243,7 +243,7 @@ async function check_payout_schedule_api_call(schedule_date) {
 
     return response?.data;
   } catch (error) {
-    console.log(error);
+  logger.error(500,{message: error,stack: error.stack}); 
     return null;
   }
 }
@@ -268,7 +268,7 @@ async function create_batch_payout_api_call(payload) {
 
     return response?.data;
   } catch (error) {
-    console.log(error);
+   logger.error(500,{message: error,stack: error.stack}); 
     return null;
   }
 }
@@ -295,7 +295,7 @@ async function re_schedule_payout_api_call(payload) {
 
     return response?.data;
   } catch (error) {
-    console.log(error);
+   logger.error(500,{message: error,stack: error.stack}); 
     return null;
   }
 }

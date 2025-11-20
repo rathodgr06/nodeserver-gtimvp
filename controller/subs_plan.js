@@ -19,7 +19,7 @@ const QRCode = require("qrcode");
 const accessToken = require("../utilities/tokenmanager/token");
 const SendMail = require("./cronjobs");
 const checkSubscription = require("../utilities/validations/subscription_check");
-const winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 
 const subs_plan = {
   code: async (req, res) => {
@@ -99,7 +99,7 @@ const subs_plan = {
           .send(response.successmsg("Subscription plan added successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -217,7 +217,7 @@ const subs_plan = {
               );
           })
           .catch((error) => {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
 
             res
               .status(statusCode.internalError)
@@ -225,7 +225,7 @@ const subs_plan = {
           });
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -411,7 +411,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -463,7 +463,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -546,7 +546,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -569,7 +569,7 @@ const subs_plan = {
           .send(response.successmsg("Subscription plan deleted successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -684,7 +684,7 @@ const subs_plan = {
               );
           })
           .catch((error) => {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
 
             res
               .status(statusCode.internalError)
@@ -692,7 +692,7 @@ const subs_plan = {
           });
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -718,7 +718,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -744,7 +744,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -855,7 +855,7 @@ const subs_plan = {
                 .send(response.successmsg("Mail sent successfully"));
             })
             .catch((error) => {
-              winston.error(error);
+             logger.error(500,{message: error,stack: error.stack}); 
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error.message));
@@ -863,7 +863,7 @@ const subs_plan = {
         }
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -957,7 +957,7 @@ const subs_plan = {
             .send(response.successansmsg(data, "Details fetch successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -1127,7 +1127,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1403,7 +1403,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1571,7 +1571,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1720,7 +1720,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1737,7 +1737,7 @@ const subs_plan = {
           .send(response.successmsg("Subscription cancelled successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2046,7 +2046,7 @@ const subs_plan = {
         res.status(statusCode.ok).send(res_order_details);
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2193,7 +2193,7 @@ const subs_plan = {
             );
         })
         .catch((error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
@@ -2320,7 +2320,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2362,7 +2362,7 @@ const subs_plan = {
           .add_logs(logs_data)
           .then(async (result) => {})
           .catch((error) => {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
 
             res
               .status(statusCode.internalError)
@@ -2397,7 +2397,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -2468,7 +2468,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2534,7 +2534,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -2550,7 +2550,7 @@ const subs_plan = {
         .status(statusCode.ok)
         .send(response.successmsg("Mail send successfully."));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -2564,7 +2564,7 @@ const subs_plan = {
         .status(statusCode.ok)
         .send(response.successmsg("Mail send successfully."));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -2708,7 +2708,7 @@ const subs_plan = {
             );
         })
         .catch((error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
@@ -2733,7 +2733,7 @@ const subs_plan = {
         .status(statusCode.ok)
         .send(response.successmsg("Mail send successfully."));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -2882,7 +2882,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2911,7 +2911,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2959,7 +2959,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -3095,7 +3095,7 @@ const subs_plan = {
               );
           })
           .catch((error) => {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
 
             res
               .status(statusCode.internalError)
@@ -3103,7 +3103,7 @@ const subs_plan = {
           });
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -3192,7 +3192,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -3355,7 +3355,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -3474,7 +3474,7 @@ const subs_plan = {
               );
           })
           .catch((error) => {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
 
             res
               .status(statusCode.internalError)
@@ -3482,7 +3482,7 @@ const subs_plan = {
           });
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -3508,7 +3508,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -3534,7 +3534,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -3668,7 +3668,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -3777,7 +3777,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -4046,7 +4046,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -4225,7 +4225,7 @@ const subs_plan = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -4349,7 +4349,7 @@ const subs_plan = {
                 .send(response.successmsg("Mail sent successfully"));
             })
             .catch((error) => {
-              winston.error(error);
+             logger.error(500,{message: error,stack: error.stack}); 
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error.message));
@@ -4357,7 +4357,7 @@ const subs_plan = {
         }
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -4375,7 +4375,7 @@ const subs_plan = {
           .send(response.successmsg("Subscription cancelled successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));

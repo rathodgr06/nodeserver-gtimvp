@@ -4,7 +4,7 @@ const statusCode = require("../utilities/statuscode/index");
 const response = require("../utilities/response/ServerResponse");
 const enc_dec = require("../utilities/decryptor/decryptor");
 const helpers = require("../utilities/helper/general_helper");
-const winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 const momentDataFormater = require("../utilities/date_formatter/index");
 const RoutingModel = require("../models/routingModel");
 const attributes = require("../utilities/validations/routing_rule_attribute");
@@ -110,7 +110,7 @@ var Routing = {
           response.successdatamsg(new_res, "Details fetched successfully.")
         );
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       console.log("error", error);
       res
         .status(statusCode.internalError)
@@ -157,7 +157,7 @@ var Routing = {
           response.successdatamsg(send_res, "Details fetched successfully.")
         );
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       console.log("error", error);
       res
         .status(statusCode.internalError)
@@ -211,7 +211,7 @@ var Routing = {
         .status(statusCode.ok)
         .send(response.successmsg("Routing saved successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       console.log("error", error);
       res
         .status(statusCode.internalError)
@@ -279,7 +279,7 @@ var Routing = {
         .status(statusCode.ok)
         .send(response.successmsg(message));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       console.log("error", error);
       res
         .status(statusCode.internalError)
@@ -309,7 +309,7 @@ var Routing = {
         .status(statusCode.ok)
         .send(response.successmsg("Routing saved successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       console.log("error", error);
       res
         .status(statusCode.internalError)
@@ -340,7 +340,7 @@ var Routing = {
         .status(statusCode.ok)
         .send(response.successmsg("Updated successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       console.log("error", error);
       res
         .status(statusCode.internalError)
@@ -367,7 +367,7 @@ var Routing = {
         .status(statusCode.ok)
         .send(response.successmsg("Rule deleted successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       console.log("error", error);
       res
         .status(statusCode.internalError)
@@ -388,7 +388,7 @@ var Routing = {
           response.successdatamsg(routing_rule_order[0], "Details fetched successfully.")
         );
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       console.log("error", error);
       res
         .status(statusCode.internalError)

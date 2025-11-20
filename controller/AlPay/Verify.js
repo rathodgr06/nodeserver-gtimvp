@@ -12,6 +12,7 @@ const { countryToAlpha3 } = require("country-to-iso");
 const { send_webhook_data } = require("../webhook_settings");
 const PspModel = require("../../models/psp");
 const credientials = require("../../config/credientials");
+const logger = require('../../config/logger');
 const Verify = async (req, res) => {
   const order_id = req.body.order_id;
   const mode = req.body.mode;
@@ -106,7 +107,7 @@ const Verify = async (req, res) => {
       status: "success",
     });
   } catch (error) {
-    console.log(error);
+    logger.error(500,{message: error,stack: error.stack}); 
     return res.status(statusCode.ok).send(Server_response.errorMsgWithData('Unable to verify', []));
   } 
 };

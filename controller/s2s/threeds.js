@@ -17,7 +17,7 @@ const SendTransactionMailAction = require('../SendTransactionMail');
 const { send_webhook_data } = require("../webhook_settings");
 const PspModel = require("../../models/psp");
 const calculateTransactionCharges = require("../../utilities/charges/transaction-charges/index");
-
+const logger = require('../../config/logger');
 const s2s_3ds = async (req, res) => {
     console.log(`req body after 3ds`)
     console.log(req.body);
@@ -480,7 +480,7 @@ const s2s_3ds = async (req, res) => {
         });
         // res.send("OKAY")
     }catch(error){
-        console.log(error);
+       logger.error(500,{message: error,stack: error.stack}); 
     }
 }
 

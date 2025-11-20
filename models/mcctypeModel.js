@@ -1,4 +1,5 @@
 const path = require("path");
+const logger = require('../config/logger');
 require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
@@ -13,7 +14,7 @@ var dbModel = {
     try {
       response = await qb.returning("id").insert(dbtable, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -38,7 +39,7 @@ var dbModel = {
           .get(dbtable);
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -50,7 +51,7 @@ var dbModel = {
     try {
       response = await qb.select(selection).where(condition).get(dbtable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -66,7 +67,7 @@ var dbModel = {
         .order_by("mcc_category", "asc")
         .get(dbtable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -78,7 +79,7 @@ var dbModel = {
     try {
       response = await qb.select(selection).where(condition).get(dbtable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -90,7 +91,7 @@ var dbModel = {
     try {
       response = await qb.set(data).where(condition).update(dbtable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -105,7 +106,7 @@ var dbModel = {
         "select count('id') as count from " + dbtable + " where " + condition
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }

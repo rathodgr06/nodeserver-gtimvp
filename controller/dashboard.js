@@ -12,7 +12,7 @@ const moment = require("moment");
 const e = require("express");
 const referrer_model = require("../models/referrer_model");
 const date_formatter = require("../utilities/date_formatter/index"); // date formatter module
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 
 const getDateCondition = async (req) => {
     const from_date = req.bodyString("from_date") || (await date_formatter.convert_date_by_days(6));
@@ -30,7 +30,7 @@ async function table_conditions(req) {
             };
             resolve(obj);
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             reject(error);
         }
     });
@@ -44,12 +44,12 @@ const getAndCondition = async (req) => {
             and_condition.merchant_id = 0;
             and_condition.super_merchant_id = req.user.id;
         } else {
-            and_condition.merchant_id = await enc_dec.cjs_decrypt(sub_merchant_id);
+            and_condition.merchant_id =  enc_dec.cjs_decrypt(sub_merchant_id);
         }
     }
 
     if (req.bodyString("currency")) {
-        and_condition.currency = await req.bodyString("currency");
+        and_condition.currency =  req.bodyString("currency");
     }
     if (req.bodyString("psp")) {
         and_condition.psp = req.bodyString("psp");
@@ -716,7 +716,7 @@ var res_data = {
                 );
             }
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -756,7 +756,7 @@ var res_data = {
 
             
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -795,7 +795,7 @@ var res_data = {
             );
             
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -850,7 +850,7 @@ var res_data = {
 
            
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -918,8 +918,7 @@ var res_data = {
             ));
 
         } catch (error) {
-            console.log(error)
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             return res.status(statusCode.ok).send(
                 response.errormsg(error.message)
             );
@@ -995,7 +994,7 @@ var res_data = {
            
 
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -1048,8 +1047,7 @@ var res_data = {
         
             
         } catch (error) {
-            console.log(error)
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             return res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -1126,8 +1124,7 @@ var res_data = {
 
 
         } catch (error) {
-            console.log(error)
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -1202,8 +1199,7 @@ var res_data = {
            
 
         } catch (error) {
-            console.log(error);
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -1321,7 +1317,7 @@ var res_data = {
 
 
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -1370,8 +1366,7 @@ var res_data = {
 
             
         } catch (error) {
-            console.log(error);
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -1493,7 +1488,7 @@ var res_data = {
             );
             */
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -1613,7 +1608,7 @@ var res_data = {
             );
             */
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -1727,7 +1722,7 @@ var res_data = {
             );
             */
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -1750,7 +1745,7 @@ var res_data = {
                 )
             );
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -1818,7 +1813,7 @@ var res_data = {
 
 
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -1872,8 +1867,7 @@ var res_data = {
             
 
         } catch (error) {
-            console.log(error)
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -1920,7 +1914,7 @@ var res_data = {
             );
                     
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -1968,7 +1962,7 @@ var res_data = {
             );
          
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -2012,7 +2006,7 @@ var res_data = {
             );
 
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -2114,8 +2108,7 @@ var res_data = {
             );
 
         } catch (error) {
-            console.log(error);
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -2160,8 +2153,7 @@ var res_data = {
             );
 
         } catch (error) {
-            console.log(error);
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -2201,7 +2193,7 @@ var res_data = {
 
       
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -2300,7 +2292,7 @@ var res_data = {
             );
 
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -2361,7 +2353,7 @@ var res_data = {
             );
 
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );

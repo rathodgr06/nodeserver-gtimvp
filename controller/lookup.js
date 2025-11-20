@@ -5,7 +5,7 @@ const encrypt_decrypt = require("../utilities/decryptor/encrypt_decrypt");
 const merchantOrderModel = require("../models/merchantOrder");
 const enc_dec = require("../utilities/decryptor/decryptor");
 const helpers = require("../utilities/helper/general_helper");
-const winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 const { constants } = require("buffer");
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
@@ -193,7 +193,7 @@ var lookup = {
         );
     } catch (error) {
       console.log(error);
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       return res
         .status(statusCode.badRequest)
         .send(response.errormsg(error?.response?.data?.error || error.message));
@@ -253,11 +253,11 @@ var lookup = {
             );
         })
         .catch((error) => {
-          winston.error(error);
+          logger.error(500,{message: error,stack: error.stack}); 
           res.status(statusCode.ok).send(response.errormsg(error.message));
         }); // wrap in async function
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.ok).send(response.errormsg(error.message));
     }
   },
@@ -384,15 +384,14 @@ var lookup = {
             next();
           })
           .catch((error) => {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             return res
               .status(statusCode.ok)
               .send(response.errormsg(error.request.data["api-error-msg"]));
           });
       }
     } catch (error) {
-      console.log(error);
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       return res.status(statusCode.ok).send(response.errormsg(error.message));
     }
   },
@@ -610,8 +609,7 @@ var lookup = {
 
       next();
     } catch (error) {
-      console.log(error);
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       return res.status(statusCode.ok).send(response.errormsg(error.message));
     }
   },
@@ -866,8 +864,7 @@ var lookup = {
 
       next();
     } catch (error) {
-      console.log(error);
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       return res.status(statusCode.ok).send(response.errormsg(error.message));
     }
   },
@@ -922,19 +919,20 @@ var lookup = {
           next();
         })
         .catch((error) => {
-          winston.error(error);
+          logger.error(500,{message: error,stack: error.stack}); 
           return res
             .status(statusCode.ok)
             .send(response.errormsg(error.request.data["api-error-msg"]));
         });
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       return res.status(statusCode.ok).send(response.errormsg(error.message));
     }
   },
 };
 
 async function checkMidIsValid(mid, card_details, order_details) {
+  try{
   const mid_details = await merchantOrderModel.selectDynamicONE(
     "payment_methods,payment_schemes,domestic,international,minTxnAmount,maxTxnAmount,currency_id as currency",
     { id: mid, deleted: 0 },
@@ -980,6 +978,9 @@ async function checkMidIsValid(mid, card_details, order_details) {
     return false;
   }
   return true;
+}catch(error){
+   logger.error(500,{message: error,stack: error.stack}); 
+}
 }
 
 module.exports = lookup;

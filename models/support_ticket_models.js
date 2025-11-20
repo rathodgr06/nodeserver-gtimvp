@@ -5,6 +5,7 @@ const pool = require("../config/database");
 const dbtable = config.table_prefix + "orders";
 const dbtable2 = config.table_prefix + "charges_invoice";
 const helpers = require("../utilities/helper/general_helper");
+const logger = require('../config/logger');
 
 var support_ticket_model = {
   add: async (data) => {
@@ -13,7 +14,7 @@ var support_ticket_model = {
     try {
       response = await qb.returning("id").insert(dbtable2, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -47,7 +48,7 @@ var support_ticket_model = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -71,7 +72,7 @@ var support_ticket_model = {
           response = await qb.get(dbtable2);
         }
       } catch (error) {
-        console.error("Database query failed:", error);
+        logger.error(500,{message: error,stack: error.stack}); 
       } finally {
         qb.release();
       }
@@ -88,7 +89,7 @@ var support_ticket_model = {
           response = await qb.get(dbtable2);
         }
       } catch (error) {
-        console.error("Database query failed:", error);
+        logger.error(500,{message: error,stack: error.stack}); 
       } finally {
         qb.release();
       }
@@ -102,7 +103,7 @@ var support_ticket_model = {
     try {
       response = await qb.set(data).where(condition).update(dbtable2);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }

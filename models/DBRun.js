@@ -1,6 +1,6 @@
 const { executablePath } = require("puppeteer");
 const pool = require("../config/database");
-
+const logger = require('../config/logger');
 let DBRun = {
   exec_query: async (query) => {
     if (!query) {
@@ -12,7 +12,7 @@ let DBRun = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -34,7 +34,7 @@ let DBRun = {
     try {
       response = await qb.select(select).where(where).get(table_name);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -63,7 +63,7 @@ let DBRun = {
         .limit(limit)
         .get(table_name);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -74,7 +74,7 @@ let DBRun = {
     try {
       response = dbQuery?.run();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }

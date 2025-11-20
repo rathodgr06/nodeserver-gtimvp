@@ -3,7 +3,7 @@ const moment = require('moment');
 const envconfig = require("../config/config.json")[env];
 const pool = require('../config/database');
 const mailSender = require("../utilities/mail/mailsender");
-
+const logger = require('../config/logger');
 sendMail = async (data) => {
     let qb = await pool.get_connection();
     
@@ -30,6 +30,7 @@ sendMail = async (data) => {
             .get();
         //console.log('merchant_and_customer_transaction_response', merchant_and_customer_transaction_response)
     } catch (error) {
+        logger.error(500,{message: error,stack: error.stack}); 
         console.error("Database query failed:", error);
     } finally {
         qb.release();

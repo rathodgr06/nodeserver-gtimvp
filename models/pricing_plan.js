@@ -11,7 +11,7 @@ const mid_sell_table = config.table_prefix + "master_mid_sellrate";
 const master_subm_sellrate = config.table_prefix + "master_subm_sellrate";
 const helpers = require("../utilities/helper/general_helper");
 const enc_dec = require("../utilities/decryptor/decryptor");
-
+const logger = require('../config/logger');
 var pricing_model = {
   add: async (data, table) => {
     let qb = await pool.get_connection();
@@ -22,7 +22,7 @@ var pricing_model = {
         .insert(config.table_prefix + table, data);
         console.log(qb.last_query());
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -39,7 +39,7 @@ var pricing_model = {
         .where(condition)
         .update(config.table_prefix + table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -53,7 +53,7 @@ var pricing_model = {
     try {
       response = await qb.returning("id").insert(buyrate_table, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -65,7 +65,7 @@ var pricing_model = {
     try {
       response = await qb.returning("id").insert(salerate_table, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -77,7 +77,7 @@ var pricing_model = {
     try {
       response = await qb.set(data).where(condition).update(buyrate_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -89,7 +89,7 @@ var pricing_model = {
     try {
       response = await qb.set(data).where(condition).update(salerate_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -101,7 +101,7 @@ var pricing_model = {
     try {
       response = await qb.select("*").where(condition).get(dbtable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -124,7 +124,7 @@ var pricing_model = {
           .get(config.table_prefix + table);
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -139,7 +139,7 @@ var pricing_model = {
         .where(condition)
         .get(config.table_prefix + table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -154,7 +154,7 @@ var pricing_model = {
         .where(condition)
         .get(config.table_prefix + "master_mid_sellrate");
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -172,7 +172,7 @@ var pricing_model = {
           .get(config.table_prefix + table);
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -201,7 +201,7 @@ var pricing_model = {
         console.log(qb.last_query());
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -217,7 +217,7 @@ var pricing_model = {
         .where(condition)
         .get(config.table_prefix + table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -275,7 +275,7 @@ var pricing_model = {
         // );
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -305,7 +305,7 @@ var pricing_model = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -319,7 +319,7 @@ var pricing_model = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -356,7 +356,7 @@ var pricing_model = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -369,7 +369,7 @@ var pricing_model = {
     try {
       response = await qb.select("*").where(condition).get(sellrate_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -415,7 +415,7 @@ var pricing_model = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -462,7 +462,7 @@ var pricing_model = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -498,7 +498,7 @@ var pricing_model = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -537,7 +537,7 @@ var pricing_model = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -570,7 +570,7 @@ var pricing_model = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -583,7 +583,7 @@ var pricing_model = {
     try {
       response = await qb.select(selection).where(condition).get(psp_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -600,7 +600,7 @@ var pricing_model = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -628,7 +628,7 @@ var pricing_model = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -665,7 +665,7 @@ var pricing_model = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -682,7 +682,7 @@ var pricing_model = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -703,7 +703,7 @@ var pricing_model = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -719,7 +719,7 @@ var pricing_model = {
         .where({ deleted: 0, status: 0 })
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -742,7 +742,7 @@ var pricing_model = {
           ")"
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -776,7 +776,7 @@ var pricing_model = {
           ")"
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -790,7 +790,7 @@ var pricing_model = {
         id: id,
       });
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -808,7 +808,7 @@ var pricing_model = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -829,7 +829,7 @@ var pricing_model = {
           cond
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -850,7 +850,7 @@ var pricing_model = {
           cond
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -873,7 +873,7 @@ var pricing_model = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -896,7 +896,7 @@ var pricing_model = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -911,7 +911,7 @@ var pricing_model = {
         condition
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -926,7 +926,7 @@ var pricing_model = {
         .where(condition)
         .get(config.table_prefix + table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -943,7 +943,7 @@ var pricing_model = {
         .where(condition)
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -960,7 +960,7 @@ var pricing_model = {
         .where(condition)
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -974,7 +974,7 @@ var pricing_model = {
 `)
   
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }

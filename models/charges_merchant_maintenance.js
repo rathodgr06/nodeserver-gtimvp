@@ -1,4 +1,5 @@
 const path = require("path");
+const logger = require('../config/logger');
 require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
@@ -22,7 +23,7 @@ var MerchantMaintenanceModel = {
     try {
       response = await qb.returning("id").insert(db_table, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -45,7 +46,7 @@ var MerchantMaintenanceModel = {
           ")"
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -68,7 +69,7 @@ var MerchantMaintenanceModel = {
           ")"
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -81,7 +82,7 @@ var MerchantMaintenanceModel = {
     try {
       response = await qb.select("id,code").from(currency_dbtable).get(data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -108,7 +109,7 @@ var MerchantMaintenanceModel = {
       qb.limit(limit.perpage, limit.start);
       response = await qb.get(charges_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -132,7 +133,7 @@ var MerchantMaintenanceModel = {
       qb.limit(limit.perpage, limit.start);
       response = await qb.get(features_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -146,7 +147,7 @@ var MerchantMaintenanceModel = {
     try {
       response = await qb.set(data).where(condition).update(db_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -159,7 +160,7 @@ var MerchantMaintenanceModel = {
     try {
       response = await qb.select(selection).where(condition).get(db_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -173,7 +174,7 @@ var MerchantMaintenanceModel = {
     try {
       response = await qb.query("select count('id') as count from " + db_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -198,7 +199,7 @@ var MerchantMaintenanceModel = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -223,7 +224,7 @@ var MerchantMaintenanceModel = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }

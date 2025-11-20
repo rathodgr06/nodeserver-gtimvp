@@ -22,7 +22,7 @@ const mobile_activity_logger = require("../utilities/activity-logger/mobile_acti
 const admin_activity_logger = require('../utilities/activity-logger/admin_activity_logger');
 const cipherModel = require('../models/cipher_models')
 const date_formatter = require("../utilities/date_formatter/index"); // date formatter module
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 
 var admin_user = {
     list: async (req, res) => {
@@ -142,7 +142,7 @@ var admin_user = {
                         );
                     })
                     .catch((error) => {
-                        winston.error(error);
+                        logger.error(500,{message: error,stack: error.stack}); 
                         res.status(statusCode.internalError).send(
                             response.errormsg(error.message)
                         );
@@ -157,7 +157,7 @@ var admin_user = {
                 // );
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -235,7 +235,7 @@ var admin_user = {
                         );
                     })
                     .catch((error) => {
-                        winston.error(error);
+                        logger.error(500,{message: error,stack: error.stack}); 
                         res.status(statusCode.internalError).send(
                             response.errormsg(error.message)
                         );
@@ -249,7 +249,7 @@ var admin_user = {
                 // );
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -296,7 +296,7 @@ var admin_user = {
                         );
                     })
                     .catch((error) => {
-                        winston.error(error);
+                        logger.error(500,{message: error,stack: error.stack}); 
                         res.status(statusCode.internalError).send(
                             response.errormsg(error.message)
                         );
@@ -311,7 +311,7 @@ var admin_user = {
             })
             .catch((error) => {
                 console.log(error);
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -319,76 +319,82 @@ var admin_user = {
     },
 
     otp_Sent: async (req, res) => {
-        let is_existing = req.bodyString("is_existing");
-        let foundCust = await CustomerModel.selectOne("id,email,name", {
+        try {
+          let is_existing = req.bodyString("is_existing");
+          let foundCust = await CustomerModel.selectOne("id,email,name", {
             dial_code: req.bodyString("mobile_code"),
             mobile_no: req.bodyString("mobile_no"),
             deleted: 0,
-        });
-        if (is_existing == 1 && foundCust) {
+          });
+          if (is_existing == 1 && foundCust) {
             if (foundCust.email == req.bodyString("email")) {
-                payload = {
-                    id: foundCust.id,
-                    name: foundCust.name,
-                    email: foundCust.email,
-                    type: "customer",
-                };
+              payload = {
+                id: foundCust.id,
+                name: foundCust.name,
+                email: foundCust.email,
+                type: "customer",
+              };
 
-                const aToken = accessToken(payload);
-                res.status(statusCode.ok).send(
-                    response.loginSuccess({
-                        accessToken: aToken,
-                        name: payload.name,
-                        cid: encrypt_decrypt("encrypt", payload.id),
-                        user_type: "customer",
-                    })
-                );
+              const aToken = accessToken(payload);
+              res.status(statusCode.ok).send(
+                response.loginSuccess({
+                  accessToken: aToken,
+                  name: payload.name,
+                  cid: encrypt_decrypt("encrypt", payload.id),
+                  user_type: "customer",
+                })
+              );
             } else {
-                res.status(statusCode.ok).send(
-                    response.errormsg(
-                        "Not valid email id linked with mobile no"
-                    )
+              res
+                .status(statusCode.ok)
+                .send(
+                  response.errormsg("Not valid email id linked with mobile no")
                 );
             }
-        } else {
-            
-            let register_at =  await date_formatter.created_date_time();
+          } else {
+            let register_at = await date_formatter.created_date_time();
             let token = uuid.v1();
             let otp = await helpers.generateOtp(4);
             let ins_data = {
-                email: req.bodyString("email"),
-                token: token,
-                otp: otp,
-                register_at: register_at,
+              email: req.bodyString("email"),
+              token: token,
+              otp: otp,
+              register_at: register_at,
             };
             CustomerModel.add(ins_data)
-                .then(async (result_add_reset) => {
-                    let title = await helpers.get_title();
-                    let subject = " Verify email account";
+              .then(async (result_add_reset) => {
+                let title = await helpers.get_title();
+                let subject = " Verify email account";
 
-                   let mail_response = await mailSender.otpMail(
-                        req.bodyString("email"),
-                        subject,
-                        otp
-                    );
-                    
-                    res.status(statusCode.ok).send(
-                        response.successansmsg(
-                            { otp_token: token },
-                            "OTP sent, Please Verify your mail"
-                        )
-                    );
-                })
-                .catch((error) => {
-                    winston.error(error);
-                    res.status(statusCode.internalError).send(
-                        response.errormsg(error)
-                    );
-                });
+                let mail_response = await mailSender.otpMail(
+                  req.bodyString("email"),
+                  subject,
+                  otp
+                );
+
+                res
+                  .status(statusCode.ok)
+                  .send(
+                    response.successansmsg(
+                      { otp_token: token },
+                      "OTP sent, Please Verify your mail"
+                    )
+                  );
+              })
+              .catch((error) => {
+                logger.error(500, { message: error, stack: error.stack });
+                res
+                  .status(statusCode.internalError)
+                  .send(response.errormsg(error));
+              });
+          }
+        } catch (error) {
+          logger.error(500, { message: error, stack: error.stack });
         }
     },
 
     otp_Sent_email: async (req, res) => {
+        try{
         let register_at =  await date_formatter.created_date_time();
         let token = uuid.v1();
         let otp = await helpers.generateOtp(4);
@@ -423,11 +429,14 @@ var admin_user = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error)
                 );
             });
+        }catch(error){
+             logger.error(500,{message: error,stack: error.stack}); 
+        }
     },
 
     otp_verity: async (req, res) => {
@@ -461,7 +470,7 @@ var admin_user = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -498,7 +507,7 @@ var admin_user = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -506,7 +515,7 @@ var admin_user = {
     },
 
     customer_ques_list: async (req, res) => {
-        let cid = await enc_dec.cjs_decrypt(req.bodyString("cid"));
+        let cid =  enc_dec.cjs_decrypt(req.bodyString("cid"));
 
         CustomerModel.selectAnswer("id,customer_id,question_id", {
             deleted: 0,
@@ -565,7 +574,7 @@ var admin_user = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -573,55 +582,62 @@ var admin_user = {
     },
 
     verify_question_answer: async (req, res) => {
-        let verify_data = req.body.data;
-        let correct_answer = 0;
-        let customer_id = verify_data[0].cid;
+        try {
+          let verify_data = req.body.data;
+          let correct_answer = 0;
+          let customer_id = verify_data[0].cid;
 
-        // let module_and_user = {
-        //     user: req.user.id,
-        //     user_type: req.user.type,
-        //     module: "Customer",
-        //     sub_module: "Verify_Question",
-        // };
-        // let activity = `Verify security questions and answers.`;
-        // let headers = req.headers;
-        // mobile_activity_logger.insert(module_and_user, activity, headers);
+          // let module_and_user = {
+          //     user: req.user.id,
+          //     user_type: req.user.type,
+          //     module: "Customer",
+          //     sub_module: "Verify_Question",
+          // };
+          // let activity = `Verify security questions and answers.`;
+          // let headers = req.headers;
+          // mobile_activity_logger.insert(module_and_user, activity, headers);
 
-        for (let i = 0; i < verify_data.length; i++) {
-            let cid = await enc_dec.cjs_decrypt(verify_data[i].cid);
-            let qid = await enc_dec.cjs_decrypt(verify_data[i].question_id);
+          for (let i = 0; i < verify_data.length; i++) {
+            let cid = enc_dec.cjs_decrypt(verify_data[i].cid);
+            let qid = enc_dec.cjs_decrypt(verify_data[i].question_id);
             let answer = verify_data[i].answer;
             if (answer < 2) {
-                res.status(statusCode.badRequest).send(
-                    response.validationResponse(
-                        "Please select at least 2 answers"
-                    )
+              res
+                .status(statusCode.badRequest)
+                .send(
+                  response.validationResponse(
+                    "Please select at least 2 answers"
+                  )
                 );
             } else {
-                await CustomerModel.selectAnswer("*", {
-                    deleted: 0,
-                    customer_id: cid,
-                    question_id: qid,
-                    answer: answer,
-                }).then((result) => {
-                    if (result.length > 0) {
-                        correct_answer++;
-
-                    }
-                });
+              await CustomerModel.selectAnswer("*", {
+                deleted: 0,
+                customer_id: cid,
+                question_id: qid,
+                answer: answer,
+              }).then((result) => {
+                if (result.length > 0) {
+                  correct_answer++;
+                }
+              });
             }
-        }
-        if (correct_answer >= 2) {
-            res.status(statusCode.ok).send(
+          }
+          if (correct_answer >= 2) {
+            res
+              .status(statusCode.ok)
+              .send(
                 response.successdatamsg(
-                    { cid: customer_id },
-                    "Answer matched.You can proceed."
+                  { cid: customer_id },
+                  "Answer matched.You can proceed."
                 )
-            );
-        } else {
-            res.status(statusCode.badRequest).send(
-                response.validationResponse(`Answer does not match`)
-            );
+              );
+          } else {
+            res
+              .status(statusCode.badRequest)
+              .send(response.validationResponse(`Answer does not match`));
+          }
+        } catch (error) {
+          logger.error(500, { message: error, stack: error.stack });
         }
     },
 
@@ -668,7 +684,7 @@ var admin_user = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -707,7 +723,7 @@ var admin_user = {
                     );
                 })
                 .catch((error) => {
-                    winston.error(error);
+                    logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(
                         response.errormsg(error.message)
                     );
@@ -717,7 +733,7 @@ var admin_user = {
             //     response.successmsg("Customer profile updated successfully")
             // );
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -792,7 +808,7 @@ var admin_user = {
                         );
                     })
                     .catch((error) => {
-                        winston.error(error);
+                        logger.error(500,{message: error,stack: error.stack}); 
                         res.status(statusCode.internalError).send(
                             response.errormsg(error.message)
                         );
@@ -805,7 +821,7 @@ var admin_user = {
                 // );
             });
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -813,6 +829,7 @@ var admin_user = {
     },
 
     change_pin: async (req, res) => {
+        try{
         let new_pin = req.bodyString("new_pin");
         let hashPin = await encrypt_decrypt("encrypt", new_pin);
 
@@ -835,17 +852,21 @@ var admin_user = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
             });
+        }catch(error){
+             logger.error(500,{message: error,stack: error.stack}); 
+        }
         // res.status(statusCode.ok).send(
         //     response.successmsg("Pin changed successfully")
         // );
     },
 
     change_email: async (req, res) => {
+        try{
         let cid = req.user.payload.id;
         let selection = "id,email";
         let condition = {
@@ -893,11 +914,14 @@ var admin_user = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
             });
+        }catch(error){
+             logger.error(500,{message: error,stack: error.stack}); 
+        }
         // res.status(statusCode.ok).send(
         //     response.successmsg("Email updated successfully.")
         // );
@@ -905,57 +929,64 @@ var admin_user = {
 
     cardList: async (req, res, next) => {
         // let dec_token = req.bodyString('token');
-        let cid = await encrypt_decrypt("encrypt", req.user.payload.id);
-        if (cid) {
+        try {
+          let cid = encrypt_decrypt("encrypt", req.user.payload.id);
+          if (cid) {
             // let customer_data = JSON.parse(dec_token);
             // let email = customer_data.email;
             // let customer = await merchantOrderModel.selectOne('*', { email: email }, 'customers')
             let customer_cards = await CustomerModel.selectDynamicCard(
-                "*",
-                { cid: cid, deleted: 0 },
-                "customers_cards"
+              "*",
+              { cid: cid, deleted: 0 },
+              "customers_cards"
             );
 
             let module_and_user = {
-                user: req.user.payload.id,
-                user_type: req.user.payload.type,
-                module: "Card",
-                sub_module: "List",
+              user: req.user.payload.id,
+              user_type: req.user.payload.type,
+              module: "Card",
+              sub_module: "List",
             };
             let activity = "Fetched card list.";
             let headers = req.headers;
             mobile_activity_logger.insert(module_and_user, activity, headers);
 
             if (customer_cards[0]) {
-                let cards = [];
-                for (let card of customer_cards) {
-                    let card_obj = {
-                        card_id: enc_dec.cjs_encrypt(card.id),
-                        name: card.name_on_card,
-                        expiryDate: card.card_expiry,
-                        card_no: card.card_number,
-                        card_last_digit: card.last_4_digit,
-                        status: card.status == 1 ? "Hide" : "Show",
-                        primary_card: card.primary_card,
-                    };
-                    cards.push(card_obj);
-                }
-                res.status(statusCode.ok).send(
-                    response.successdatamsg(cards, "List fetched successfully.")
+              let cards = [];
+              for (let card of customer_cards) {
+                let card_obj = {
+                  card_id: enc_dec.cjs_encrypt(card.id),
+                  name: card.name_on_card,
+                  expiryDate: card.card_expiry,
+                  card_no: card.card_number,
+                  card_last_digit: card.last_4_digit,
+                  status: card.status == 1 ? "Hide" : "Show",
+                  primary_card: card.primary_card,
+                };
+                cards.push(card_obj);
+              }
+              res
+                .status(statusCode.ok)
+                .send(
+                  response.successdatamsg(cards, "List fetched successfully.")
                 );
             } else {
-                res.status(statusCode.ok).send(
-                    response.successdatamsg([], "No card found.")
-                );
+              res
+                .status(statusCode.ok)
+                .send(response.successdatamsg([], "No card found."));
             }
-        } else {
-            res.status(statusCode.ok).send(
-                response.successdatamsg([], "No card found.")
-            );
+          } else {
+            res
+              .status(statusCode.ok)
+              .send(response.successdatamsg([], "No card found."));
+          }
+        } catch (error) {
+          logger.error(500, { message: error, stack: error.stack });
         }
     },
 
     card_add: async (req, res) => {
+        try{
         let added_date =  await date_formatter.created_date_time();
         let name_on_card = req.bodyString("card_holder_name");
         let expiry_date = req.bodyString("expiry_date");
@@ -993,7 +1024,7 @@ var admin_user = {
                         );
                     })
                     .catch((error) => {
-                        winston.error(error);
+                        logger.error(500,{message: error,stack: error.stack}); 
                         console.log(error)
                         res.status(statusCode.internalError).send(
                             response.errormsg(error.message)
@@ -1006,15 +1037,19 @@ var admin_user = {
             })
             .catch((error) => {
                 console.log(error);
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
             });
+        }catch(error){
+             logger.error(500,{message: error,stack: error.stack}); 
+        }
     },
 
     card_delete: async (req, res) => {
-        let card_id_exist = await enc_dec.cjs_decrypt(
+        try{
+        let card_id_exist =  enc_dec.cjs_decrypt(
             req.bodyString("card_id")
         );
         await CustomerModel.updateDynamic(
@@ -1037,17 +1072,21 @@ var admin_user = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
             });
+        }catch(error){
+             logger.error(500,{message: error,stack: error.stack}); 
+        }
         // res.status(statusCode.ok).send(
         //     response.successmsg("Deleted successfully")
         // );
     },
 
     card_hide: async (req, res) => {
+        try{
         let card_id_exist = await enc_dec.cjs_decrypt(
             req.bodyString("card_id")
         );
@@ -1074,11 +1113,14 @@ var admin_user = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
             });
+        }catch(error){
+             logger.error(500,{message: error,stack: error.stack}); 
+        }
 
         // res.status(statusCode.ok).send(
         //     response.successmsg("Updated successfully")
@@ -1086,11 +1128,11 @@ var admin_user = {
     },
 
     card_primary: async (req, res) => {
-        
-        let card_id_exist = await enc_dec.cjs_decrypt(
+        try{
+        let card_id_exist =  enc_dec.cjs_decrypt(
             req.bodyString("card_id")
         );
-        let cid = await enc_dec.cjs_encrypt(req.user.payload.id);
+        let cid =  enc_dec.cjs_encrypt(req.user.payload.id);
         await CustomerModel.updateDynamic(
             { cid: cid, deleted: 0 },
             { primary_card: 0 },
@@ -1120,11 +1162,14 @@ var admin_user = {
             })
             .catch((error) => {
                 console.log(error)
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
             });
+        }catch(error){
+             logger.error(500,{message: error,stack: error.stack}); 
+        }
 
         // res.status(statusCode.ok).send(
         //     response.successmsg("Updated successfully")
@@ -1145,11 +1190,11 @@ var admin_user = {
         mobile_activity_logger.insert(module_and_user, activity, headers);
 
         for (let i = 0; i < verify_data.length; i++) {
-            let card_id = await enc_dec.cjs_decrypt(verify_data[i].card_id);
+            let card_id =  enc_dec.cjs_decrypt(verify_data[i].card_id);
             let deleted = verify_data[i].deleted;
             let hide = verify_data[i].hide;
             let primary_card = verify_data[i].primary_card;
-            await CustomerModel.updateDynamic(
+            CustomerModel.updateDynamic(
                 { id: card_id },
                 { deleted: deleted, status: hide, primary_card: primary_card },
                 "customers_cards"
@@ -1157,6 +1202,8 @@ var admin_user = {
                 res.status(statusCode.ok).send(
                     response.successmsg("Updated successfully")
                 );
+            }).catch((error)=>{
+                 logger.error(500,{message: error,stack: error.stack}); 
             });
         }
     },
@@ -1191,7 +1238,7 @@ var admin_user = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -1203,103 +1250,106 @@ var admin_user = {
     },
 
     receive_sms: async (req, res) => {
-        
-        let msg = req.body.Body;
-        let from = req.body.From;
-        let dec_msg = encrypt_decrypt("decrypt", msg);
-        let split_msg = dec_msg.split(" ");
-        let code = split_msg[0];
-        let no = split_msg[1];
-        let fcm_id = split_msg[2];
-        let cid = split_msg[3];
+        try {
+          let msg = req.body.Body;
+          let from = req.body.From;
+          let dec_msg = encrypt_decrypt("decrypt", msg);
+          let split_msg = dec_msg.split(" ");
+          let code = split_msg[0];
+          let no = split_msg[1];
+          let fcm_id = split_msg[2];
+          let cid = split_msg[3];
 
-        if (from == code + no) {
+          if (from == code + no) {
             let added_date = await date_formatter.created_date_time();
             const uuid = new SequenceUUID({
-                valid: true,
-                dashes: false,
-                unsafeBuffer: true,
+              valid: true,
+              dashes: false,
+              unsafeBuffer: true,
             });
             let token = uuid.generate();
             let data = {
-                dial_code: code,
-                mobile_no: no,
+              dial_code: code,
+              mobile_no: no,
             };
             CustomerModel.updateDetails({ id: cid }, data)
-                .then(async (result) => {
-                    let title = await helpers.get_title();
-                    let message = "Mobile verified";
-                    let url_ = "";
-                    let type = "";
-                    let user = await helpers.get_customer_name(cid);
-                    let payload = {
-                        token: token,
-                        message: message,
-                        status: true,
-                    };
-                    helpers.pushNotification(
-                        fcm_id,
-                        title,
-                        message,
-                        url_,
-                        type,
-                        payload,
-                        (user = user)
-                    );
+              .then(async (result) => {
+                let title = await helpers.get_title();
+                let message = "Mobile verified";
+                let url_ = "";
+                let type = "";
+                let user = await helpers.get_customer_name(cid);
+                let payload = {
+                  token: token,
+                  message: message,
+                  status: true,
+                };
+                helpers.pushNotification(
+                  fcm_id,
+                  title,
+                  message,
+                  url_,
+                  type,
+                  payload,
+                  (user = user)
+                );
 
-                    // let module_and_user = {
-                    //     user: req.user.id,
-                    //     user_type: req.user.type,
-                    //     module: "Customer",
-                    //     sub_module: "Receive_SMS",
-                    // };
-                    // let activity = "Mobile_no verified by sms.";
-                    // let headers = req.headers;
-                    // mobile_activity_logger
-                    //     .insert(module_and_user, activity, headers)
-                    //     .then((result) => {
-                    //         res.status(statusCode.ok).send(
-                    //             response.successdatamsg(
-                    //                 "Mobile no verified successfully."
-                    //             )
-                    //         );
-                    //     })
-                    //     .catch((error) => {
-                    //         res.status(statusCode.internalError).send(
-                    //             response.errormsg(error.message)
-                    //         );
-                    //     });
+                // let module_and_user = {
+                //     user: req.user.id,
+                //     user_type: req.user.type,
+                //     module: "Customer",
+                //     sub_module: "Receive_SMS",
+                // };
+                // let activity = "Mobile_no verified by sms.";
+                // let headers = req.headers;
+                // mobile_activity_logger
+                //     .insert(module_and_user, activity, headers)
+                //     .then((result) => {
+                //         res.status(statusCode.ok).send(
+                //             response.successdatamsg(
+                //                 "Mobile no verified successfully."
+                //             )
+                //         );
+                //     })
+                //     .catch((error) => {
+                //         res.status(statusCode.internalError).send(
+                //             response.errormsg(error.message)
+                //         );
+                //     });
 
-                    res.status(statusCode.ok).send(
-                        response.successdatamsg(
-                            "Mobile no verified successfully."
-                        )
-                    );
-                })
-                .catch((error) => {
-                    winston.error(error);
-                    res.status(statusCode.internalError).send(
-                        response.errormsg(error.message)
-                    );
-                });
-        } else {
+                res
+                  .status(statusCode.ok)
+                  .send(
+                    response.successdatamsg("Mobile no verified successfully.")
+                  );
+              })
+              .catch((error) => {
+                logger.error(500, { message: error, stack: error.stack });
+                res
+                  .status(statusCode.internalError)
+                  .send(response.errormsg(error.message));
+              });
+          } else {
             let title = await helpers.get_title();
             let message = "Mobile not verified";
             let url_ = "";
             let type = "";
             let payload = { message: message, status: false };
             helpers.pushNotification(
-                fcm_id,
-                title,
-                message,
-                url_,
-                type,
-                payload,
-                (user = "")
+              fcm_id,
+              title,
+              message,
+              url_,
+              type,
+              payload,
+              (user = "")
             );
-            res.status(statusCode.ok).send(
-                response.errormsg("Unable to verify mobile no.")
-            );
+            res
+              .status(statusCode.ok)
+              .send(response.errormsg("Unable to verify mobile no."));
+          }
+        } catch (error) {
+          logger.error(500, { message: error, stack: error.stack });
         }
     },
 
@@ -1484,7 +1534,7 @@ var admin_user = {
                     );
                 })
                 .catch((error) => {
-                    winston.error(error);
+                    logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(
                         response.errormsg(error.message)
                     );
@@ -1499,7 +1549,7 @@ var admin_user = {
             // );
         } catch (error) {
             console.log(error);
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -1566,20 +1616,20 @@ var admin_user = {
                             );
                         })
                         .catch((error) => {
-                            winston.error(error);
+                            logger.error(500,{message: error,stack: error.stack}); 
                             res.status(statusCode.internalError).send(
                                 response.errormsg(error)
                             );
                         });
                 })
                 .catch((error) => {
-                    winston.error(error);
+                    logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(
                         response.errormsg(error)
                     );
                 });
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -1633,7 +1683,7 @@ var admin_user = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -1671,7 +1721,7 @@ var admin_user = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -1679,56 +1729,62 @@ var admin_user = {
     },
 
     change_mobile: async (req, res) => {
-        let cid = req.user.id;
-        let selection = "id,dial_code,mobile_no";
-        let condition = {
+        try {
+          let cid = req.user.id;
+          let selection = "id,dial_code,mobile_no";
+          let condition = {
             otp: req.bodyString("otp"),
             token: req.bodyString("otp_token"),
-        };
-        let old_mobile = await CustomerModel.selectOne(selection, { id: cid });
-        let selection_data = "id,mobile_code,mobile_no";
-        let new_mobile = await CustomerModel.selectMobileOtpDAta(
+          };
+          let old_mobile = await CustomerModel.selectOne(selection, {
+            id: cid,
+          });
+          let selection_data = "id,mobile_code,mobile_no";
+          let new_mobile = await CustomerModel.selectMobileOtpDAta(
             selection_data,
             condition
-        );
-        let mobile_no = `'${new_mobile.mobile_code}${new_mobile.mobile_no}'`;
-        let get_count = await CustomerModel.get_count_logs(cid, {
+          );
+          let mobile_no = `'${new_mobile.mobile_code}${new_mobile.mobile_no}'`;
+          let get_count = await CustomerModel.get_count_logs(cid, {
             new_mobile_no: mobile_no,
-        });
-        let customerData = {
+          });
+          let customerData = {
             dial_code: new_mobile.mobile_code,
             mobile_no: new_mobile.mobile_no,
-        };
-        let updateTaken = await CustomerModel.updateDetails(
+          };
+          let updateTaken = await CustomerModel.updateDetails(
             { id: cid },
             customerData
-        );
+          );
 
-        let module_and_user = {
+          let module_and_user = {
             user: req.user.id,
             user_type: req.user.type,
             module: "User",
             sub_module: "Change-Mobile",
-        };
-        let headers = req.headers;
-        mobile_activity_logger.edit(module_and_user, req.user.id, headers);
+          };
+          let headers = req.headers;
+          mobile_activity_logger.edit(module_and_user, req.user.id, headers);
 
-        if (get_count == 0) {
-            let added_date =  await date_formatter.created_date_time();
+          if (get_count == 0) {
+            let added_date = await date_formatter.created_date_time();
             let logs = {
-                cid: req.user.id,
-                type: "mobile",
-                old_mobile_no: old_mobile.dial_code + old_mobile.mobile_no,
-                new_mobile_no: new_mobile.mobile_code + new_mobile.mobile_no,
-                old_email: "",
-                new_email: "",
-                created_at: added_date,
+              cid: req.user.id,
+              type: "mobile",
+              old_mobile_no: old_mobile.dial_code + old_mobile.mobile_no,
+              new_mobile_no: new_mobile.mobile_code + new_mobile.mobile_no,
+              old_email: "",
+              new_email: "",
+              created_at: added_date,
             };
             CustomerModel.addLogs(logs);
+          }
+          res
+            .status(statusCode.ok)
+            .send(response.successmsg("Mobile number updated successfully."));
+        } catch (error) {
+          logger.error(500, { message: error, stack: error.stack });
         }
-        res.status(statusCode.ok).send(
-            response.successmsg("Mobile number updated successfully.")
-        );
     },
 
     delete: async (req, res) => {
@@ -1756,7 +1812,7 @@ var admin_user = {
                     );
                 })
                 .catch((error) => {
-                    winston.error(error);
+                    logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(
                         response.errormsg(error.message)
                     );
@@ -1766,7 +1822,7 @@ var admin_user = {
             //     response.successmsg("Customer account deleted successfully")
             // );
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );

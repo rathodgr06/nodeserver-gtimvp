@@ -11,6 +11,7 @@ const merchant_details = config.table_prefix + "master_merchant_details";
 const order_table = config.table_prefix + "orders";
 const helpers = require("../utilities/helper/general_helper");
 const mid_dbtable = config.table_prefix + "mid";
+const logger = require('../config/logger');
 var dbModel = {
   addInvoice: async (data) => {
     let qb = await pool.get_connection();
@@ -18,7 +19,7 @@ var dbModel = {
     try {
       response = await qb.returning("id").insert(dbtable2, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -52,7 +53,7 @@ var dbModel = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -66,7 +67,7 @@ var dbModel = {
     try {
       response = await qb.get(dbtable2);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -120,7 +121,7 @@ var dbModel = {
         response = await qb.query(query);
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -144,7 +145,7 @@ var dbModel = {
           response = await qb.get(dbtable2);
         }
       } catch (error) {
-        console.error("Database query failed:", error);
+        logger.error(500,{message: error,stack: error.stack}); 
       } finally {
         qb.release();
       }
@@ -162,7 +163,7 @@ var dbModel = {
           response = await qb.get(dbtable2);
         }
       } catch (error) {
-        console.error("Database query failed:", error);
+        logger.error(500,{message: error,stack: error.stack}); 
       } finally {
         qb.release();
       }
@@ -175,7 +176,7 @@ var dbModel = {
     try {
       response = await qb.set(data).where(condition).update(dbtable2);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -217,7 +218,7 @@ var dbModel = {
         );
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -283,7 +284,7 @@ var dbModel = {
         response = await qb.query(query);
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -340,7 +341,7 @@ var dbModel = {
         response = await qb.query(query);
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -394,7 +395,7 @@ var dbModel = {
       let query = "select count('id') as count from " + dbtable3 + final_cond;
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -441,7 +442,7 @@ var dbModel = {
     try {
       response = await qb.query(query_str);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -457,7 +458,7 @@ var dbModel = {
         .where({ id: value })
         .get(config.table_prefix + table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -477,7 +478,7 @@ var dbModel = {
         .limit(limit.perpage, limit.start)
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -501,7 +502,7 @@ var dbModel = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -549,7 +550,7 @@ var dbModel = {
       try {
         response = await qb.query(query);
       } catch (error) {
-        console.error("Database query failed:", error);
+        logger.error(500,{message: error,stack: error.stack}); 
       } finally {
         qb.release();
       }
@@ -566,7 +567,7 @@ var dbModel = {
       try {
         response = await qb.query(query);
       } catch (error) {
-        console.error("Database query failed:", error);
+        logger.error(500,{message: error,stack: error.stack}); 
       } finally {
         qb.release();
       }
@@ -600,7 +601,7 @@ var dbModel = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -612,7 +613,7 @@ var dbModel = {
     try {
       response = await qb.select(selection).where(condition).get(mid_dbtable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -630,7 +631,7 @@ var dbModel = {
         .limit(1)
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -713,7 +714,7 @@ var dbModel = {
       try {
         response = await qb.query(query);
       } catch (error) {
-        console.error("Database query failed:", error);
+        logger.error(500,{message: error,stack: error.stack}); 
       } finally {
         qb.release();
       }
@@ -733,7 +734,7 @@ var dbModel = {
       try {
         response = await qb.query(query);
       } catch (error) {
-        console.error("Database query failed:", error);
+        logger.error(500,{message: error,stack: error.stack}); 
       } finally {
         qb.release();
       }
@@ -815,7 +816,7 @@ var dbModel = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }

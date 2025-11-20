@@ -21,6 +21,7 @@ const mtnService = require("../../service/mtnService");
 const orangeService = require("../../service/orangeService");
 const alpayService = require("../../service/alpayService");
 const MerchantRegistrationModel = require("../../models/merchant_registration");
+const logger = require('../../config/logger');
 const execuatePayment = async (req, res) => {
   try {
     req.body.data = req.body;
@@ -133,7 +134,7 @@ const execuatePayment = async (req, res) => {
         );
     }
   } catch (error) {
-    console.log(error);
+   logger.error(500,{message: error,stack: error.stack}); 
     return res
       .status(statusCode.badRequest)
       .send(

@@ -1,4 +1,5 @@
 const path = require("path");
+const logger = require('../config/logger');
 require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
@@ -11,7 +12,7 @@ var dbModel = {
     try {
       response = await qb.returning("id").insert(dbTable, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -24,7 +25,7 @@ var dbModel = {
     try {
       response = await qb.select(selection).where(condition).get(dbTable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -36,7 +37,7 @@ var dbModel = {
     try {
       response = await qb.returning("id").insert(dbTable, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -48,7 +49,7 @@ var dbModel = {
     try {
       response = await qb.set(userData).where(condition).update(dbTable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }

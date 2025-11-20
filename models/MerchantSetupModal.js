@@ -1,4 +1,5 @@
 const path = require("path");
+const logger = require('../config/logger');
 require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
@@ -18,7 +19,7 @@ var MerchantSetupModal = {
       try {
         response = await qb.select("id").where(checkdata).get(dbtable);
       } catch (error) {
-        console.error("Database query failed:", error);
+        logger.error(500,{message: error,stack: error.stack}); 
         isError = error;
       } finally {
         qb.release();
@@ -39,7 +40,7 @@ var MerchantSetupModal = {
         response = await qb.select("*").where(where).get(dbtable);
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
       isError = error;
     } finally {
       qb.release();
@@ -98,7 +99,7 @@ var MerchantSetupModal = {
         limit,
       };
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
       response = { status: 400, message: error.message };
     } finally {
       qb.release();
@@ -117,7 +118,7 @@ var MerchantSetupModal = {
       // Perform the update query
       response = await qb.set(data).where(checkdata).update(dbtable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
       isError = error;
     } finally {
       // Always release the connection if it exists
@@ -161,7 +162,7 @@ var MerchantSetupModal = {
         data: data
       };
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
       response = { status: 400, message: error.message };
     } finally {
       qb.release();

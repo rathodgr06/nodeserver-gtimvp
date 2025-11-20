@@ -2,7 +2,7 @@ require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
 const pool = require("../config/database");
-
+const logger = require('../config/logger');
 //tables
 const referrer_invoice_payout_table =
   config.table_prefix + "referrer_invoice_payout";
@@ -15,7 +15,7 @@ async function addPayout(data) {
       .returning("id")
       .insert(referrer_invoice_payout_table, data);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -31,7 +31,7 @@ async function updatePayout(data, condition) {
       .where(condition)
       .update(referrer_invoice_payout_table);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -50,7 +50,7 @@ async function selectPayout(condition) {
       .where(condition)
       .get();
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -72,7 +72,7 @@ async function selectPayoutReferrer(date) {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }

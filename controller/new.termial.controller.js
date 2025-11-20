@@ -4,7 +4,7 @@ const PspModel = require("../models/psp");
 const helpers = require("../utilities/helper/general_helper");
 const ServerResponse = require("../utilities/response/ServerResponse");
 const StatusCode = require("../utilities/statuscode/index");
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 const RoutingModel = require('../models/routingModel');
 const { json } = require("body-parser");
 const enc_dec = require('../utilities/decryptor/decryptor');
@@ -688,7 +688,7 @@ class TerminalControllerClass {
       
     } catch (error) {
       console.log(error);
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       return res
         .status(StatusCode.internalError)
         .send(ServerResponse.errormsg(error?.message));

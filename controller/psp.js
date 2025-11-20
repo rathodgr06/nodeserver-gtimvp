@@ -13,7 +13,7 @@ const pricing_model = require("../models/pricing_plan");
 const date_formatter = require("../utilities/date_formatter/index");
 const setUpCharges = require("../utilities/charges/setup-charges/index");
 require("dotenv").config({ path: "../.env" });
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 
 var Psp = {
     getMccCodes: async (req, res) => {
@@ -90,14 +90,14 @@ var Psp = {
                         );
                     })
                     .catch((error) => {
-                        winston.error(error);
+                       logger.error(500,{message: error,stack: error.stack}); 
                         res.status(statusCode.internalError).send(
                             response.errormsg(error.message)
                         );
                     });
             })
             .catch((error) => {
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error)
                 );
@@ -311,7 +311,7 @@ var Psp = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -380,13 +380,13 @@ var Psp = {
                     );
                 })
                 .catch((error) => {
-                        winston.error(error);
+                       logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(
                         response.errormsg(error.message)
                     );
                 });
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -416,13 +416,13 @@ var Psp = {
                     );
                 })
                 .catch((error) => {
-                        winston.error(error);
+                       logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(
                         response.errormsg(error.message)
                     );
                 });
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -452,13 +452,13 @@ var Psp = {
                     );
                 })
                 .catch((error) => {
-                        winston.error(error);
+                       logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(
                         response.errormsg(error.message)
                     );
                 });
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -488,13 +488,13 @@ var Psp = {
                     );
                 })
                 .catch((error) => {
-                        winston.error(error);
+                       logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(
                         response.errormsg(error.message)
                     );
                 });
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -559,7 +559,7 @@ var Psp = {
 
                             })
                             .catch((error) => {
-                                winston.error(error);
+                               logger.error(500,{message: error,stack: error.stack}); 
                                 fault++;
                                 
                             });
@@ -571,7 +571,7 @@ var Psp = {
 
                             })
                             .catch((error) => {
-                                winston.error(error);
+                               logger.error(500,{message: error,stack: error.stack}); 
                                 fault++;
                                 
                             });
@@ -595,7 +595,7 @@ var Psp = {
 
                                 })
                                 .catch((error) => {
-                                    winston.error(error);
+                                   logger.error(500,{message: error,stack: error.stack}); 
                                     fault++;
                                     
                                 });
@@ -607,7 +607,7 @@ var Psp = {
 
                                 })
                                 .catch((error) => {
-                                    winston.error(error);
+                                   logger.error(500,{message: error,stack: error.stack}); 
                                     fault++;
                                     
                                 });
@@ -628,7 +628,7 @@ var Psp = {
                 });
             }
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(
                 response.errormsg("internal server error")
@@ -724,7 +724,7 @@ var Psp = {
                 )
             );
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(
                 response.errormsg("internal server error")
@@ -760,7 +760,7 @@ var Psp = {
                 .status(statusCode.ok)
                 .send(response.successmsg("Buyrate deleted successfully"));
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(response.errormsg(error));
         }
@@ -835,7 +835,7 @@ var Psp = {
                 response.successdatamsg(send_res, "List fetched successfully.")
             );
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(
                 response.errormsg("internal server error")
@@ -950,7 +950,7 @@ var Psp = {
                 .status(statusCode.ok)
                 .send(response.successmsg("Buy rate deleted successfully"));
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(response.errormsg(error));
         }
@@ -970,7 +970,7 @@ var Psp = {
                 .status(statusCode.ok)
                 .send(response.successmsg("Buy rate deleted successfully"));
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(response.errormsg(error));
         }
@@ -1034,7 +1034,7 @@ var Psp = {
 
                             })
                             .catch((error) => {
-                                winston.error(error);
+                               logger.error(500,{message: error,stack: error.stack}); 
                                 fault++;
                                 
                             });
@@ -1045,7 +1045,7 @@ var Psp = {
 
                             })
                             .catch((error) => {
-                                winston.error(error);
+                               logger.error(500,{message: error,stack: error.stack}); 
                                 fault++;
                                 
                             });
@@ -1070,7 +1070,7 @@ var Psp = {
 
                                 })
                                 .catch((error) => {
-                                    winston.error(error);
+                                   logger.error(500,{message: error,stack: error.stack}); 
                                     fault++;
                                     
                                 });
@@ -1081,7 +1081,7 @@ var Psp = {
 
                                 })
                                 .catch((error) => {
-                                    winston.error(error);
+                                   logger.error(500,{message: error,stack: error.stack}); 
                                     fault++;
                                     
                                 });
@@ -1101,7 +1101,7 @@ var Psp = {
                 });
             }
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(
                 response.errormsg("internal server error")
@@ -1185,7 +1185,7 @@ var Psp = {
                 )
             );
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(
                 response.errormsg("internal server error")
@@ -1229,7 +1229,7 @@ var Psp = {
                 .status(statusCode.ok)
                 .send(response.successmsg("Sellrate deleted successfully"));
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(response.errormsg(error));
         }
@@ -1301,7 +1301,7 @@ var Psp = {
                 )
             );
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(
                 response.errormsg("internal server error")
@@ -1469,7 +1469,7 @@ var Psp = {
                 )
             );
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(
                 response.errormsg("internal server error")
@@ -1588,7 +1588,7 @@ var Psp = {
                 .status(statusCode.ok)
                 .send(response.successmsg("Sellrate deleted successfully"));
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(response.errormsg(error));
         }
@@ -1608,7 +1608,7 @@ var Psp = {
                 .status(statusCode.ok)
                 .send(response.successmsg("Sellrate deleted successfully"));
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(response.errormsg(error));
         }
@@ -1674,14 +1674,14 @@ var Psp = {
                     });
                 })
                 .catch((error) => {
-                        winston.error(error);
+                       logger.error(500,{message: error,stack: error.stack}); 
                     
                     res.status(statusCode.internalError).send(
                         response.errormsg(error)
                     );
                 });
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(
                 response.errormsg("internal server error")
@@ -1889,7 +1889,7 @@ var Psp = {
                 )
             );
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(response.errormsg(error));
         }
@@ -1925,7 +1925,7 @@ var Psp = {
                     response.successmsg("Plan sellrate deleted successfully")
                 );
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(response.errormsg(error));
         }
@@ -1990,11 +1990,11 @@ var Psp = {
                     );
                 })
                 .catch((error) => {
-                    winston.error(error);
+                   logger.error(500,{message: error,stack: error.stack}); 
                     
                 });
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
@@ -2028,7 +2028,7 @@ var Psp = {
 
                         })
                         .catch((error) => {
-                            winston.error(error);
+                           logger.error(500,{message: error,stack: error.stack}); 
                             fault++;
                             
                         });
@@ -2044,7 +2044,7 @@ var Psp = {
                             pass++;
                         })
                         .catch((error) => {
-                            winston.error(error);
+                           logger.error(500,{message: error,stack: error.stack}); 
                             
                             fault++;
                             // res.status(statusCode.internalError).send(
@@ -2067,7 +2067,7 @@ var Psp = {
                 });
             }
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(
                 response.errormsg("internal server error")
@@ -2131,7 +2131,7 @@ var Psp = {
                     response.successmsg("Plan sell rate deleted successfully")
                 );
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             
             res.status(statusCode.internalError).send(response.errormsg(error));
         }
@@ -2175,7 +2175,7 @@ var Psp = {
             }
             res.status(statusCode.ok).send(response.successdatamsg(send_res));
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );

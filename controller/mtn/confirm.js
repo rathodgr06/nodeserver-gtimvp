@@ -16,6 +16,7 @@ const ee = new EventEmitter();
 const SendTransactionMailAction = require('../SendTransactionMail');
 const { send_webhook_data } = require("../webhook_settings");
 const PspModel = require("../../models/psp");
+const logger = require('../../config/logger');
 const calculateTransactionCharges = require("../../utilities/charges/transaction-charges/index");
 const confirm_payment = async (req, res) => {
     console.log(`request body is at our 3ds pages mpgs`);
@@ -262,8 +263,7 @@ const confirm_payment = async (req, res) => {
         );
     }
     catch (error) {
-        console.log(`error is here`);
-        console.log(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         await merchantOrderModel.updateDynamic({ status: "FAILED" }, { order_id: order_id }, order_table);
         const insertFunction = mode === 'live' ? order_transactionModel.add : order_transactionModel.test_txn_add;
         const order_txn_update = {

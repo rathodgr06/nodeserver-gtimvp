@@ -4,7 +4,7 @@ const response = require("../utilities/response/ServerResponse");
 const helpers = require("../utilities/helper/general_helper")
 const enc_dec = require("../utilities/decryptor/decryptor")
 const admin_activity_logger = require('../utilities/activity-logger/admin_activity_logger');
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 const submerchantModel = require('../models/submerchantmodel');
 
 var currency = {
@@ -29,11 +29,11 @@ var currency = {
             admin_activity_logger.add(module_and_user, added_name, headers).then((result) => {
                 res.status(statusCode.ok).send(response.successmsg('Currency added successfully.'));
             }).catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             })
         }).catch((error) => {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         });
 
@@ -76,8 +76,7 @@ var currency = {
                 res.status(statusCode.ok).send(response.successdatamsg(send_res, 'List fetched successfully.', total_count));
             })
             .catch((error) => {
-                console.log(error);
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             });
     },
@@ -133,8 +132,7 @@ var currency = {
                 res.status(statusCode.ok).send(response.successdatamsg(send_res, 'List fetched successfully.', total_count));
             })
             .catch((error) => {
-                console.log(error);
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             });
 
@@ -158,7 +156,7 @@ var currency = {
                 res.status(statusCode.ok).send(response.successdatamsg(send_res, 'Details fetched successfully.'));
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             });
     },
@@ -187,11 +185,11 @@ var currency = {
             admin_activity_logger.edit(module_and_user, currency_id, headers).then((result) => {
                 res.status(statusCode.ok).send(response.successmsg('Currency updated successfully'));
             }).catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             })
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },
@@ -215,11 +213,11 @@ var currency = {
             admin_activity_logger.deactivate(module_and_user, currency_id, headers).then((result) => {
                 res.status(statusCode.ok).send(response.successmsg('Currency deactivated successfully'));
             }).catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             })
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },
@@ -243,11 +241,11 @@ var currency = {
             admin_activity_logger.activate(module_and_user, currency_id, headers).then((result) => {
                 res.status(statusCode.ok).send(response.successmsg('Currency activated successfully'));
             }).catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             })
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },
@@ -271,11 +269,11 @@ var currency = {
             admin_activity_logger.delete(module_and_user, currency_id, headers).then((result) => {
                 res.status(statusCode.ok).send(response.successmsg('Currency deleted successfully'));
             }).catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             })
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },

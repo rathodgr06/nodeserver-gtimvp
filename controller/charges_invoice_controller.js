@@ -10,7 +10,7 @@ const pool = require("../config/database");
 const helpers = require("../utilities/helper/general_helper");
 const charges_invoice_models = require("../models/charges_invoice_models");
 const submerchantmodel = require("../models/submerchantmodel");
-const winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 const currency = require("./currency");
 const { sub_merchant_list } = require("../models/merchantmodel");
 
@@ -44,7 +44,7 @@ const charges_invoice_controller = {
         .where({ merchant_id: merchant_id, month: month_year })
         .get(config.table_prefix + "charges_invoice");
     } catch (error) {
-      console.error("Database query failed:", error);
+     logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -59,8 +59,8 @@ const charges_invoice_controller = {
             total_tax = total_tax + item.sale_tax;
           }
         })
-        .catch((err) => {
-          winston.error(err);
+        .catch((error) => {
+        logger.error(500,{message: error,stack: error.stack}); 
         });
 
       let inv_data = {
@@ -201,7 +201,7 @@ const charges_invoice_controller = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -298,7 +298,7 @@ const charges_invoice_controller = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -330,7 +330,7 @@ const charges_invoice_controller = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -366,7 +366,7 @@ const charges_invoice_controller = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -439,7 +439,7 @@ const charges_invoice_controller = {
           });
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -543,7 +543,7 @@ const charges_invoice_controller = {
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -584,7 +584,7 @@ const charges_invoice_controller = {
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -677,7 +677,7 @@ const charges_invoice_controller = {
           )
         );
     } catch (error) {
-      console.error("Transaction list error:", error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg("Failed to fetch transactions"));
@@ -767,7 +767,7 @@ const charges_invoice_controller = {
           )
         );
     } catch (error) {
-      console.error("Transaction list error:", error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg("Failed to fetch transactions"));
@@ -878,7 +878,7 @@ const charges_invoice_controller = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -994,7 +994,7 @@ const charges_invoice_controller = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1041,7 +1041,7 @@ const charges_invoice_controller = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1078,7 +1078,7 @@ const charges_invoice_controller = {
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1175,7 +1175,7 @@ const charges_invoice_controller = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1216,7 +1216,7 @@ const charges_invoice_controller = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1253,7 +1253,7 @@ const charges_invoice_controller = {
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1332,7 +1332,7 @@ const charges_invoice_controller = {
           )
         );
     } catch (error) {
-      console.error("Transaction summary error:", error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(
@@ -1364,7 +1364,7 @@ const charges_invoice_controller = {
           .status(statusCode.badRequest)
           .send(response.errormsg("No wallet found with the given details."));
     } catch (error) {
-      console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1495,6 +1495,7 @@ const charges_invoice_controller = {
           .send(response.errormsg("Invalid sub merchant id"));
       }
     } catch (error) {
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1529,7 +1530,7 @@ const charges_invoice_controller = {
           );
       }
     } catch (error) {
-      console.log(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1591,7 +1592,7 @@ const charges_invoice_controller = {
           )
         );
     } catch (error) {
-      console.error("Wallet list error:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message || "Failed to fetch wallets"));
@@ -1619,7 +1620,7 @@ const charges_invoice_controller = {
           response.successdatamsg(send_res, "Merchant fetched successfully.")
         );
     } catch (error) {
-      console.log(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1643,6 +1644,7 @@ const charges_invoice_controller = {
           .send(response.errormsg(result?.message));
       }
     } catch (error) {
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1706,7 +1708,7 @@ const charges_invoice_controller = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1731,7 +1733,7 @@ const charges_invoice_controller = {
       }
       
     } catch (error) {
-      console.log(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1755,7 +1757,7 @@ const charges_invoice_controller = {
       }
       
     } catch (error) {
-      console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1779,7 +1781,7 @@ const charges_invoice_controller = {
       }
       
     } catch (error) {
-      console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1816,6 +1818,7 @@ async function updateChargesFunction(sub_merchant_id, receiver_id){
         return {status: 400, message: "Error: on charges update..."};
       }
     } catch (error) {
+      logger.error(500,{message: error,stack: error.stack}); 
       return {status: 400, message: error.message};
     }
   };
