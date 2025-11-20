@@ -18,6 +18,7 @@ const pool = require("../config/database");
 require("dotenv").config({ path: "../.env" });
 const date_formatter = require("../utilities/date_formatter/index"); // date formatter module
 const winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 
 var admin_user = {
   register: async (req, res) => {
@@ -126,8 +127,7 @@ var admin_user = {
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      console.log(error);
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -164,7 +164,7 @@ var admin_user = {
         }
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -196,7 +196,7 @@ var admin_user = {
         }
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -277,7 +277,7 @@ var admin_user = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -326,8 +326,7 @@ var admin_user = {
           );
       })
       .catch((error) => {
-        console.log(error);
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -351,7 +350,7 @@ var admin_user = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -452,7 +451,7 @@ var admin_user = {
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -489,7 +488,7 @@ var admin_user = {
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -542,7 +541,7 @@ var admin_user = {
             .send(response?.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -577,7 +576,7 @@ var admin_user = {
             .send(response.errormsg(error.message));
         });
     } catch {
-      winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -595,7 +594,7 @@ var admin_user = {
         .status(statusCode.ok)
         .send(response.successmsg("Record blocked successfully"));
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -613,7 +612,7 @@ var admin_user = {
         .status(statusCode.ok)
         .send(response.successmsg("Record unblocked successfully"));
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -669,7 +668,7 @@ var admin_user = {
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -705,7 +704,7 @@ var admin_user = {
           )
         );
     } catch (error) {
-      winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },

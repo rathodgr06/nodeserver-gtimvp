@@ -7,7 +7,7 @@ const SequenceUUID = require("sequential-uuid");
 const uuid = require("uuid");
 const { errorMsg } = require("../utilities/response/ServerResponse");
 const { default: axios } = require("axios");
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 
 const webHook = {
     get: async (req, res) => {
@@ -26,7 +26,7 @@ const webHook = {
                 )
             );
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.badRequest).send(
                 response.errormsg(error.message)
             );
@@ -72,14 +72,14 @@ const webHook = {
                         );
                     })
                     .catch((error) => {
-                        winston.error(error);
+                       logger.error(500,{message: error,stack: error.stack}); 
                         res.status(statusCode.badRequest).send(
                             response.errormsg(error.message)
                         );
                     });
             }
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.badRequest).send(
                 response.errormsg(error.message)
             );
@@ -121,14 +121,14 @@ const webHook = {
                         );
                     })
                     .catch((error) => {
-                        winston.error(error);
+                       logger.error(500,{message: error,stack: error.stack}); 
                         res.status(statusCode.badRequest).send(
                             response.errormsg(error.message)
                         );
                     });
             }
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.badRequest).send(
                 response.errormsg(error.message)
             );
@@ -166,7 +166,7 @@ const webHook = {
                 response.successdatamsg(send_res, "Details fetch successfully.")
             );
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.badRequest).send(
                 response.errormsg(error.message)
             );
@@ -185,7 +185,7 @@ const webHook = {
             let result =  await axios(support_config);
             return true;
         }catch(error){
-            console.log(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             return true;
         }
        /* var support_config = {
@@ -201,7 +201,7 @@ const webHook = {
                     resolve(result.data);
                 })
                 .catch(function (error) {
-                    winston.error(error);
+                   logger.error(500,{message: error,stack: error.stack}); 
                     reject(error);
                 });
         }); */

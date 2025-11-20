@@ -14,7 +14,7 @@ const invoice_to_merchant = config.table_prefix + "invoice_to_merchant";
 
 const helpers = require("../utilities/helper/general_helper");
 const { add } = require("./cipher_models");
-
+const logger = require('../config/logger');
 var charges_invoice_models = {
   addInvoice: async (data) => {
     let qb = await pool.get_connection();
@@ -22,7 +22,7 @@ var charges_invoice_models = {
     try {
       response = await qb.returning("id").insert(dbtable2, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -57,7 +57,7 @@ var charges_invoice_models = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -71,7 +71,7 @@ var charges_invoice_models = {
       qb.where(condition);
       response = await qb.get(dbtable2);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -85,7 +85,7 @@ var charges_invoice_models = {
       qb.where(condition);
       response = await qb.get(dbtable3);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -99,7 +99,7 @@ var charges_invoice_models = {
       qb.where(condition);
       response = await qb.get(config.table_prefix + table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -116,7 +116,7 @@ var charges_invoice_models = {
           qb.limit(limit.perpage, limit.start);
           response = await qb.get(dbtable2);
         } catch (error) {
-          console.error("Database query failed:", error);
+          logger.error(500,{message: error,stack: error.stack}); 
         } finally {
           qb.release();
         }
@@ -127,7 +127,7 @@ var charges_invoice_models = {
           qb.limit(limit.perpage, limit.start);
           response = await qb.get(dbtable2);
         } catch (error) {
-          console.error("Database query failed:", error);
+          logger.error(500,{message: error,stack: error.stack}); 
         } finally {
           qb.release();
         }
@@ -141,7 +141,7 @@ var charges_invoice_models = {
           qb.where(condition).order_by("id", "asc");
           response = await qb.get(dbtable2);
         } catch (error) {
-          console.error("Database query failed:", error);
+          logger.error(500,{message: error,stack: error.stack}); 
         } finally {
           qb.release();
         }
@@ -151,7 +151,7 @@ var charges_invoice_models = {
           qb.order_by("id", "asc");
           response = await qb.get(dbtable2);
         } catch (error) {
-          console.error("Database query failed:", error);
+          logger.error(500,{message: error,stack: error.stack}); 
         } finally {
           qb.release();
         }
@@ -182,7 +182,7 @@ var charges_invoice_models = {
       }
       response = await qb.get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -228,7 +228,7 @@ var charges_invoice_models = {
     try {
       response = await qb.set(data).where(condition).update(dbtable2);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -243,7 +243,7 @@ var charges_invoice_models = {
         .where(condition)
         .update(config.table_prefix + table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -276,7 +276,7 @@ var charges_invoice_models = {
         );
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -309,7 +309,7 @@ var charges_invoice_models = {
         );
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -323,7 +323,7 @@ var charges_invoice_models = {
       qb.where(condition_obj);
       response = await qb.get(dbtable2);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -337,7 +337,7 @@ var charges_invoice_models = {
       qb.where(condition);
       response = await qb.get(config.table_prefix + "master_merchant");
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -819,7 +819,7 @@ var charges_invoice_models = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -855,7 +855,7 @@ var charges_invoice_models = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -900,7 +900,7 @@ var charges_invoice_models = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -938,7 +938,7 @@ var charges_invoice_models = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -961,7 +961,7 @@ var charges_invoice_models = {
       }
       response = await qb.get(invoice_to_merchant);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -1029,7 +1029,7 @@ var charges_invoice_models = {
         );
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -1052,7 +1052,7 @@ var charges_invoice_models = {
       }
       response = await qb.get(invoice_to_psp);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -1120,7 +1120,7 @@ var charges_invoice_models = {
         );
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -1374,7 +1374,7 @@ LEFT JOIN pending_payouts pp ON (
       console.log(query);
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -1701,7 +1701,7 @@ fetchWalletBalances: async (walletIds) => {
         .returning("id")
         .insert(config.table_prefix + "transaction_charges", data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -1716,7 +1716,7 @@ fetchWalletBalances: async (walletIds) => {
         .where({sub_merchant_id: sub_merchant_id, receiver_id: 0})
         .update(config.table_prefix + "transaction_charges");
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -1730,7 +1730,7 @@ fetchWalletBalances: async (walletIds) => {
       console.log("🚀 ~ fetchWalletList: ~ query:", query);
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -1850,7 +1850,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
 
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
       throw error; // Re-throw to handle in controller
     } finally {
       qb.release();
@@ -1921,7 +1921,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
       let query = `SELECT d.merchant_id, d.company_name FROM pg_master_merchant m JOIN pg_master_merchant_details d ON d.merchant_id = m.id WHERE m.super_merchant_id = ${condition.super_merchant_id} AND m.deleted=0 AND m.status=0;`;
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -2006,7 +2006,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
         .insert(config.table_prefix + "payout_pending_transactions", data);
       console.log("payout_pending_transactions...", qb.last_query());
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -2018,7 +2018,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
     try {
       response = qb.select("*").from("pg_wallet").order_by("id", "desc").get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -2036,7 +2036,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
         .limit(1)
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -2183,7 +2183,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
       // console.log("🚀 ~ response:", response)
 
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -2198,7 +2198,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
         .returning("id")
         .insert(config.table_prefix + "wallet_snap", data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -2218,7 +2218,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
         .get();
       console.log("Last snap date query:", qb.last_query());
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -2242,7 +2242,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
         .get();
       console.log("Last snap date query:", qb.last_query());
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -2375,7 +2375,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
       response = await qb.query(query);
       console.log("🚀 ~ response:", response)
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -2481,7 +2481,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
 
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -2506,7 +2506,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
       let query = `SELECT SUM(amount) AS pending_balance FROM pg_payout_pending_transactions WHERE sub_merchant_id = ${condition.sub_merchant_id} AND receiver_id = ${condition.receiver_id} AND currency = '${condition.currency}' AND order_status = 'PENDING' AND status = 0 AND created_at >= '${condition.last_cut_off_date}' AND created_at <= '${condition.current_date}';`;
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -2527,7 +2527,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
       let query = `SELECT SUM(amount) AS pending_turned_balance FROM pg_payout_pending_transactions WHERE sub_merchant_id = ${condition.sub_merchant_id} AND receiver_id = ${condition.receiver_id} AND currency = '${condition.currency}' AND (order_status = 'COMPLETED' OR order_status='FAILED') AND status = 0`;
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -2548,7 +2548,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
       let query = `UPDATE pg_payout_pending_transactions SET status=1 WHERE sub_merchant_id = ${condition.sub_merchant_id} AND receiver_id = ${condition.receiver_id} AND currency = '${condition.currency}' AND (order_status = 'COMPLETED' OR order_status='FAILED') AND status = 0`;
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -2600,7 +2600,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }

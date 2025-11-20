@@ -18,7 +18,7 @@ const MerchantRegistrationModel = require("../models/merchant_registration");
 const fontModel = require("../models/fonts");
 const submerchatDraftModel = require("../models/master_merchant_draft");
 //const setUpCharges = require("../utilities/charges/setup-charges/index");
-const winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 
 const brandingCreateOrUpdate = require("../utilities/branding/create");
 const brandingDelete = require("../utilities/branding/delete");
@@ -96,7 +96,7 @@ var all_data = {
           )
         );
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -440,7 +440,7 @@ var all_data = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -482,7 +482,7 @@ var all_data = {
           )
         );
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -513,7 +513,7 @@ var all_data = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -606,7 +606,7 @@ var all_data = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -625,7 +625,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("Submerchant updated successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -654,7 +654,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("Submerchant deactivated successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -684,7 +684,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("Submerchant activated successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -712,7 +712,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("Submerchant deleted successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -856,7 +856,7 @@ var all_data = {
         })
         .catch((error) => {
           console.log(error);
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
@@ -1036,7 +1036,7 @@ var all_data = {
         .send(response.successmsg("Submerchant branding updated successfully"));
     } catch (error) {
       console.log(error);
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1198,7 +1198,7 @@ var all_data = {
       res.status(statusCode.ok).send(response.successmsg(message));
     } catch (error) {
       console.log(error);
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1216,7 +1216,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("Submerchant blocked successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1234,7 +1234,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("Submerchant unblocked successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1258,7 +1258,7 @@ var all_data = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1500,7 +1500,7 @@ var all_data = {
         });
       }
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
 
       res
         .status(statusCode.internalError)
@@ -1526,7 +1526,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("MID deleted successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1805,7 +1805,7 @@ var all_data = {
         .send(response.successmsg("MID added successfully"));
     } catch (error) {
       console.log(error);
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
 
       return res
         .status(statusCode.internalError)
@@ -2051,7 +2051,7 @@ var all_data = {
         .send(response.successmsg("MID updated successfully"));
     } catch (error) {
       console.log(error);
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
@@ -2305,7 +2305,7 @@ var all_data = {
         .send(response.successmsg("MID deleted successfully"));
     } catch (error) {
       console.log(error);
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
@@ -2320,7 +2320,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("MID activated successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
@@ -2334,7 +2334,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("MID deactivated successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
@@ -2446,14 +2446,14 @@ var all_data = {
             );
         })
         .catch((error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           console.log("error", error);
           return res
             .status(statusCode.internalError)
             .send(response.errormsg(error));
         });
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
 
       return res
         .status(statusCode.internalError)
@@ -2474,7 +2474,7 @@ var all_data = {
       condition["submerchant_id"] = submerchant_id;
     }
 
-    await SubmerchantModel.selectOneMID("*", condition)
+     SubmerchantModel.selectOneMID("*", condition)
       .then(async (result) => {
         // console.log("🚀 ~ .then ~ result:", result);
         let send_res = [];
@@ -2538,7 +2538,7 @@ var all_data = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         console.log("error", error);
         return res
           .status(statusCode.internalError)
@@ -2564,7 +2564,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successdatamsg(send_res, "List fetched successfully."));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
 
       return res
         .status(statusCode.internalError)
@@ -2644,14 +2644,14 @@ var all_data = {
             .send(response.successdatamsg(temp, "List fetched successfully."));
         })
         .catch((error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
 
           return res
             .status(statusCode.internalError)
             .send(response.errormsg(error));
         });
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
 
       return res
         .status(statusCode.internalError)
@@ -2688,7 +2688,7 @@ var all_data = {
           )
         );
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
@@ -2756,7 +2756,7 @@ var all_data = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2775,7 +2775,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("Deactivated successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -2818,7 +2818,7 @@ var all_data = {
       }
       res.status(statusCode.ok).send(response.successdatamsg(send_res));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -2858,7 +2858,7 @@ var all_data = {
           .send(response.successmsg("Features updated successfully"));
       }
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -3243,7 +3243,7 @@ var all_data = {
 
         .send(response.successdatamsg({}, "Settings changed successfully!"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
 
       res
 
@@ -3366,7 +3366,7 @@ var all_data = {
           response.successdatamsg(send_res, "Details fetched successfully.")
         );
     } catch (error) {
-      console.log(error);
+    logger.error(500,{message: error,stack: error.stack}); 
       res
 
         .status(statusCode.ok)
@@ -3478,7 +3478,7 @@ var all_data = {
           .send(response.successdatamsg([], "Unable to add funding details."));
       }
     } catch (error) {
-      console.log(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -3593,7 +3593,7 @@ var all_data = {
           );
       }
     } catch (error) {
-      console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
     /*  try {
@@ -3716,7 +3716,7 @@ var all_data = {
           .send(response.errormsg("Invalid account id."));
       }
     } catch (error) {
-      console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -3788,7 +3788,7 @@ var all_data = {
           .send(response.errormsg("Invalid account id."));
       }
     } catch (error) {
-      console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -3992,7 +3992,7 @@ var all_data = {
           );
       }
     } catch (error) {
-      console.error("🔥 Error in payers function:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.badRequest)
         .send(
@@ -4172,7 +4172,7 @@ var all_data = {
         });
       }
     } catch (error) {
-      console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -4271,7 +4271,7 @@ var all_data = {
           .send(response.errormsg("Account not found"));
       }
     } catch (error) {
-      console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.ok)
         .send(response.errormsg("Unable to fetch funding details."));
@@ -4378,7 +4378,7 @@ var all_data = {
           );
       }
     } catch (error) {
-      console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.ok)
         .send(response.errormsg("Unable to fetch funding details."));
@@ -4419,7 +4419,7 @@ var all_data = {
           )
         );
     } catch (error) {
-      console.log(error);
+      logger.error(500,{message: error,stack: error.stack}); 
         countries.push({ country_iso_code: "LBR", name: "Liberia" });
       res
         .status(statusCode.ok)
@@ -4446,6 +4446,7 @@ var all_data = {
           )
         );
     } catch (error) {
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.ok)
         .send(response.successdatamsg("", "Unable to fetch."));
@@ -4483,6 +4484,7 @@ var all_data = {
           )
         );
     } catch (error) {
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.ok)
         .send(response.successdatamsg([], "Unable to fetch funding details."));
@@ -4500,7 +4502,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successdatamsg(send_res, "IP list fetch successfully."));
     } catch (error) {
-      console.log(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.ok).send(response.errormsg("Unable to IP list."));
     }
   },
@@ -4533,6 +4535,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successdatamsg([], "IP list updated successfully."));
     } catch (error) {
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.ok)
         .send(response.errormsg("Unable to update IP list."));
@@ -4574,7 +4577,7 @@ var all_data = {
           .send(response.errormsg("Invalid sub merchant id or account id."));
       }
     } catch (error) {
-      console.log(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -4648,7 +4651,7 @@ var all_data = {
           response.successdatamsg(results, "Funding details added successfully")
         );
     } catch (error) {
-      console.log(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -4688,7 +4691,7 @@ var all_data = {
           )
         );
     } catch (error) {
-      console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -4709,7 +4712,7 @@ var all_data = {
           .send(response.errormsg("Merchant details not found"));
       }
     } catch (error) {
-      console.log(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -4722,7 +4725,7 @@ var all_data = {
           response.successdatamsg(company_details, "Company details found")
         );
     } catch (error) {
-      console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -4742,7 +4745,7 @@ var all_data = {
           .send(response.errormsg("Not Found"));
       }
     } catch (error) {
-      console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -4759,7 +4762,7 @@ var all_data = {
           .send(response.errormsg("Payers not found"));
       }
     } catch (error) {
-      console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -4780,7 +4783,7 @@ var all_data = {
           .send(response.errormsg("Submerchant ID required"));
       }
     } catch (error) {
-      console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -5001,7 +5004,7 @@ async function get_receiver_by_sub_merchant_id_api_call(sub_merchant_id) {
     let receiver_id = response?.data?.receiver?.receiver_id ||0
     return receiver_id;
   } catch (error) {
-    console.log(error);
+   logger.error(500,{message: error,stack: error.stack}); 
     return 0;
   }
 }
@@ -5462,7 +5465,7 @@ async function alpay_payer_list(funding_type) {
     return payer_list;
     
   } catch (error) {
-    console.log(error);
+   logger.error(500,{message: error,stack: error.stack}); 
     return [];
   }
 }

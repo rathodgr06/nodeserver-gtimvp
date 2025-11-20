@@ -20,6 +20,7 @@ class HttpError extends Error {
         this.status = status;
     }
 }
+const logger = require('../../config/logger');
 const Pay = async (req, res) => {
   console.log(`inside orange money pay`)
   let payment_id;
@@ -197,7 +198,7 @@ const Pay = async (req, res) => {
       status: "success",
     });
   } catch (error) {
-    console.log(error.Error);
+     logger.error(500,{message: error,stack: error.stack}); 
     let remark;
     let invalidMid = false;
     if (error?.response?.status == "401") {

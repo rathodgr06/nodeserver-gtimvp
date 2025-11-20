@@ -16,16 +16,16 @@ require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
 const date_formatter = require("../utilities/date_formatter/index"); // date formatter module
-const winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 
 const inv = {
   add_customer: async (req, res) => {
     let added_date = await date_formatter.created_date_time();
     let ip = await helpers.get_ip(req);
-    let ship_country = await enc_dec.cjs_decrypt(
+    let ship_country =  enc_dec.cjs_decrypt(
       req.bodyString("ship_country")
     );
-    let bill_country = await enc_dec.cjs_decrypt(
+    let bill_country =  enc_dec.cjs_decrypt(
       req.bodyString("bill_country")
     );
     let cust_data = {
@@ -103,7 +103,7 @@ const inv = {
         // })
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -238,7 +238,7 @@ const inv = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -298,7 +298,7 @@ const inv = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -376,7 +376,7 @@ const inv = {
           response.successdatamsg(customerData, "Client Updated successfully.")
         );
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -396,7 +396,7 @@ const inv = {
         .status(statusCode.ok)
         .send(response.successmsg("Client deactivated successfully"));
     } catch {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -416,7 +416,7 @@ const inv = {
         .status(statusCode.ok)
         .send(response.successmsg("Client activated successfully"));
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -434,7 +434,7 @@ const inv = {
         .status(statusCode.ok)
         .send(response.successmsg("Client deleted successfully"));
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -536,14 +536,14 @@ const inv = {
             );
           })
           .catch((error) => {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res
               .status(statusCode.internalError)
               .send(response.errormsg(error.message));
           });
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -746,7 +746,7 @@ const inv = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -893,7 +893,7 @@ const inv = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -911,7 +911,7 @@ const inv = {
           .send(response.successmsg("Invoice deleted successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1002,20 +1002,20 @@ const inv = {
               );
             })
             .catch((error) => {
-              winston.error(error);
+              logger.error(500,{message: error,stack: error.stack}); 
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error.message));
             });
         })
         .catch((error) => {
-          winston.error(error);
+          logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1036,7 +1036,7 @@ const inv = {
         .status(statusCode.ok)
         .send(response.successmsg("Customer deactivated successfully"));
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1057,7 +1057,7 @@ const inv = {
         .status(statusCode.ok)
         .send(response.successmsg("Customer activated successfully"));
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1184,7 +1184,7 @@ const inv = {
         );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1277,7 +1277,7 @@ const inv = {
         });
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1300,7 +1300,7 @@ const inv = {
           .send(response.successmsg("Invoice cancelled successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1308,6 +1308,7 @@ const inv = {
   },
   //invoice item start
   item_add: async (req, res) => {
+    try{
     let added_date = await date_formatter.created_date_time();
     let ip = await helpers.get_ip(req);
     let item = req.body.item;
@@ -1329,6 +1330,9 @@ const inv = {
     }
     await invModel.add_item(resp);
     res.status(statusCode.ok).send(response.successmsg("Added successfully"));
+    }catch(error){
+      logger.error(500,{message: error,stack: error.stack}); 
+    }
     // let item_data={
     //    invoice_master_id: await enc_dec.cjs_decrypt(req.bodyString("invoice_master_id")),
     // }
@@ -1403,7 +1407,7 @@ const inv = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1443,7 +1447,7 @@ const inv = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1499,7 +1503,7 @@ const inv = {
           .send(response.successmsg("Record updated successfully"));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1517,7 +1521,7 @@ const inv = {
         .status(statusCode.ok)
         .send(response.successmsg("Item deleted successfully"));
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1550,7 +1554,7 @@ const inv = {
         )
       );
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1630,7 +1634,7 @@ const inv = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1664,7 +1668,7 @@ const inv = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1688,7 +1692,7 @@ const inv = {
           .send(response.successmsg("Item updated successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1709,7 +1713,7 @@ const inv = {
           .send(response.successmsg("Item activated successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1730,7 +1734,7 @@ const inv = {
           .send(response.successmsg("Item deactivated successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1751,7 +1755,7 @@ const inv = {
           .send(response.successmsg("Item deleted successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1979,8 +1983,7 @@ const inv = {
           .send(response.common_error_msg("No active MID."));
       }
     } catch (error) {
-      console.log(error);
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -2207,7 +2210,7 @@ const inv = {
           .send(response.common_error_msg("No active MID."));
       }
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -2239,7 +2242,7 @@ const inv = {
         )
       );
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -2311,7 +2314,7 @@ const inv = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2345,7 +2348,7 @@ const inv = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2371,7 +2374,7 @@ const inv = {
           .send(response.successmsg("Item updated successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2392,7 +2395,7 @@ const inv = {
           .send(response.successmsg("Item activated successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2413,7 +2416,7 @@ const inv = {
           .send(response.successmsg("Item deactivated successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2434,7 +2437,7 @@ const inv = {
           .send(response.successmsg("Item deleted successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2526,7 +2529,7 @@ const inv = {
         );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2581,7 +2584,7 @@ const inv = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2666,7 +2669,7 @@ const inv = {
           .send(response.successmsg("Client updated successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2684,7 +2687,7 @@ const inv = {
         .status(statusCode.ok)
         .send(response.successmsg("Client deactivated successfully"));
     } catch {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -2702,7 +2705,7 @@ const inv = {
         .status(statusCode.ok)
         .send(response.successmsg("Client activated successfully"));
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -2720,7 +2723,7 @@ const inv = {
         .status(statusCode.ok)
         .send(response.successmsg("Client deleted successfully"));
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -2851,153 +2854,157 @@ const inv = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
       });
   },
   open_invoice_add: async (req, res) => {
-    let created_at = await date_formatter.created_date_time();
-    let ip = await helpers.get_ip(req);
+    try {
+      let created_at = await date_formatter.created_date_time();
+      let ip = await helpers.get_ip(req);
 
-    let data = req.body.data;
-    var inv_ids = [];
-    let tempArr = 0;
-    for (j = 0; j < data.length; j++) {
-      let customer_id_exist = await invModel.get_count_cust(
-        {
-          id: enc_dec.cjs_decrypt(data[j].customer_id),
+      let data = req.body.data;
+      var inv_ids = [];
+      let tempArr = 0;
+      for (j = 0; j < data.length; j++) {
+        let customer_id_exist = await invModel.get_count_cust(
+          {
+            id: enc_dec.cjs_decrypt(data[j].customer_id),
+            submerchant_id: req.credentials.merchant_id,
+            deleted: 0,
+            status: 0,
+          },
+          [],
+          []
+        );
+        let mid_currency = await helpers.get_currency_id_by_name(
+          data[j].currency
+        );
+        count_mid_data = await invModel.get_count_mid("mid", {
           submerchant_id: req.credentials.merchant_id,
+          currency_id: mid_currency,
+          env: req.credentials.type,
           deleted: 0,
           status: 0,
-        },
-        [],
-        []
-      );
-      let mid_currency = await helpers.get_currency_id_by_name(
-        data[j].currency
-      );
-      count_mid_data = await invModel.get_count_mid("mid", {
-        submerchant_id: req.credentials.merchant_id,
-        currency_id: mid_currency,
-        env: req.credentials.type,
-        deleted: 0,
-        status: 0,
-      });
-      if (customer_id_exist > 0 && count_mid_data > 0) {
-        let items = req.body.data[j].item_data;
-        let product_items = [];
-        var total_amount = 0.0;
-        var total_discount = 0.0;
-        var total_tax = 0.0;
-        for (i = 0; i < items.length; i++) {
-          let item_id_exist = await invModel.item_master_count({
-            id: enc_dec.cjs_decrypt(items[i].item_id),
-            submerchant_id: req.credentials.merchant_id,
-            is_deleted: 0,
-            status: 0,
-          });
-          if (item_id_exist > 0) {
-            var rate = parseFloat(items[i].rate);
-            var qty = parseFloat(items[i].quantity);
-            var tax = parseFloat(items[i].tax);
-            var discount = parseFloat(items[i].discount);
-            let temp_total = rate * qty;
-            let tax_amount = 0;
-            let discount_amount = 0;
-            if (discount > 0) {
-              discount_amount = (discount / 100) * temp_total;
-            }
-            if (tax > 0) {
-              tax_amount = (tax / 100) * (temp_total - discount_amount);
-            }
-
-            temp_total = temp_total + tax_amount - discount_amount;
-            total_amount = total_amount + temp_total;
-            total_discount = total_discount + discount_amount;
-            total_tax = total_tax + tax_amount;
-            let temp_items = {
-              invoice_master_id: "",
-              item_id: enc_dec.cjs_decrypt(items[i].item_id),
-              item_rate: rate,
-              quantity: qty,
-              tax_per: tax,
-              discount_per: discount,
-              total_amount: temp_total,
-              added_by: req.credentials.super_merchant_id,
-              ip: ip,
+        });
+        if (customer_id_exist > 0 && count_mid_data > 0) {
+          let items = req.body.data[j].item_data;
+          let product_items = [];
+          var total_amount = 0.0;
+          var total_discount = 0.0;
+          var total_tax = 0.0;
+          for (i = 0; i < items.length; i++) {
+            let item_id_exist = await invModel.item_master_count({
+              id: enc_dec.cjs_decrypt(items[i].item_id),
+              submerchant_id: req.credentials.merchant_id,
+              is_deleted: 0,
               status: 0,
-              created_at: created_at,
-              updated_at: created_at,
-            };
-            product_items.push(temp_items);
-          }
-        }
-        if (product_items.length > 0) {
-          let inv_data = {
-            customer_id: enc_dec.cjs_decrypt(data[j].customer_id),
-            merchant_id: req.credentials.super_merchant_id,
-            sub_merchant_id: req.credentials.merchant_id,
-            invoice_no: await helpers.make_order_number("INV"),
-            currency: data[j].currency,
-            merchant_full_name: await helpers.getInvCustomerName(
-              enc_dec.cjs_decrypt(data[j].customer_id)
-            ),
-            total_amount: total_amount,
-            total_tax: total_tax,
-            total_discount: total_discount,
-            description: data[j].description,
-            special_note: data[j].note,
-            issue_date: data[j].issue_date,
-            expiry_date: data[j].expiry_date,
-            merchant_invoice_no: data[j].merchant_invoice_no,
-            payment_terms: data[j].payment_terms,
-            status: "Draft",
-            added_by: req.credentials.super_merchant_id,
-            ip: ip,
-            created_at: created_at,
-            updated_at: created_at,
-            created_by: req.credentials.super_merchant_id,
-            mode: req.credentials.type,
-          };
-          if (total_amount > 0) {
-            let result = await invModel.add_inv(inv_data);
-            if (result) {
-              for (i = 0; i < product_items.length; i++) {
-                product_items[i].invoice_master_id = result.insertId;
+            });
+            if (item_id_exist > 0) {
+              var rate = parseFloat(items[i].rate);
+              var qty = parseFloat(items[i].quantity);
+              var tax = parseFloat(items[i].tax);
+              var discount = parseFloat(items[i].discount);
+              let temp_total = rate * qty;
+              let tax_amount = 0;
+              let discount_amount = 0;
+              if (discount > 0) {
+                discount_amount = (discount / 100) * temp_total;
+              }
+              if (tax > 0) {
+                tax_amount = (tax / 100) * (temp_total - discount_amount);
               }
 
-              invModel
-                .add_inv_items(product_items)
-                .then(async (result_meta) => {});
-              let de_qr_id = helpers.formatNumber(result.insertId);
-              inv_ids.push({
-                invoice_id: de_qr_id,
-                data_id: enc_dec.cjs_encrypt(result.insertId),
-              });
-              tempArr++;
+              temp_total = temp_total + tax_amount - discount_amount;
+              total_amount = total_amount + temp_total;
+              total_discount = total_discount + discount_amount;
+              total_tax = total_tax + tax_amount;
+              let temp_items = {
+                invoice_master_id: "",
+                item_id: enc_dec.cjs_decrypt(items[i].item_id),
+                item_rate: rate,
+                quantity: qty,
+                tax_per: tax,
+                discount_per: discount,
+                total_amount: temp_total,
+                added_by: req.credentials.super_merchant_id,
+                ip: ip,
+                status: 0,
+                created_at: created_at,
+                updated_at: created_at,
+              };
+              product_items.push(temp_items);
+            }
+          }
+          if (product_items.length > 0) {
+            let inv_data = {
+              customer_id: enc_dec.cjs_decrypt(data[j].customer_id),
+              merchant_id: req.credentials.super_merchant_id,
+              sub_merchant_id: req.credentials.merchant_id,
+              invoice_no: await helpers.make_order_number("INV"),
+              currency: data[j].currency,
+              merchant_full_name: await helpers.getInvCustomerName(
+                enc_dec.cjs_decrypt(data[j].customer_id)
+              ),
+              total_amount: total_amount,
+              total_tax: total_tax,
+              total_discount: total_discount,
+              description: data[j].description,
+              special_note: data[j].note,
+              issue_date: data[j].issue_date,
+              expiry_date: data[j].expiry_date,
+              merchant_invoice_no: data[j].merchant_invoice_no,
+              payment_terms: data[j].payment_terms,
+              status: "Draft",
+              added_by: req.credentials.super_merchant_id,
+              ip: ip,
+              created_at: created_at,
+              updated_at: created_at,
+              created_by: req.credentials.super_merchant_id,
+              mode: req.credentials.type,
+            };
+            if (total_amount > 0) {
+              let result = await invModel.add_inv(inv_data);
+              if (result) {
+                for (i = 0; i < product_items.length; i++) {
+                  product_items[i].invoice_master_id = result.insertId;
+                }
+
+                invModel
+                  .add_inv_items(product_items)
+                  .then(async (result_meta) => {});
+                let de_qr_id = helpers.formatNumber(result.insertId);
+                inv_ids.push({
+                  invoice_id: de_qr_id,
+                  data_id: enc_dec.cjs_encrypt(result.insertId),
+                });
+                tempArr++;
+              }
             }
           }
         }
       }
-    }
 
-    if (tempArr > 0) {
-      res
-        .status(statusCode.ok)
-        .send(
-          response.successdatamsg(
-            inv_ids,
-            tempArr + " Invoices added successfully."
-          )
-        );
-    } else {
-      res
-        .status(statusCode.badRequest)
-        .send(
-          response.common_error_msg("Total amount should be greater than 0.")
-        );
+      if (tempArr > 0) {
+        res
+          .status(statusCode.ok)
+          .send(
+            response.successdatamsg(
+              inv_ids,
+              tempArr + " Invoices added successfully."
+            )
+          );
+      } else {
+        res
+          .status(statusCode.badRequest)
+          .send(
+            response.common_error_msg("Total amount should be greater than 0.")
+          );
+      }
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
     }
   },
 
@@ -3199,7 +3206,7 @@ const inv = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -3222,7 +3229,7 @@ const inv = {
           .send(response.successmsg("Invoice cancelled successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -3239,7 +3246,7 @@ const inv = {
           .send(response.successmsg("Invoice deleted successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -3339,14 +3346,14 @@ const inv = {
                 );
               })
               .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res
                   .status(statusCode.internalError)
                   .send(response.errormsg(error.message));
               });
           })
           .catch((error) => {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res
               .status(statusCode.internalError)
               .send(response.errormsg(error.message));
@@ -3359,7 +3366,7 @@ const inv = {
           );
       }
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -3500,7 +3507,7 @@ const inv = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));

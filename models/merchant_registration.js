@@ -1,4 +1,5 @@
 const path = require("path");
+const logger = require('../config/logger');
 require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
@@ -21,7 +22,7 @@ var MerchantRegistrationModel = {
       response = await qb.returning("id").insert(super_merchant_table, data);
       console.log(qb.last_query());
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -33,7 +34,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.returning("id").insert(details_table, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -45,7 +46,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.returning("id").insert(tc_accepted, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -57,7 +58,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.returning("id").insert(reset_table, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -72,7 +73,7 @@ var MerchantRegistrationModel = {
         .where(condition)
         .get(reset_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -87,7 +88,7 @@ var MerchantRegistrationModel = {
         .where(condition)
         .get(super_merchant_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -103,7 +104,7 @@ var MerchantRegistrationModel = {
         " "
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -115,7 +116,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.set(data).where(condition).update(db_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -127,7 +128,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.set(data).where(condition).update(referrer);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -143,7 +144,7 @@ var MerchantRegistrationModel = {
         .where(condition)
         .update(super_merchant_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -155,7 +156,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.set(data).where(condition).update(reset_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -167,7 +168,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.returning("id").insert(two_fa_table, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -185,7 +186,7 @@ var MerchantRegistrationModel = {
         .get();
       // console.log("Query Ran: " + qb.last_query());
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -197,7 +198,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.set(data).where(condition).update(two_fa_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -266,7 +267,7 @@ var MerchantRegistrationModel = {
           } 
         } 
       } catch (error) {
-        console.error("Database query failed:", error);
+        logger.error(500,{message: error,stack: error.stack}); 
       } finally {
         qb.release();
       }
@@ -296,7 +297,7 @@ var MerchantRegistrationModel = {
           );
         }
       } catch (error) {
-        console.error("Database query failed:", error);
+        logger.error(500,{message: error,stack: error.stack}); 
       } finally {
         qb.release();
       }
@@ -357,7 +358,7 @@ var MerchantRegistrationModel = {
        
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -371,7 +372,7 @@ var MerchantRegistrationModel = {
       qb.where(condition);
       response = await qb.get(super_merchant_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -387,7 +388,7 @@ var MerchantRegistrationModel = {
         .order_by("id", "desc")
         .get(super_merchant_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -402,7 +403,7 @@ var MerchantRegistrationModel = {
         .where(condition)
         .update(super_merchant_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -414,7 +415,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.returning("id").insert(details_table, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -455,7 +456,7 @@ var MerchantRegistrationModel = {
           merchantPaymentMethodData
         );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -468,7 +469,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.set(data).where(condition).update(meeting_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -480,7 +481,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.set(data).where(condition).update(meeting_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -499,7 +500,7 @@ var MerchantRegistrationModel = {
         " and status=0  and deleted=0"
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -548,7 +549,7 @@ var MerchantRegistrationModel = {
           merchantPaymentMethodData
         );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -565,7 +566,7 @@ var MerchantRegistrationModel = {
         .order_by("id", "desc")
         .get(config.table_prefix + "master_merchant");
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -591,7 +592,7 @@ var MerchantRegistrationModel = {
           data
         );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -610,19 +611,14 @@ var MerchantRegistrationModel = {
     let qb = await pool.get_connection();
     let response;
       try {
-        response = await qb.query(`INSERT INTO pg_master_merchant_draft 
-  (submerchant_id, brand_color, accent_color, language, payment_methods, card_show, font_name, card_payment, stored_card, created_at, test_card_payment_scheme, test_stored_card_scheme) 
-  SELECT ${merchant_id}, brand_color, accent_color, language, payment_methods, card_show, font_name, card_payment, stored_card, NOW(),  test_card_payment_scheme, test_stored_card_scheme 
-  FROM pg_master_merchant_draft 
-  WHERE submerchant_id = ${immediate_sub_merchant_id};`);
-        // logging
-        console.log(`INSERT INTO pg_master_merchant_draft 
-  (submerchant_id, brand_color, accent_color, language, payment_methods, card_show, font_name, card_payment, stored_card, created_at, test_card_payment_scheme, test_stored_card_scheme) 
-  SELECT ${merchant_id}, brand_color, accent_color, language, payment_methods, card_show, font_name, card_payment, stored_card, NOW(),  test_card_payment_scheme, test_stored_card_scheme 
-  FROM pg_master_merchant_draft 
-  WHERE submerchant_id = ${immediate_sub_merchant_id};`);
+        let query = `INSERT INTO pg_master_merchant_draft 
+(submerchant_id, brand_color, accent_color, language, payment_methods, card_show, font_name, card_payment, stored_card, created_at, test_card_payment_scheme, test_stored_card_scheme)
+SELECT  ${merchant_id}, brand_color, accent_color, language, payment_methods, card_show, font_name, card_payment, stored_card, NOW(),
+    test_card_payment_scheme, test_stored_card_scheme FROM pg_master_merchant_draft FORCE INDEX(idx_master_submerchant_id)
+WHERE submerchant_id = ${immediate_sub_merchant_id} LOCK IN SHARE MODE`
+        response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -665,7 +661,7 @@ var MerchantRegistrationModel = {
         .order_by("pg_master_merchant.id", "desc")
         .get("pg_master_merchant");
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -718,7 +714,7 @@ var MerchantRegistrationModel = {
         .offset(offset)
         .get("pg_master_merchant");
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -812,7 +808,7 @@ var MerchantRegistrationModel = {
         .where(condition)
         .get(config.table_prefix+table_name);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -827,7 +823,7 @@ var MerchantRegistrationModel = {
         .where(condition)
         .get(config.table_prefix+table_name);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -840,7 +836,7 @@ var MerchantRegistrationModel = {
       response = await qb.returning("id").insert(config.table_prefix+'merchant_profile_history', data);
       console.log(response);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -853,7 +849,7 @@ var MerchantRegistrationModel = {
       response = await qb.set(data).where(condition).update(config.table_prefix+table);
       console.log(qb.last_query());
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }

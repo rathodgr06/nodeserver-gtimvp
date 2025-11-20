@@ -1,10 +1,12 @@
 require("dotenv").config({ path: "../.env" });
+
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
 const pool = require("../config/database");
 const dbtable = config.table_prefix + "master_merchant_draft";
 const db_merchant_draft_payment_model =
   config.table_prefix + "merchant_draft_payment_methods";
+  const logger = require('../config/logger');
 
 var dbModel = {
   add: async (data) => {
@@ -13,7 +15,7 @@ var dbModel = {
     try {
       response = await qb.returning("id").insert(dbtable, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -25,7 +27,7 @@ var dbModel = {
     try {
       response = await qb.where(condition).get(dbtable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -38,7 +40,7 @@ var dbModel = {
       response = await qb.set(data).where(condition).update(dbtable);
       console.log(qb.last_query());
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -51,7 +53,7 @@ var dbModel = {
       response = await qb.set(data).where(condition).update(config.table_prefix+'master_merchant');
       console.log(qb.last_query());
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -68,7 +70,7 @@ var dbModel = {
           condition.submerchant_id
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -93,7 +95,7 @@ var dbModel = {
           .update(db_merchant_draft_payment_model);
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -110,7 +112,7 @@ var dbModel = {
         .where({ submerchant_id: sub_merchant_id, mode: mode })
         .get(db_merchant_draft_payment_model);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }

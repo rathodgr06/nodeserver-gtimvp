@@ -6,7 +6,7 @@ const enc_dec = require("../utilities/decryptor/decryptor")
 const admin_activity_logger = require('../utilities/activity-logger/admin_activity_logger');
 const moment = require('moment');
 const date_formatter = require("../utilities/date_formatter/index"); // date formatter module
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 
 var Designation = {
     add: async(req, res) => {
@@ -32,11 +32,11 @@ var Designation = {
             admin_activity_logger.add(module_and_user,added_name,headers).then((result)=>{
                 res.status(statusCode.ok).send(response.successmsg('Designation added successfully.'));
             }).catch((error)=>{
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             })
         }).catch((error) => {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         });
             
@@ -80,7 +80,7 @@ var Designation = {
                 res.status(statusCode.ok).send(response.successdatamsg(send_res,'List fetched successfully.',total_count));
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             });
     },
@@ -103,7 +103,7 @@ var Designation = {
                 res.status(statusCode.ok).send(response.successdatamsg(send_res,'Details fetched successfully.'));
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             });
     },
@@ -131,12 +131,12 @@ var Designation = {
             admin_activity_logger.edit(module_and_user,designation_id,headers).then((result)=>{
                 res.status(statusCode.ok).send(response.successmsg('Designation updated successfully'));
             }).catch((error)=>{
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             })
            
         } catch(error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },
@@ -160,11 +160,11 @@ var Designation = {
             admin_activity_logger.deactivate(module_and_user,designation_id,headers).then((result)=>{
                 res.status(statusCode.ok).send(response.successmsg('Designation deactivated successfully'));
             }).catch((error)=>{
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             })
         } catch(error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },
@@ -188,11 +188,11 @@ var Designation = {
             admin_activity_logger.activate(module_and_user,designation_id,headers).then((result)=>{
                 res.status(statusCode.ok).send(response.successmsg('Designation activated successfully'));
             }).catch((error)=>{
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             })
         } catch(error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },
@@ -216,11 +216,11 @@ var Designation = {
             admin_activity_logger.delete(module_and_user,designation_id,headers).then((result)=>{
                 res.status(statusCode.ok).send(response.successmsg('Designation deleted successfully'));
             }).catch((error)=>{
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             })
         } catch(error){
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },

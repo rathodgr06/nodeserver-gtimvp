@@ -1,4 +1,5 @@
 const path = require("path");
+const logger = require('../config/logger');
 require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
@@ -19,7 +20,7 @@ var merchantOrderModel = {
 
       response = await qb.returning("id").insert(db_table, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -35,7 +36,7 @@ var merchantOrderModel = {
         .get(config.table_prefix + table);
         console.log(qb.last_query());
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -52,7 +53,7 @@ var merchantOrderModel = {
         .get(config.table_prefix + table);
       console.log(qb.last_query());
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -67,7 +68,7 @@ var merchantOrderModel = {
         .where(condition)
         .get(config.table_prefix + table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -83,7 +84,7 @@ var merchantOrderModel = {
         .get(config.table_prefix + table);
         console.log(qb.last_query());
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -97,7 +98,7 @@ var merchantOrderModel = {
     try {
       response = await qb.returning("id").insert(db_table, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -111,7 +112,7 @@ var merchantOrderModel = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -124,7 +125,7 @@ var merchantOrderModel = {
     try {
       response = await qb.set(data).where(condition).update(db_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -172,7 +173,7 @@ var merchantOrderModel = {
         .where({ "sm.token": paymentlink_id, "sp.deleted": 0, "s.status": 0 })
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -211,7 +212,7 @@ var merchantOrderModel = {
         .where({ "mk.qr_id": paymentlink_id, "mk.status": 0 })
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -227,7 +228,7 @@ var merchantOrderModel = {
         .where({ "mk.qr_id": payment_id })
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -243,7 +244,7 @@ var merchantOrderModel = {
         "select count('id') as count from " + db_table + " where " + condition
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -292,7 +293,7 @@ var merchantOrderModel = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -335,7 +336,7 @@ var merchantOrderModel = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -384,7 +385,7 @@ var merchantOrderModel = {
     try {
       response = await qb.query(query2);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -428,7 +429,7 @@ var merchantOrderModel = {
     try {
       response = await qb.query(query2);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -446,7 +447,7 @@ var merchantOrderModel = {
         .where(condition_obj)
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -468,7 +469,7 @@ var merchantOrderModel = {
         .order_by("id", "desc")
         .get(config.table_prefix + table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -482,7 +483,7 @@ var merchantOrderModel = {
       response = await qb.query(query);
       console.log(qb.last_query());
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -495,7 +496,7 @@ var merchantOrderModel = {
     try {
       response = await qb.query("SELECT MAX(id) as max_id FROM pg_order_txn");
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -518,7 +519,7 @@ var merchantOrderModel = {
         .where(condition)
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -537,7 +538,7 @@ var merchantOrderModel = {
         .get();
         console.log(qb.last_query());
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -559,7 +560,7 @@ var merchantOrderModel = {
         })
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -572,7 +573,7 @@ var merchantOrderModel = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -585,7 +586,7 @@ var merchantOrderModel = {
     try {
       response = await qb.select(selection).from(config.table_prefix+first_table).join(config.table_prefix+second_table,join_on,'INNER').where(condition).get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -604,7 +605,7 @@ var merchantOrderModel = {
         .limit(1)
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -620,7 +621,7 @@ var merchantOrderModel = {
       .where(condition)
       .get();
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }

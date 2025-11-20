@@ -5,8 +5,10 @@ const helpers = require("../utilities/helper/general_helper");
 const enc_dec = require("../utilities/decryptor/decryptor");
 const admin_activity_logger = require("../utilities/activity-logger/admin_activity_logger");
 const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 var country = {
     add: async (req, res) => {
+        try{
         let added_date = moment().format('YYYY-MM-DD HH:mm:ss');
         let country_name = req.bodyString("country_name");
         let country_code = req.bodyString("country_code");
@@ -52,18 +54,21 @@ var country = {
                         );
                     })
                     .catch((error) => {
-                        winston.error(error);
+                         logger.error(500,{message: error,stack: error.stack});
                         res.status(statusCode.internalError).send(
                             response.errormsg(error.message)
                         );
                     });
             })
             .catch((error) => {
-                winston.error(error);
+                 logger.error(500,{message: error,stack: error.stack});
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
             });
+        }catch(error){
+             logger.error(500,{message: error,stack: error.stack});
+        }
     },
     list: async (req, res) => {
         let limit = {
@@ -120,7 +125,7 @@ var country = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack});
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -156,7 +161,7 @@ var country = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack});
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -211,13 +216,13 @@ var country = {
                     );
                 })
                 .catch((error) => {
-                    winston.error(error);
+                    logger.error(500,{message: error,stack: error.stack});
                     res.status(statusCode.internalError).send(
                         response.errormsg(error.message)
                     );
                 });
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack});
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -251,13 +256,13 @@ var country = {
                     );
                 })
                 .catch((error) => {
-                    winston.error(error);
+                     logger.error(500,{message: error,stack: error.stack});
                     res.status(statusCode.internalError).send(
                         response.errormsg(error.message)
                     );
                 });
         } catch (error) {
-            winston.error(error);
+             logger.error(500,{message: error,stack: error.stack});
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -291,13 +296,13 @@ var country = {
                     );
                 })
                 .catch((error) => {
-                    winston.error(error);
+                     logger.error(500,{message: error,stack: error.stack});
                     res.status(statusCode.internalError).send(
                         response.errormsg(error.message)
                     );
                 });
         } catch (error) {
-            winston.error(error);
+             logger.error(500,{message: error,stack: error.stack});
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -331,13 +336,13 @@ var country = {
                     );
                 })
                 .catch((error) => {
-                    winston.error(error);
+                     logger.error(500,{message: error,stack: error.stack});
                     res.status(statusCode.internalError).send(
                         response.errormsg(error.message)
                     );
                 });
         } catch (error) {
-            winston.error(error);
+             logger.error(500,{message: error,stack: error.stack});
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );

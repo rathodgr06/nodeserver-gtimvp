@@ -9,7 +9,7 @@ const mailSender = require('../utilities/mail/mailsender');
 const merchantToken = require("../utilities/tokenmanager/merchantToken");
 const QRCode = require('qrcode')
 const moment = require('moment');
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 
 var referrer = {
     add: async (req, res) => {
@@ -81,7 +81,7 @@ var referrer = {
                 }
             );
         }).catch((error) => {
-            winston.error(error);
+             logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         })
     },
@@ -147,7 +147,7 @@ var referrer = {
             let total_count = await merchant_model.get_count(condition,or_cond, search);
             res.status(statusCode.ok).send(response.successdatamsg(send_res, 'Merchant user list fetched successfully.', total_count));
         }).catch((error) => {
-            winston.error(error);
+             logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         })
     },
@@ -176,7 +176,7 @@ var referrer = {
             }
             res.status(statusCode.ok).send(response.successdatamsg(send_res, 'Details fetched successfully.'));
         }).catch((error) => {
-            winston.error(error);
+             logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         })
     },
@@ -186,7 +186,7 @@ var referrer = {
         merchant_model.updateDetails({ id: id }, update_data).then((result) => {
             res.status(statusCode.ok).send(response.successmsg('User deleted successfully.'));
         }).catch((error) => {
-            winston.error(error);
+             logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         })
 
@@ -247,12 +247,12 @@ var referrer = {
                 merchant_model.updateDetails({ id: muser_id }, ins_data).then((result) => {
                     res.status(statusCode.ok).send(response.successmsg('User updated successfully.'));
                 }).catch((error) => {
-                    winston.error(error);
+                     logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(response.errormsg(error.message));
                 })
             }
         }).catch((error) => {
-            winston.error(error);
+             logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         })
     },
@@ -262,7 +262,7 @@ var referrer = {
         merchant_model.updateDetails({ id: id }, update_data).then((result) => {
             res.status(statusCode.ok).send(response.successmsg('User activated successfully.'));
         }).catch((error) => {
-            winston.error(error);
+             logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         })
 
@@ -273,7 +273,7 @@ var referrer = {
         merchant_model.updateDetails({ id: id }, update_data).then((result) => {
             res.status(statusCode.ok).send(response.successmsg('User deactivated successfully.'));
         }).catch((error) => {
-            winston.error(error);
+             logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         })
 
@@ -331,14 +331,14 @@ var referrer = {
                         );
                     })
                     .catch((error) => {
-                        winston.error(error);
+                         logger.error(500,{message: error,stack: error.stack}); 
                         res.status(statusCode.internalError).send(
                             response.errormsg(error)
                         );
                     });
             })
             .catch((error) => {
-                winston.error(error);
+                 logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error)
                 );
@@ -393,7 +393,7 @@ var referrer = {
                             });
                         })
                         .catch((error) => {
-                            winston.error(error);
+                             logger.error(500,{message: error,stack: error.stack}); 
                             res.status(statusCode.internalError).send(
                                 response.errormsg(error)
                             );
@@ -404,8 +404,8 @@ var referrer = {
                     );
                 }
             })
-            .catch((err) => {
-                winston.error(err);
+            .catch((error) => {
+                 logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error)
                 );

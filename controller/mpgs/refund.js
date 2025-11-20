@@ -9,6 +9,7 @@ const merchantOrderModel = require("../../models/merchantOrder");
 const moment = require('moment');
 const { v4: uuidv4 } = require('uuid');
 const calculateTransactionCharges = require("../../utilities/charges/transaction-charges/index");
+const logger = require('../../config/logger');
 
 const mpgs_refund = async (req, res) => {
   let txn_id = req.bodyString("txn_id");
@@ -226,8 +227,7 @@ const mpgs_refund = async (req, res) => {
           .send(Server_response.errormsg("Unable to initiate refund."));
       }
     } catch (error) {
-      console.log(error);
-      console.log(error.response.data.error);
+      logger.error(500,{message: error,stack: error.stack}); 
       let resp_dump = {
         order_id: order_id,
         type: "REFUND",

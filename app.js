@@ -38,6 +38,7 @@ app.use(function (req, res, next) {
     } 
     return urlencodedMiddleware(req, res, next); 
 });
+app.set('trust proxy', 1); 
 // app.use(sanitizeReqBody);
 app.use((req, res, next) => {
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
@@ -89,7 +90,7 @@ app.use((req, res, next) => {
             timestamp: new Date().toISOString(),
             responseBody: parsedBody
         };
-        console.log(`the status code of ${statusCode}`)
+        // console.log(`the status code of ${statusCode}`)
         // Log based on status code
         if (statusCode >= 500) {
             winston.error('Server Error Response:', logData);

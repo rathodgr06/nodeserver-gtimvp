@@ -1,4 +1,5 @@
 const path = require("path");
+const logger = require('../config/logger');
 require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
@@ -103,7 +104,7 @@ const Routing = {
         // mid_response = await qb.query(midSql);
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -115,7 +116,7 @@ const Routing = {
     try {
       qb.insert(`${config.table_prefix}${table}`, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -132,7 +133,7 @@ const Routing = {
         .order_by(["routing_order"], "asc")
         .get(`${config.table_prefix}${table}`);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -146,7 +147,7 @@ const Routing = {
         .where(condition)
         .update(`${config.table_prefix}${table}`);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -160,7 +161,7 @@ const Routing = {
     try {
       response = await qb.query(sql);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -178,7 +179,7 @@ const Routing = {
         .where({ country_code: country })
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -200,7 +201,7 @@ const Routing = {
         .limit(1)
         .get(`${config.table_prefix}${table}`);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -222,7 +223,7 @@ const Routing = {
         .order_by(["rule_order"], "asc")
         .get(`${config.table_prefix}${table}`);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -238,7 +239,7 @@ const Routing = {
         .order_by(["routing_order"], "asc")
         .get(`${config.table_prefix}${table}`);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }

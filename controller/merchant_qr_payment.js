@@ -8,7 +8,7 @@ const SequenceUUID = require('sequential-uuid');
 const QRCode = require('qrcode');
 require('dotenv').config({ path: "../.env" });
 const moment = require('moment');
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 
 const qr_payment = {
    add: async (req, res) => {
@@ -84,12 +84,12 @@ const qr_payment = {
 
                                  res.status(statusCode.internalError).send(response.errormsg(error.message));
                               }).catch((error) => {
-                                 winston.error(error);
+                                logger.error(500,{message: error,stack: error.stack}); 
                               })
                               // res.status(statusCode.ok).send(response.successmsg('Payment order created successfully.'))
                               res.status(statusCode.internalError).send(response.errormsg(error.message));
                            }).catch((error) => {
-                              winston.error(error);
+                             logger.error(500,{message: error,stack: error.stack}); 
                            })
                         }
                      }
@@ -198,11 +198,11 @@ const qr_payment = {
                                        res.status(statusCode.ok).send(response.successansmsg(qr_pay, 'Payment order created successfully.'))
 
                                     }).catch((error) => {
-                                       winston.error(error);
+                                      logger.error(500,{message: error,stack: error.stack}); 
                                        res.status(statusCode.internalError).send(response.errormsg(error.message));
                                     })
                                  }).catch((error) => {
-                                    winston.error(error);
+                                   logger.error(500,{message: error,stack: error.stack}); 
                                     res.status(statusCode.internalError).send(response.errormsg(error.message));
                                  })
 
@@ -243,13 +243,13 @@ const qr_payment = {
                                           res.status(statusCode.ok).send(response.successansmsg(qr_pay, 'Payment order created successfully.'))
 
                                        }).catch((error) => {
-                                          winston.error(error);
+                                         logger.error(500,{message: error,stack: error.stack}); 
                                           res.status(statusCode.internalError).send(response.errormsg(error.message));
                                        })
 
 
                                     }).catch((error) => {
-                                       winston.error(error);
+                                      logger.error(500,{message: error,stack: error.stack}); 
                                        res.status(statusCode.internalError).send(response.errormsg(error.message));
                                     })
 
@@ -300,11 +300,11 @@ const qr_payment = {
                                     res.status(statusCode.ok).send(response.successansmsg(qr_pay, 'Payment order created successfully.'))
 
                                  }).catch((error) => {
-                                    winston.error(error);
+                                   logger.error(500,{message: error,stack: error.stack}); 
                                     res.status(statusCode.internalError).send(response.errormsg(error.message));
                                  })
                               }).catch((error) => {
-                                 winston.error(error);
+                                logger.error(500,{message: error,stack: error.stack}); 
                                  res.status(statusCode.internalError).send(response.errormsg(error.message));
                               })
 
@@ -364,12 +364,12 @@ const qr_payment = {
                            res.status(statusCode.ok).send(response.successansmsg(qr_pay, 'Payment order created successfully.'))
 
                         }).catch((error) => {
-                           winston.error(error);
+                          logger.error(500,{message: error,stack: error.stack}); 
                            res.status(statusCode.internalError).send(response.errormsg(error.message));
                         })
                         // res.status(statusCode.ok).send(response.successmsg('Payment order created successfully.'))
                      }).catch((error) => {
-                        winston.error(error);
+                       logger.error(500,{message: error,stack: error.stack}); 
                         res.status(statusCode.internalError).send(response.errormsg(error.message));
                      })
                   }
@@ -481,11 +481,11 @@ const qr_payment = {
                                  res.status(statusCode.ok).send(response.successansmsg(qr_pay, 'Payment order created successfully.'))
 
                               }).catch((error) => {
-                                 winston.error(error);
+                                logger.error(500,{message: error,stack: error.stack}); 
                                  res.status(statusCode.internalError).send(response.errormsg(error.message));
                               })
                            }).catch((error) => {
-                              winston.error(error);
+                             logger.error(500,{message: error,stack: error.stack}); 
                               res.status(statusCode.internalError).send(response.errormsg(error.message));
                            })
 
@@ -528,13 +528,13 @@ const qr_payment = {
                                     res.status(statusCode.ok).send(response.successansmsg(qr_pay, 'Payment order created successfully.'))
 
                                  }).catch((error) => {
-                                    winston.error(error);
+                                   logger.error(500,{message: error,stack: error.stack}); 
                                     res.status(statusCode.internalError).send(response.errormsg(error.message));
                                  })
 
 
                               }).catch((error) => {
-                                 winston.error(error);
+                                logger.error(500,{message: error,stack: error.stack}); 
                                  res.status(statusCode.internalError).send(response.errormsg(error.message));
                               })
 
@@ -587,11 +587,11 @@ const qr_payment = {
                               res.status(statusCode.ok).send(response.successansmsg(qr_pay, 'Payment order created successfully.'))
 
                            }).catch((error) => {
-                              winston.error(error);
+                             logger.error(500,{message: error,stack: error.stack}); 
                               res.status(statusCode.internalError).send(response.errormsg(error.message));
                            })
                         }).catch((error) => {
-                           winston.error(error);
+                          logger.error(500,{message: error,stack: error.stack}); 
                            res.status(statusCode.internalError).send(response.errormsg(error.message));
                         })
 
@@ -630,7 +630,7 @@ const qr_payment = {
             }
             qrGenerateModule.update_collection({ id: id }, payment_data).then(async (result) => {
             }).catch((error) => {
-               winston.error(error);
+              logger.error(500,{message: error,stack: error.stack}); 
                res.status(statusCode.internalError).send(response.errormsg(error.message));
             })
 
@@ -649,11 +649,11 @@ const qr_payment = {
                   res.status(statusCode.ok).send(response.successmsg("Payment status " + rlt.payment_status))
 
                }).catch((error) => {
-                  winston.error(error);
+                 logger.error(500,{message: error,stack: error.stack}); 
                   res.status(statusCode.internalError).send(response.errormsg(error.message));
                })
             }).catch((error) => {
-               winston.error(error);
+              logger.error(500,{message: error,stack: error.stack}); 
                res.status(statusCode.internalError).send(response.errormsg(error.message));
             })
          }
@@ -772,6 +772,7 @@ const qr_payment = {
    },
 
    payment_list: async (req, res) => {
+      try{
       const merchant_name = await qrGenerateModule.getMerchantName();
       let limit = {
          perpage: 0,
@@ -816,7 +817,11 @@ const qr_payment = {
       }
       let total_count = await qrGenerateModule.get_count_payment(search);
       res.status(statusCode.ok).send(response.successdatamsg(send_res, 'List fetched successfully.', total_count));
-   },
+   }catch(error){
+      logger.error(500,{message: error,stack: error.stack}); 
+      res.status(statusCode.internalError).send(response.errorMsg("Something went wrong"));
+   }
+}
 }
 
 module.exports = qr_payment;

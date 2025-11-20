@@ -70,7 +70,7 @@ const declinedCardModel = require("../models/subscription_card_declined_model");
 const subscription_card_expired_model = require("../models/subscription_card_expired_model");
 const calculateTransactionCharges = require("../utilities/charges/transaction-charges/index");
 const calculateFeatureCharges = require("../utilities/charges/feature-charges/index");
-const winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 const { mode } = require("crypto-js");
 const fraudService = require("../service/fraudService");
 const TelrAutoCapture = require("../utilities/auto/telrAutoCapture.js");
@@ -308,7 +308,7 @@ const ni_capture_func = async (req, res) => {
         .send(response.errormsg("Unable to initiate Transaction Captured."));
     }
   } catch (error) {
-    winston.error(error);
+   logger.error(500,{message: error,stack: error.stack}); 
     let resp_dump = {
       order_id: req.bodyString("p_order_id"),
       type: "CAPTURE",
@@ -555,8 +555,7 @@ const ni_open_capture_func = async (req, res) => {
         .send(response.errormsg("Unable to initiate Transaction Captured."));
     }
   } catch (error) {
-    console.log(error);
-    winston.error(error);
+   logger.error(500,{message: error,stack: error.stack}); 
     let resp_dump = {
       order_id: req.bodyString("p_order_id"),
       type: "CAPTURE",
@@ -842,7 +841,7 @@ const telr_capture_func = async (req, res) => {
       res.status(statusCode.ok).send(response.errormsg("Unable to capture."));
     }
   } catch (error) {
-    winston.error(error);
+   logger.error(500,{message: error,stack: error.stack}); 
     console.log(error);
     let resp_dump = {
       order_id: req.bodyString("p_order_id"),
@@ -1167,8 +1166,7 @@ const telr_void_func = async (req, res) => {
       res.status(statusCode.ok).send(response.errormsg(telr_void.message));
     }
   } catch (error) {
-    console.log(error);
-    winston.error(error);
+   logger.error(500,{message: error,stack: error.stack}); 
 
     let resp_dump = {
       order_id: req.bodyString("order_id"),
@@ -1478,7 +1476,7 @@ const ni_void_func = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    winston.error(error);
+   logger.error(500,{message: error,stack: error.stack}); 
 
     let resp_dump = {
       order_id: req.bodyString("order_id"),
@@ -1798,7 +1796,7 @@ const telr_refund_func = async (req, res) => {
       }
     } catch (error) {
       console.log(error);
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
 
       let resp_dump = {
         order_id: req.bodyString("p_order_id"),
@@ -2050,7 +2048,7 @@ const ni_refund_func = async (req, res) => {
           .send(response.errormsg("Unable to initiate refund."));
       }
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       console.log(error);
       let resp_dump = {
         order_id: req.bodyString("p_order_id"),
@@ -2128,7 +2126,7 @@ const telr_update_3ds_func = async () => {
       pan: telr_sale_request.paymentMethod.pan,
       updated_at: updated_at,
     };
-    await merchantOrderModel
+     merchantOrderModel
       .updateDynamic(
         order_update,
         {
@@ -2150,7 +2148,7 @@ const telr_update_3ds_func = async () => {
           .send(successdatamsg(res_obj, "Successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2221,7 +2219,7 @@ const ni_update_3ds_func = async (req, res) => {
       pan: ni_sale_request.paymentMethod.pan,
       updated_at: updated_at,
     };
-    await merchantOrderModel
+     merchantOrderModel
       .updateDynamic(
         order_update,
         {
@@ -2243,7 +2241,7 @@ const ni_update_3ds_func = async (req, res) => {
           .send(successdatamsg(res_obj, "Successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2438,6 +2436,7 @@ const open_telr_refund = async (req, res) => {
 
 var MerchantOrder = {
   create: async (req, res) => {
+    try{
     const logs = [];
     logs.push(
       `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : protocol type ${
@@ -2639,7 +2638,7 @@ var MerchantOrder = {
         res.status(statusCode.ok).send(res_order_details);
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -2654,10 +2653,15 @@ var MerchantOrder = {
       .add(logs_payload, "order_logs")
       .then((result) => {})
       .catch((err) => {
-        winston.error(err);
+       logger.error(500,{message: err,stack: err.stack}); 
       });
+    }catch(error){
+      logger.error(500,{message: error,stack: error.stack}); 
+      res.status(statusCode.internalError).send(response.errorMsg("Something went wrong"));
+    }
   },
   open_create: async (req, res) => {
+    try{
     let classType = req.body.data.class;
     if (classType == "cont") {
       return createContineousOrder(req, res);
@@ -2794,8 +2798,8 @@ var MerchantOrder = {
       amount: order_details.amount,
       amount_left: order_details.amount,
       currency: order_details.currency,
-      order_amount:order_details.amount,
-      order_currency:order_details.currency,
+      // order_amount:order_details.amount,
+      // order_currency:order_details.currency,
       // return_url: order_details.return_url,
       description: order_details?.description,
       other_description: order_details?.description,
@@ -2888,7 +2892,7 @@ var MerchantOrder = {
         res.status(statusCode.ok).send(res_order_details);
       })
       .catch(async (error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         let logs_payload = {
           order_id: order_id,
@@ -2899,6 +2903,10 @@ var MerchantOrder = {
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
       });
+    }catch(error){
+      logger.error(500,{message: error,stack: error.stack}); 
+      res.status(statusCode.internalError).send(response.errorMsg("Something went wrong"));
+    }
   },
 
   createOrderAuth: async (req, res) => {
@@ -2987,7 +2995,7 @@ var MerchantOrder = {
         //res.status(statusCode.ok).send(res_order_details);
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -3183,7 +3191,7 @@ var MerchantOrder = {
           })
           .catch((error) => {
             console.log("error in order details", error);
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
 
             res
               .status(statusCode.internalError)
@@ -3192,7 +3200,7 @@ var MerchantOrder = {
       })
       .catch((error) => {
         console.log("error in order details22", error);
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -3346,7 +3354,7 @@ var MerchantOrder = {
               .send(successdatamsg(data, "Details fetch successfully."));
           })
           .catch((error) => {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
 
             res
               .status(statusCode.internalError)
@@ -3354,7 +3362,7 @@ var MerchantOrder = {
           });
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -3523,7 +3531,7 @@ var MerchantOrder = {
             );
         });
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       return res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -3644,14 +3652,14 @@ var MerchantOrder = {
           .send(successdatamsg(new_data, "Details fetch successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -4030,7 +4038,7 @@ var MerchantOrder = {
           console.log("ni_order_sale", ni_order_sale);
         } catch (error) {
           // console.log(error);
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
 
           let order_update_failed = {
             cardholderName: ni_sale_req.cardholderName,
@@ -5285,7 +5293,7 @@ var MerchantOrder = {
             )
             .then((result) => {})
             .catch((err) => {
-              winston.error(err);
+             logger.error(500,{message: err,stack: err.stack}); 
             });
           if (
             ni_order_sale.state == "AUTHORISED" ||
@@ -5434,7 +5442,7 @@ var MerchantOrder = {
       })
       .catch(async (error) => {
         console.log("error_ni", error);
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         logs.push(
           `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : error occurred`
@@ -6498,7 +6506,7 @@ var MerchantOrder = {
               )
               .then((result) => {})
               .catch((err) => {
-                winston.error(err);
+               logger.error(500,{message: err,stack: err.stack}); 
               });
             // web  hook starting
             let hook_info = await helpers.get_data_list(
@@ -6727,7 +6735,7 @@ var MerchantOrder = {
               )
               .then((result) => {})
               .catch((err) => {
-                winston.error(err);
+               logger.error(500,{message: err,stack: err.stack}); 
               });
 
             return res
@@ -6851,6 +6859,7 @@ var MerchantOrder = {
         return res.status(statusCode.ok).send(response.successansmsg(res_obj));
       }
     } catch (error) {
+      logger.error(500,{message: error,stack: error.stack}); 
       let res_order_data = await merchantOrderModel.selectDynamicONE(
         "*",
         { order_id: req.bodyString("order_id") },
@@ -6998,7 +7007,7 @@ var MerchantOrder = {
           .status(statusCode.ok)
           .send(response.successdatamsg(res_obj, "Transaction Failed"));
       } catch (error) {
-        console.log(error);
+        logger.error(500,{message: error,stack: error.stack}); 
       }
     }
   },
@@ -7065,7 +7074,7 @@ var MerchantOrder = {
                 next();
               })
               .catch((error) => {
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
                 res
                   .status(statusCode.internalError)
                   .send(response.errormsg(error.message));
@@ -7090,7 +7099,7 @@ var MerchantOrder = {
               })
               .catch((error) => {
                 console.log("add_custoner", error);
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
 
                 res
                   .status(statusCode.internalError)
@@ -7100,7 +7109,7 @@ var MerchantOrder = {
         })
         .catch((error) => {
           console.log("add_custoner", error);
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
 
           res
             .status(statusCode.internalError)
@@ -7157,7 +7166,7 @@ var MerchantOrder = {
                 next();
               })
               .catch((error) => {
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
                 res
                   .status(statusCode.internalError)
                   .send(response.errormsg(error.message));
@@ -7183,7 +7192,7 @@ var MerchantOrder = {
                 next();
               })
               .catch((error) => {
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
 
                 res
                   .status(statusCode.internalError)
@@ -7192,7 +7201,7 @@ var MerchantOrder = {
           }
         })
         .catch((error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
 
           res
             .status(statusCode.internalError)
@@ -7201,8 +7210,7 @@ var MerchantOrder = {
     }
   },
   saveCard: async (req, res, next) => {
-    console.log("saveCard");
-
+   try{
     let browser_token = {
       os: req.headers.os,
       browser: req.headers.browser,
@@ -7280,7 +7288,7 @@ var MerchantOrder = {
             next();
           })
           .catch((error) => {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
 
             res
               .status(statusCode.internalError)
@@ -7353,10 +7361,14 @@ var MerchantOrder = {
       let addTempCardRes = await helpers.addTempCard(temp_card_storage_data);
       next();
     }
+  }catch(error){
+    logger.error(500,{message: error,stack: error.stack}); 
+    res.status(statusCode.internalError).send(response.errorMsg("Something went wrong"));
+  }
   },
 
   bin_saveCard: async (req, res, next) => {
-    console.log("bin_saveCard");
+    try{
     let browser_token = {
       os: req.headers.os,
       browser: req.headers.browser,
@@ -7411,7 +7423,7 @@ var MerchantOrder = {
           })
           .catch((error) => {
             console.log(error);
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
 
             return res
               .status(statusCode.internalError)
@@ -7437,49 +7449,60 @@ var MerchantOrder = {
     } else {
       next();
     }
+  }catch(error){
+    logger.error(500,{message: error,stack: error.stack}); 
+    res.status(statusCode.internalError).send(response.errorMsg("Something went wrong"));
+  }
   },
 
   cardList: async (req, res, next) => {
-    let dec_token = req.bodyString("token");
-    if (dec_token) {
-      // let customer_data = JSON.parse(dec_token);
-      // let email = customer_data.email;
-      // let customer = await merchantOrderModel.selectOne('*', { email: email }, 'customers')
-      let customer_cards = await merchantOrderModel.selectDynamic(
-        "*",
-        {
-          browser_token: dec_token,
-          deleted: 0,
-          is_save: 1,
-          email: req.bodyString("email"),
-        },
-        "customers_cards"
-      );
-      if (customer_cards[0]) {
-        let cards = [];
-        for (let card of customer_cards) {
-          let card_obj = {
-            card_id: enc_dec.cjs_encrypt(card.id),
-            Name: card.name_on_card,
-            ExpiryDate: card.card_expiry,
-            CardNetwork: card.card_nw,
-            Card: card.last_4_digit,
-            Image: server_addr + "/static/images/visa-image.png",
-          };
-          cards.push(card_obj);
+    try {
+      let dec_token = req.bodyString("token");
+      if (dec_token) {
+        // let customer_data = JSON.parse(dec_token);
+        // let email = customer_data.email;
+        // let customer = await merchantOrderModel.selectOne('*', { email: email }, 'customers')
+        let customer_cards = await merchantOrderModel.selectDynamic(
+          "*",
+          {
+            browser_token: dec_token,
+            deleted: 0,
+            is_save: 1,
+            email: req.bodyString("email"),
+          },
+          "customers_cards"
+        );
+        if (customer_cards[0]) {
+          let cards = [];
+          for (let card of customer_cards) {
+            let card_obj = {
+              card_id: enc_dec.cjs_encrypt(card.id),
+              Name: card.name_on_card,
+              ExpiryDate: card.card_expiry,
+              CardNetwork: card.card_nw,
+              Card: card.last_4_digit,
+              Image: server_addr + "/static/images/visa-image.png",
+            };
+            cards.push(card_obj);
+          }
+          res
+            .status(statusCode.ok)
+            .send(response.successdatamsg(cards, "List fetched successfully."));
+        } else {
+          res
+            .status(statusCode.badRequest)
+            .send(response.successdatamsg([], "No card found."));
         }
-        res
-          .status(statusCode.ok)
-          .send(response.successdatamsg(cards, "List fetched successfully."));
       } else {
         res
-          .status(statusCode.badRequest)
+          .status(statusCode.ok)
           .send(response.successdatamsg([], "No card found."));
       }
-    } else {
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
       res
-        .status(statusCode.ok)
-        .send(response.successdatamsg([], "No card found."));
+        .status(statusCode.internalError)
+        .send(response.errorMsg("Something went wrong"));
     }
   },
   cancel: async (req, res) => {
@@ -7646,7 +7669,7 @@ var MerchantOrder = {
       })
       .catch((error) => {
         console.log(error);
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         return res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -7682,7 +7705,7 @@ var MerchantOrder = {
           .send(successdatamsg(order_res, "Cancelled successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -7798,7 +7821,7 @@ var MerchantOrder = {
           .send(successdatamsg(order_res, "Order failed."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         console.log(error);
         res
           .status(statusCode.internalError)
@@ -7835,7 +7858,7 @@ var MerchantOrder = {
           .send(successdatamsg(order_res, "Order failed."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -7857,7 +7880,7 @@ var MerchantOrder = {
           .send(successmsg("Card deleted successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -8006,7 +8029,7 @@ var MerchantOrder = {
           .send(successdatamsg(res_obj, "Paid successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -8080,7 +8103,7 @@ var MerchantOrder = {
           .send(successdatamsg(new_res, "Details fetch successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -8185,7 +8208,7 @@ var MerchantOrder = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -8407,14 +8430,14 @@ var MerchantOrder = {
           .then((result) => {})
           .catch((err) => {
             console.log(err);
-            winston.error(err);
+           logger.error(500,{message: err,stack: err.stack}); 
           });
 
         res.status(statusCode.ok).send(res_order_details);
       })
       .catch(async (error) => {
         console.log(error);
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         logs.push(
           `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : response error ${
             error.message
@@ -8429,7 +8452,7 @@ var MerchantOrder = {
           .add(logs_payload, "order_logs")
           .then((result) => {})
           .catch((err) => {
-            winston.error(err);
+           logger.error(500,{message: err,stack: err.stack}); 
           });
         res
           .status(statusCode.internalError)
@@ -8626,12 +8649,12 @@ var MerchantOrder = {
           .add(logs_payload, "order_logs")
           .then((result) => {})
           .catch((err) => {
-            winston.error(err);
+           logger.error(500,{message: err,stack: err.stack}); 
           });
         res.status(statusCode.ok).send(res_order_details);
       })
       .catch(async (error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         logs.push(
           `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : error occurred ${
             error.message
@@ -8646,7 +8669,7 @@ var MerchantOrder = {
           .add(logs_payload, "order_logs")
           .then((result) => {})
           .catch((err) => {
-            winston.error(err);
+           logger.error(500,{message: err,stack: err.stack}); 
           });
         res
           .status(statusCode.internalError)
@@ -8709,7 +8732,7 @@ var MerchantOrder = {
           });
         })
         .catch((error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
@@ -8996,12 +9019,12 @@ var MerchantOrder = {
           .add(logs_payload, "order_logs")
           .then((result) => {})
           .catch((err) => {
-            winston.error(err);
+           logger.error(500,{message: err,stack: err.stack}); 
           });
         res.status(statusCode.ok).send(res_order_details);
       })
       .catch(async (error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         logs.push(
           `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : received error ${
             error.message
@@ -9016,7 +9039,7 @@ var MerchantOrder = {
           .add(logs_payload, "order_logs")
           .then((result) => {})
           .catch((err) => {
-            winston.error(err);
+           logger.error(500,{message: err,stack: err.stack}); 
           });
         res
           .status(statusCode.internalError)
@@ -9191,7 +9214,7 @@ var MerchantOrder = {
             )
             .then((result) => {})
             .catch((err) => {
-              winston.error(err);
+             logger.error(500,{message: err,stack: err.stack}); 
             });
           res
             .status(statusCode.ok)
@@ -9217,14 +9240,14 @@ var MerchantOrder = {
             )
             .then((result) => {})
             .catch((err) => {
-              winston.error(err);
+             logger.error(500,{message: err,stack: err.stack}); 
             });
           res
             .status(statusCode.ok)
             .send(response.errormsg("Unable to initiate refund."));
         }
       } catch (error) {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         let resp_dump = {
           order_id: req.bodyString("order_id"),
           type: "VOID",
@@ -9258,7 +9281,7 @@ var MerchantOrder = {
           )
           .then((result) => {})
           .catch((err) => {
-            winston.error(err);
+           logger.error(500,{message: err,stack: err.stack}); 
           });
         res
           .status(statusCode.ok)
@@ -9283,7 +9306,7 @@ var MerchantOrder = {
         )
         .then((result) => {})
         .catch((err) => {
-          winston.error(err);
+         logger.error(500,{message: err,stack: err.stack}); 
         });
       res
         .status(statusCode.ok)
@@ -9438,7 +9461,7 @@ var MerchantOrder = {
             )
             .then((result) => {})
             .catch((err) => {
-              winston.error(err);
+             logger.error(500,{message: err,stack: err.stack}); 
             });
           res
             .status(statusCode.ok)
@@ -9462,14 +9485,14 @@ var MerchantOrder = {
             )
             .then((result) => {})
             .catch((err) => {
-              winston.error(err);
+             logger.error(500,{message: err,stack: err.stack}); 
             });
           res
             .status(statusCode.ok)
             .send(response.errormsg("Order is not at captured state!"));
         }
       } catch (error) {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         logs.push(
           `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : error occurred ${
             error.response.data.errors[0].message
@@ -9503,7 +9526,7 @@ var MerchantOrder = {
           )
           .then((result) => {})
           .catch((err) => {
-            winston.error(err);
+           logger.error(500,{message: err,stack: err.stack}); 
           });
         res
           .status(statusCode.ok)
@@ -9528,7 +9551,7 @@ var MerchantOrder = {
         )
         .then((result) => {})
         .catch((err) => {
-          winston.error(err);
+         logger.error(500,{message: err,stack: err.stack}); 
         });
       res
         .status(statusCode.ok)
@@ -10248,7 +10271,7 @@ var MerchantOrder = {
                 await ReferralBonusModel.addBonus(bonusData)
                   .then((result) => {})
                   .catch((error) => {
-                    winston.error(error);
+                   logger.error(500,{message: error,stack: error.stack}); 
                   });
               }
 
@@ -10402,7 +10425,7 @@ var MerchantOrder = {
               }
             }
           } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             return error.response;
           }
         });
@@ -10425,7 +10448,7 @@ var MerchantOrder = {
           )
           .then((result) => {})
           .catch((err) => {
-            winston.error(err);
+           logger.error(500,{message: err,stack: err.stack}); 
           });
         return res
           .status(statusCode.ok)
@@ -10507,14 +10530,14 @@ var MerchantOrder = {
           )
           .then((result) => {})
           .catch((err) => {
-            winston.error(err);
+           logger.error(500,{message: err,stack: err.stack}); 
           });
         return res
           .status(statusCode.ok)
           .send(response.errorMsgWithData(sale_api_res.message, res_obj));
       }
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       return res.status(statusCode.ok).send(response.errormsg(error?.message));
     }
   },
@@ -11065,7 +11088,7 @@ var MerchantOrder = {
             )
             .then((result) => {})
             .catch((err) => {
-              winston.error(err);
+             logger.error(500,{message: err,stack: err.stack}); 
             });
 
           // web  hook starting
@@ -11144,7 +11167,7 @@ var MerchantOrder = {
             .send(successdatamsg(res_obj, res_obj.message));
         })
         .catch(async (error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           logs.push(
             `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : error occurred ${
               error.message
@@ -11164,7 +11187,7 @@ var MerchantOrder = {
             )
             .then((result) => {})
             .catch((err) => {
-              winston.error(err);
+             logger.error(500,{message: err,stack: err.stack}); 
             });
           res
             .status(statusCode.internalError)
@@ -11190,7 +11213,7 @@ var MerchantOrder = {
         )
         .then((result) => {})
         .catch((err) => {
-          winston.error(err);
+         logger.error(500,{message: err,stack: err.stack}); 
         });
       res
         .status(statusCode.ok)
@@ -12056,7 +12079,7 @@ var MerchantOrder = {
           })
           .catch(async (error) => {
             console.log(error);
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             logs.push(
               `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : error occurred ${
                 error.message
@@ -12084,7 +12107,7 @@ var MerchantOrder = {
               )
               .then((result) => {})
               .catch((err) => {
-                winston.error(err);
+               logger.error(500,{message: err,stack: err.stack}); 
               });
             res
               .status(statusCode.internalError)
@@ -12110,7 +12133,7 @@ var MerchantOrder = {
           )
           .then((result) => {})
           .catch((err) => {
-            winston.error(err);
+           logger.error(500,{message: err,stack: err.stack}); 
           });
         res
           .status(statusCode.ok)
@@ -12119,7 +12142,7 @@ var MerchantOrder = {
           );
       }
     } catch (error) {
-      console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
     }
   },
   capture: async (req, res, next) => {
@@ -12243,7 +12266,7 @@ var MerchantOrder = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.ok)
@@ -12391,7 +12414,7 @@ var MerchantOrder = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         console.log(error);
         res
           .status(statusCode.ok)
@@ -12506,7 +12529,7 @@ var MerchantOrder = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -12535,7 +12558,7 @@ var MerchantOrder = {
           response.successdatamsg(res1, "Order request fetched successfully.")
         );
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
 
       res
         .status(statusCode.ok)
@@ -13484,7 +13507,7 @@ var MerchantOrder = {
           .then((result) => {})
           .catch((err) => {
             console.log(err);
-            winston.error(err);
+           logger.error(500,{message: err,stack: err.stack}); 
           });
 
         return res
@@ -13492,7 +13515,7 @@ var MerchantOrder = {
           .send(response.successdatamsg(res_obj, sale_api_res.message));
       }
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
 
       console.log(error);
 
@@ -13575,7 +13598,7 @@ var MerchantOrder = {
           );
       }
     } catch (err) {
-      winston.error(err);
+     logger.error(500,{message: err,stack: err.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(err.message));
     }
   },
@@ -13775,7 +13798,7 @@ var MerchantOrder = {
           .send(response.errormsg("Invalid p_order_id"));
       }
     } catch (err) {
-      winston.error(err);
+     logger.error(500,{message: err,stack: err.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(err.message));
     }
   },
@@ -14093,7 +14116,7 @@ var MerchantOrder = {
         );
     } catch (err) {
       console.log(err);
-      winston.error(err);
+     logger.error(500,{message: err,stack: err.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(err.message));
     }
   },
@@ -14300,7 +14323,7 @@ var MerchantOrder = {
         res.status(statusCode.ok).send(res_order_details);
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -14315,7 +14338,7 @@ var MerchantOrder = {
       .add(logs_payload, "order_logs")
       .then((result) => {})
       .catch((err) => {
-        winston.error(err);
+       logger.error(500,{message: err,stack: err.stack}); 
       });
   },
   transaction_new: async (req, res) => {
@@ -14413,7 +14436,7 @@ var MerchantOrder = {
       }
     } catch (err) {
       console.log(err);
-      winston.error(err);
+     logger.error(500,{message: err,stack: err.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(err.message));
     }
   },
@@ -14427,7 +14450,7 @@ var MerchantOrder = {
           })
           .then((res) => {})
           .catch((error) => {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
           });
       }
 
@@ -14435,7 +14458,7 @@ var MerchantOrder = {
         .status(statusCode.ok)
         .send(response.successansmsg("All email were sent."));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
 
       res
         .status(statusCode.internalError)
@@ -14514,7 +14537,7 @@ var MerchantOrder = {
           .send(response.errormsg("No authorised payment to capture"));
       }
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
 
       res
         .status(statusCode.internalError)
@@ -14705,7 +14728,7 @@ var MerchantOrder = {
           .send(response.errormsg("Invalid order id or mode"));
       }
     } catch (error) {
-      console.log(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -14742,6 +14765,7 @@ var MerchantOrder = {
         }
       }
     } catch (error) {
+      logger.error(500,{message: error,stack: error.stack}); 
       return false;
     }
   },
@@ -14828,7 +14852,7 @@ var MerchantOrder = {
           )
         );
     } catch (error) {
-      console.log(error);
+    logger.error(500,{message: error,stack: error.stack}); 
       return res
         .status(statusCode.internalError)
         .send(response.errormsg("Something went wrong"));
@@ -15264,11 +15288,11 @@ async function telr_pay(req) {
         }
       })
       .catch(async (error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
       });
     return true;
   } catch (error) {
-    winston.error(error);
+   logger.error(500,{message: error,stack: error.stack}); 
 
     throw error;
   }
@@ -15317,7 +15341,7 @@ async function auto_subscription_pay() {
       return "No recurring payment";
     }
   } catch (error) {
-    winston.error(error);
+   logger.error(500,{message: error,stack: error.stack}); 
 
     return "Something went wrong";
   }
@@ -15747,8 +15771,7 @@ async function confirmMTN(order_id, mode) {
       status: "SUCCESS",
     };
   } catch (error) {
-    console.log(`error is here`);
-    console.log(error);
+   logger.error(500,{message: error,stack: error.stack}); 
     await merchantOrderModel.updateDynamic(
       { status: "FAILED" },
       { order_id: order_id },
@@ -16138,8 +16161,7 @@ async function confirmOrange(order_id, mode) {
         final_response.data.resultset.TXNSTATUS === "TS" ? "SUCCESS" : "FAILED",
     };
   } catch (error) {
-    console.log(`error is here`);
-    console.log(error);
+   logger.error(500,{message: error,stack: error.stack}); 
     await merchantOrderModel.updateDynamic(
       { status: "FAILED" },
       { order_id: order_id },
@@ -16525,8 +16547,7 @@ async function confirmALPAY(order_id, mode) {
         final_response?.data?.data.status == "SUCCESSFUL"? "SUCCESS" : "FAILED",
     };    
   } catch (error) {
-    console.log(`error is here`);
-    console.log(error);
+   logger.error(500,{message: error,stack: error.stack}); 
     await merchantOrderModel.updateDynamic(
       { status: "FAILED" },
       { order_id: order_id },

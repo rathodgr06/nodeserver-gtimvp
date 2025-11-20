@@ -9,6 +9,7 @@ const merchantOrderModel = require("../../models/merchantOrder");
 const moment = require('moment');
 const { v4: uuidv4 } = require('uuid');
 const calculateTransactionCharges = require("../../utilities/charges/transaction-charges/index");
+const logger = require('../../config/logger');
 
 const mpgs_void = async (req, res) => {
     console.log("mpgs void starts........");
@@ -277,7 +278,7 @@ const mpgs_void = async (req, res) => {
                 Server_response.successansmsg(res_obj, "Transaction successfully void.")
             );
     } catch (error) {
-        console.log(error?.response?.data?.error?.explanation)
+        logger.error(500,{message: error,stack: error.stack}); 
         let resp_dump = {
             order_id: order_id,
             type: "VOID",

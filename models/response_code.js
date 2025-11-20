@@ -1,4 +1,5 @@
 const path = require("path");
+const logger = require('../config/logger');
 require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
@@ -38,7 +39,7 @@ var responseCodeModel = {
     try {
       response = await qb.query(sql);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -55,7 +56,7 @@ var responseCodeModel = {
     try {
       response = await qb.query(sql);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -69,7 +70,7 @@ var responseCodeModel = {
         `SELECT response_type FROM ${response_code_table} GROUP BY response_type  ORDER BY response_type ASC`
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -83,7 +84,7 @@ var responseCodeModel = {
         `SELECT name, credentials_key FROM ${psp_table} WHERE deleted = 0 and status=0 and credentials_key!='paydart' GROUP BY name ORDER by name`
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -99,7 +100,7 @@ var responseCodeModel = {
         )} FROM ${response_code_table} WHERE id=${response_code_id}`
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -114,7 +115,7 @@ var responseCodeModel = {
         .where(condition)
         .update(response_code_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -128,7 +129,7 @@ var responseCodeModel = {
         `SELECT id, category FROM pg_response_categories ORDER BY category ASC`
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }

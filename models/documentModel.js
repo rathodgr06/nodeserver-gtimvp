@@ -1,4 +1,5 @@
 const path = require("path");
+const logger = require('../config/logger');
 require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
@@ -12,7 +13,7 @@ var dbModel = {
     try {
       response = await qb.returning("id").insert(tctable, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -37,7 +38,7 @@ var dbModel = {
           .get(tctable);
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -49,7 +50,7 @@ var dbModel = {
     try {
       response = await qb.select(selection).where(condition).get(tctable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -65,7 +66,7 @@ var dbModel = {
         .order_by("id", "asc")
         .get(tctable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -81,7 +82,7 @@ var dbModel = {
         .order_by("id", "DESC")
         .get(tctable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -93,7 +94,7 @@ var dbModel = {
     try {
       response = await qb.select(selection).where(condition).get(tctable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -105,7 +106,7 @@ var dbModel = {
     try {
       response = await qb.set(data).where(condition).update(tctable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -120,7 +121,7 @@ var dbModel = {
         "select count('id') as count from " + tctable + " where " + condition
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }

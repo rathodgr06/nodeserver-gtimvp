@@ -1,4 +1,5 @@
 const path = require("path");
+const logger = require('../config/logger');
 require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
@@ -18,7 +19,7 @@ var walletDBModel = {
       try {
         response = await qb.select("id").where(checkdata).get(dbtable);
       } catch (error) {
-        console.error("Database query failed:", error);
+        logger.error(500,{message: error,stack: error.stack}); 
         isError = error;
       } finally {
         qb.release();
@@ -39,7 +40,7 @@ var walletDBModel = {
         response = await qb.select("*").where(where).get(dbtable);
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
       isError = error;
     } finally {
       qb.release();
@@ -97,7 +98,7 @@ var walletDBModel = {
     };
 
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
       response = { status: 400, message: error.message };
     } finally {
       qb.release();
@@ -135,7 +136,7 @@ var walletDBModel = {
         };
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
       isError = true;
       response = {
         status: 400,
@@ -154,7 +155,7 @@ var walletDBModel = {
     try {
       response = await qb.select("*").where(condition).get(dbtable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
       return { status: 400, message: "Error:" + error.message, details: error };
     } finally {
       qb.release();

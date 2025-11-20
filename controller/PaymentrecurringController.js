@@ -2,7 +2,7 @@ const helpers = require("../utilities/helper/general_helper");
 const moment = require("moment");
 const orderTransactionModel = require("../models/order_transaction");
 const merchantOrderModel = require("../models/merchantOrder");
-const winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 const statusCode = require("../utilities/statuscode/index");
 const response = require("../utilities/response/ServerResponse");
 const EventEmitter = require("events");
@@ -680,7 +680,7 @@ async function telr_pay(req, mode) {
     }
     return true;
   } catch (error) {
-    winston.error(error);
+   logger.error(500,{message: error,stack: error.stack}); 
 
     throw error;
   }
@@ -916,7 +916,7 @@ async function ni_pay(req, mode) {
     }
     return true;
   } catch (error) {
-    winston.error(error);
+   logger.error(500,{message: error,stack: error.stack}); 
     throw error;
   }
 }

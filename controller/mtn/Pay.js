@@ -12,6 +12,7 @@ const { countryToAlpha3 } = require("country-to-iso");
 const { send_webhook_data } = require("../webhook_settings");
 const PspModel = require("../../models/psp");
 const credientials = require("../../config/credientials");
+const logger = require('../../config/logger');
 const Pay = async (req, res,is_internal=true) => {
   let payment_id;
   const order_id = req.body.order_id;
@@ -216,7 +217,7 @@ const Pay = async (req, res,is_internal=true) => {
       status: "success",
     });
   } catch (error) {
-    console.log(error);
+    logger.error(500,{message: error,stack: error.stack}); 
     let invalidMid = false;
     if (error?.response?.status == "401") {
       invalidMid = true;

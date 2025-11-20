@@ -6,7 +6,7 @@ const enc_dec = require("../utilities/decryptor/decryptor")
 const admin_activity_logger = require('../utilities/activity-logger/admin_activity_logger');
 const moment = require('moment');
 const date_formatter = require("../utilities/date_formatter/index"); // date formatter module
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 
 var Mcc = {
       add: async(req, res) => {
@@ -39,11 +39,11 @@ var Mcc = {
                             response.successmsg("MCC added successfully")
                         );
                     }).catch((error)=>{
-                        winston.error(error);
+                        logger.error(500,{message: error,stack: error.stack}); 
                         res.status(statusCode.internalError).send(response.errormsg(error.message));
                     })
                   }).catch((error) => {
-                      winston.error(error);
+                      logger.error(500,{message: error,stack: error.stack}); 
                       res.status(statusCode.internalError).send(response.errormsg(error.message));
                   });
               }
@@ -105,7 +105,7 @@ var Mcc = {
                 res.status(statusCode.ok).send(response.successdatamsg(send_res,'List fetched successfully.',total_count));
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             });
     },
@@ -143,7 +143,7 @@ var Mcc = {
                   res.status(statusCode.ok).send(response.successdatamsg(send_res,'List fetched successfully.',total_count));
               })
               .catch((error) => {
-                    winston.error(error);
+                    logger.error(500,{message: error,stack: error.stack}); 
                   res.status(statusCode.internalError).send(response.errormsg(error.message));
               });
       },
@@ -166,7 +166,7 @@ var Mcc = {
                   res.status(statusCode.ok).send(response.successdatamsg(send_res,'Details fetched successfully.'));
               })
               .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                   res.status(statusCode.internalError).send(response.errormsg(error.message));
               });
       },
@@ -223,11 +223,11 @@ var Mcc = {
               admin_activity_logger.edit(module_and_user,mcc_id,headers).then((result)=>{
                   res.status(statusCode.ok).send(response.successmsg('MCC updated successfully'));
               }).catch((error)=>{
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                   res.status(statusCode.internalError).send(response.errormsg(error.message));
               })
           } catch (error) {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
               res.status(statusCode.internalError).send(response.errormsg(error.message));
           }
       },
@@ -252,11 +252,11 @@ var Mcc = {
             admin_activity_logger.deactivate(module_and_user,mcc_id,headers).then((result)=>{
                 res.status(statusCode.ok).send(response.successmsg('MCC deactivated successfully'));
             }).catch((error)=>{
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             })
           } catch (error) {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
               res.status(statusCode.internalError).send(response.errormsg(error.message));
           }
       },
@@ -281,11 +281,11 @@ var Mcc = {
             admin_activity_logger.activate(module_and_user,mcc_id,headers).then((result)=>{
                 res.status(statusCode.ok).send(response.successmsg('MCC activated successfully'));
             }).catch((error)=>{
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             })
           } catch (error) {
-              winston.error(error);
+              logger.error(500,{message: error,stack: error.stack}); 
               res.status(statusCode.internalError).send(response.errormsg(error.message));
           }
       },
@@ -309,11 +309,11 @@ var Mcc = {
             admin_activity_logger.delete(module_and_user,mcc_id,headers).then((result)=>{
                 res.status(statusCode.ok).send(response.successmsg('MCC deleted successfully'));
             }).catch((error)=>{
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             })
           } catch (error) {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
               res.status(statusCode.internalError).send(response.errormsg(error.message));
           }
       },

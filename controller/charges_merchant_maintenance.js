@@ -6,7 +6,7 @@ const maintenanceModule = require("../models/charges_merchant_maintenance");
 const enc_dec = require("../utilities/decryptor/decryptor");
 require('dotenv').config({ path: "../.env" });
 const moment = require('moment');
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 
 const merchantMaintenance = {
     add: async (req, res) => {
@@ -29,58 +29,71 @@ const merchantMaintenance = {
         maintenanceModule.register(plan_data).then(async (result) => {
             res.status(statusCode.ok).send(response.successmsg('Plan added successfully'));
         }).catch((error) => {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error));
         })
 
     },
 
     list: async (req, res) => {
-        let currency = await maintenanceModule.getcurrencyName();
-        let limit = {
+        try {
+          let currency = await maintenanceModule.getcurrencyName();
+          let limit = {
             perpage: 0,
             page: 0,
-        }
-        if (req.bodyString('perpage') && req.bodyString('page')) {
-            perpage = parseInt(req.bodyString('perpage'))
-            start = parseInt(req.bodyString('page'))
+          };
+          if (req.bodyString("perpage") && req.bodyString("page")) {
+            perpage = parseInt(req.bodyString("perpage"));
+            start = parseInt(req.bodyString("page"));
 
-            limit.perpage = perpage
-            limit.start = ((start - 1) * perpage)
-        }
-        let like_search = {}
+            limit.perpage = perpage;
+            limit.start = (start - 1) * perpage;
+          }
+          let like_search = {};
 
-        if (req.bodyString('search')) {
-            like_search.plan_name = req.bodyString('search');
-        }
-        let result = await maintenanceModule.select('*', limit, like_search);
+          if (req.bodyString("search")) {
+            like_search.plan_name = req.bodyString("search");
+          }
+          let result = await maintenanceModule.select("*", limit, like_search);
 
-        let send_res = [];
-        for (let val of result) {
-
+          let send_res = [];
+          for (let val of result) {
             let res = {
-                plan_id: enc_dec.cjs_encrypt(val.id),
-                plan_name: val.plan_name,
-                mid_currency: val.mid_currency,
-                mid_currency_code: currency[val.mid_currency],
-                features: val.features,
-                features_name: await maintenanceModule.getfeaturesName(val.features),
-                billing_cycle: val.billing_cycle,
-                charges_value: val.charges_value,
-                notes: val.notes,
-                description: val.description,
-                tax: val.tax,
-                status: (val.status == 1) ? "Deactivated" : "Active",
+              plan_id: enc_dec.cjs_encrypt(val.id),
+              plan_name: val.plan_name,
+              mid_currency: val.mid_currency,
+              mid_currency_code: currency[val.mid_currency],
+              features: val.features,
+              features_name: await maintenanceModule.getfeaturesName(
+                val.features
+              ),
+              billing_cycle: val.billing_cycle,
+              charges_value: val.charges_value,
+              notes: val.notes,
+              description: val.description,
+              tax: val.tax,
+              status: val.status == 1 ? "Deactivated" : "Active",
             };
             send_res.push(res);
-        }
+          }
 
-        let total_count = await maintenanceModule.get_counts(like_search);
-        res.status(statusCode.ok).send(response.successdatamsg(send_res, 'List fetched successfully.', total_count));
+          let total_count = await maintenanceModule.get_counts(like_search);
+          res
+            .status(statusCode.ok)
+            .send(
+              response.successdatamsg(
+                send_res,
+                "List fetched successfully.",
+                total_count
+              )
+            );
+        } catch (error) {
+          logger.error(500, { message: error, stack: error.stack });
+        }
     },
 
     details: async (req, res) => {
-        let id = await enc_dec.cjs_decrypt(req.bodyString("plan_id"));
+        let id =  enc_dec.cjs_decrypt(req.bodyString("plan_id"));
         maintenanceModule.selectOne("*", { id: id })
 
 
@@ -104,7 +117,7 @@ const merchantMaintenance = {
                 res.status(statusCode.ok).send(response.successdatamsg(send_res, 'Details fetched successfully.'));
             })
             .catch((error) => {
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             });
     },
@@ -127,12 +140,12 @@ const merchantMaintenance = {
                 .then((result) => {
                     res.status(statusCode.ok).send(response.successmsg('Plan updated successfully'));
                 }).catch((error) => {
-                    winston.error(error);
+                   logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(response.errormsg(error.message));
                 })
 
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },
@@ -150,12 +163,12 @@ const merchantMaintenance = {
                 .then((result) => {
                     res.status(statusCode.ok).send(response.successmsg('Plan deactivated successfully'));
                 }).catch((error) => {
-                    winston.error(error);
+                   logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(response.errormsg(error.message));
                 })
 
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },
@@ -170,50 +183,67 @@ const merchantMaintenance = {
                 .then((result) => {
                     res.status(statusCode.ok).send(response.successmsg('Plan activated successfully'));
                 }).catch((error) => {
-                    winston.error(error);
+                   logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(response.errormsg(error.message));
                 })
 
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },
 
 
     features_list: async (req, res) => {
-        let limit = {
+        try {
+          let limit = {
             perpage: 0,
             page: 0,
-        }
-        if (req.bodyString('perpage') && req.bodyString('page')) {
-            perpage = parseInt(req.bodyString('perpage'))
-            start = parseInt(req.bodyString('page'))
+          };
+          if (req.bodyString("perpage") && req.bodyString("page")) {
+            perpage = parseInt(req.bodyString("perpage"));
+            start = parseInt(req.bodyString("page"));
 
-            limit.perpage = perpage
-            limit.start = ((start - 1) * perpage)
-        }
-        let like_search = {}
+            limit.perpage = perpage;
+            limit.start = (start - 1) * perpage;
+          }
+          let like_search = {};
 
-        if (req.bodyString('search')) {
-            like_search.plan_name = req.bodyString('search');
-        }
-        let result = await maintenanceModule.select_features('*', limit, like_search);
+          if (req.bodyString("search")) {
+            like_search.plan_name = req.bodyString("search");
+          }
+          let result = await maintenanceModule.select_features(
+            "*",
+            limit,
+            like_search
+          );
 
-        let send_res = [];
-        for (let val of result) {
-
+          let send_res = [];
+          for (let val of result) {
             let res = {
-                feature_id: val.id,
-                feature: val.feature,
-                status: (val.status == 1) ? "Deactivated" : "Active",
-                enc_feature_id: await enc_dec.cjs_encrypt(val.id),
+              feature_id: val.id,
+              feature: val.feature,
+              status: val.status == 1 ? "Deactivated" : "Active",
+              enc_feature_id: await enc_dec.cjs_encrypt(val.id),
             };
             send_res.push(res);
-        }
+          }
 
-        let total_count = await maintenanceModule.get_counts_features(like_search);
-        res.status(statusCode.ok).send(response.successdatamsg(send_res, 'List fetched successfully.', total_count));
+          let total_count = await maintenanceModule.get_counts_features(
+            like_search
+          );
+          res
+            .status(statusCode.ok)
+            .send(
+              response.successdatamsg(
+                send_res,
+                "List fetched successfully.",
+                total_count
+              )
+            );
+        } catch (error) {
+          logger.error(500, { message: error, stack: error.stack });
+        }
     },
 
     

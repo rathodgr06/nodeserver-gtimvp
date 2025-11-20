@@ -30,6 +30,7 @@ const pool = require("../config/database");
 const date_formatter = require("../utilities/date_formatter/index"); // date formatter module
 const winston = require("../utilities/logmanager/winston");
 const nodeCache = require("../utilities/helper/CacheManeger");
+const logger = require('../config/logger');
 
 var Auth = {
   login: async (req, res) => {
@@ -196,7 +197,7 @@ var Auth = {
             .insert(config.table_prefix + "login_attempt", data);
         }
       } catch (error) {
-        console.error("Database query failed:", error);
+         logger.error(500,{message: error,stack: error.stack}); 
       } finally {
         qb.release();
       }
@@ -285,7 +286,7 @@ var Auth = {
         }
       })
       .catch((error) => {
-        winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },

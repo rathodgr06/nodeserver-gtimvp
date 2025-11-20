@@ -10,7 +10,7 @@ const port = process.env.SERVER_PORT;
 const admin_activity_logger = require("../utilities/activity-logger/admin_activity_logger");
 const moment = require("moment");
 const date_formatter = require("../utilities/date_formatter/index"); // date formatter module
-const winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 const nodeCache = require("../utilities/helper/CacheManeger");
 
 var language = {
@@ -48,14 +48,14 @@ var language = {
               .send(response.successmsg("Added successfully."));
           })
           .catch((error) => {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res
               .status(statusCode.internalError)
               .send(response.errormsg(error.message));
           });
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack});
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -108,7 +108,7 @@ var language = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -160,7 +160,7 @@ var language = {
     //       );
     //   })
     //   .catch((error) => {
-    //     winston.error(error);
+    //     logger.error(500,{message: error,stack: error.stack}); 
     //     res
     //       .status(statusCode.internalError)
     //       .send(response.errormsg(error.message));
@@ -205,13 +205,13 @@ var language = {
             .send(response.successmsg("Language updated successfully"));
         })
         .catch((error) => {
-          winston.error(error);
+          logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -244,13 +244,13 @@ var language = {
             .send(response.successmsg("Language deactivated successfully"));
         })
         .catch((error) => {
-          winston.error(error);
+          logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -283,13 +283,13 @@ var language = {
             .send(response.successmsg("Language activated successfully"));
         })
         .catch((error) => {
-          winston.error(error);
+          logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -322,13 +322,13 @@ var language = {
             .send(response.successmsg("Language deleted successfully"));
         })
         .catch((error) => {
-          winston.error(error);
+          logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
