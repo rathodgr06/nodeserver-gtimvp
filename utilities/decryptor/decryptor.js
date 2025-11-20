@@ -35,6 +35,9 @@ var protector = {
         // let bytes  = CryptoJS.AES.decrypt(cipher_text, sk);
         // let originalText = bytes.toString(CryptoJS.enc.Utf8);
         // return originalText;
+        if (!cipher_text || cipher_text === undefined || cipher_text === null) {
+          return false;
+        }
         try {
             let string = cipher_text.toString();
             let secret_key = process.env.SECRET_KEY;

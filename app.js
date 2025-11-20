@@ -1,4 +1,4 @@
-require('express-async-errors'); 
+
 var cors = require('cors');
 var isMultipart = /^multipart\//i;
 const express = require('express');
@@ -95,7 +95,7 @@ app.use((req, res, next) => {
         if (statusCode >= 500) {
             winston.error('Server Error Response:', logData);
             logger.error(statusCode, logData);
-        } else if (statusCode >= 400) {
+        } else if (statusCode >= 400 && statusCode<=403) {
             winston.warn('Client Error Response:', logData);
             logger.error(statusCode, logData);
         } else if (statusCode >= 300) {
@@ -124,6 +124,9 @@ app.use('/api/v1', route);
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
+     if (req.path.startsWith('/static')) {
+        return next();
+    }
     next(new ApiError(404, 'Not found'));
 });
 
