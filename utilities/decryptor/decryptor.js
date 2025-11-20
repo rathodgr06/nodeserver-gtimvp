@@ -10,6 +10,7 @@ var Utf8 = require('crypto-js/enc-utf8');
 var Base64 = require('crypto-js/enc-base64');
 var AES = require("crypto-js/aes");
 var base64 = require('base-64');
+const logger = require('../../config/logger');
 
 var protector = {
     cjs_encrypt: (nor_text) => {
@@ -49,6 +50,7 @@ var protector = {
             }).toString(Utf8);
             return output;
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             return false;
         }
     },
@@ -103,6 +105,7 @@ var protector = {
             }).toString(Utf8);
             return output;
         } catch (error) {
+            logger.error(500,{message: error,stack: error?.stack});
             return false;
         }
     },

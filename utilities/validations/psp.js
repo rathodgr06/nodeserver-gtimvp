@@ -6,6 +6,8 @@ const idChecker = require("./idchecker");
 const checkifrecordexist = require("./checkifrecordexist");
 const enc_dec = require("../../utilities/decryptor/decryptor");
 const helpers = require("../helper/general_helper");
+const logger = require('../../config/logger');
+
 const PspValidator = {
     add: async (req, res, next) => {
         const schema = Joi.object().keys({
@@ -128,6 +130,7 @@ const PspValidator = {
                 }
             }
         } catch (error) {
+                        logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -473,6 +476,7 @@ const PspValidator = {
                 }
         }
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -855,6 +859,7 @@ const PspValidator = {
                 next();
             }
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -949,6 +954,7 @@ const PspValidator = {
                 next();
             }
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -1048,6 +1054,7 @@ const PspValidator = {
                 next();
             }
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -1089,6 +1096,7 @@ const PspValidator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -1182,6 +1190,7 @@ const PspValidator = {
                 next();
             }
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -1266,6 +1275,7 @@ const PspValidator = {
                 next();
             }
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -1301,6 +1311,7 @@ const PspValidator = {
                 next();
             }
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -1455,6 +1466,7 @@ const PspValidator = {
                 }
             }
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -1494,6 +1506,7 @@ const PspValidator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -1536,6 +1549,7 @@ const PspValidator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -1578,6 +1592,7 @@ const PspValidator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -1619,6 +1634,7 @@ const PspValidator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -1660,6 +1676,7 @@ const PspValidator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -1701,6 +1718,7 @@ const PspValidator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -1742,6 +1760,7 @@ const PspValidator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -1783,6 +1802,7 @@ const PspValidator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -1824,6 +1844,7 @@ const PspValidator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -1868,6 +1889,7 @@ const PspValidator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -1911,6 +1933,7 @@ const PspValidator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -1955,6 +1978,7 @@ const PspValidator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -1999,6 +2023,7 @@ const PspValidator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -2042,6 +2067,7 @@ const PspValidator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -2085,6 +2111,7 @@ const PspValidator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -2128,6 +2155,7 @@ const PspValidator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -2180,6 +2208,7 @@ const PspValidator = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -2216,6 +2245,7 @@ const PspValidator = {
             }
             next();
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -2249,6 +2279,7 @@ const PspValidator = {
             }
             next();
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -2298,6 +2329,7 @@ const PspValidator = {
             }
             next();
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );

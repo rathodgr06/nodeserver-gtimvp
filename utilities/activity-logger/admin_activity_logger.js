@@ -64,6 +64,7 @@ var AdminActivityLogger = {
         .insert(config.table_prefix + "admin_logs", data);
     } catch (error) {
       console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack});
     } finally {
       qb.release();
     }
@@ -97,6 +98,7 @@ var AdminActivityLogger = {
         .insert(config.table_prefix + "admin_logs", data);
     } catch (error) {
       console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack});
     } finally {
       qb.release();
     }
@@ -130,6 +132,7 @@ var AdminActivityLogger = {
         .insert(config.table_prefix + "admin_logs", data);
     } catch (error) {
       console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack});
     } finally {
       qb.release();
     }
@@ -163,6 +166,7 @@ var AdminActivityLogger = {
         .insert(config.table_prefix + "admin_logs", data);
     } catch (error) {
       console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack});
     } finally {
       qb.release();
     }
@@ -195,6 +199,7 @@ var AdminActivityLogger = {
         .insert(config.table_prefix + "admin_logs", data);
     } catch (error) {
       console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack});
     } finally {
       qb.release();
     }
@@ -228,6 +233,7 @@ var AdminActivityLogger = {
         .insert(config.table_prefix + "admin_logs", data);
     } catch (error) {
       console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack});
     } finally {
       qb.release();
     }

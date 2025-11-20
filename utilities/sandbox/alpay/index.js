@@ -4,6 +4,7 @@ const cors = require('cors');
 
 const router = express.Router();
 const JWT_SECRET = 'alpay_mock_secret_key';
+const logger = require('../../../config/logger');
 
 router.use(cors());
 // Mock data for different transaction scenarios
@@ -112,6 +113,7 @@ const bearerAuth = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
+    logger.error(500,{message: error,stack: error?.stack});
     return res.status(401).json({
       statusCode: '401',
       statusDesc: 'Unauthorized',

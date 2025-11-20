@@ -4,6 +4,7 @@ const env = process.env.ENVIRONMENT;
 const config = require("../../../config/config.json")[env];
 const pool = require("../../../config/database");
 const momentFormat = require("../../date_formatter");
+const logger = require('../../../config/logger');
 
 const feature_type = {
   invoice: 1,
@@ -21,6 +22,7 @@ async function getFeature(type) {
     response = await qb.query(sql);
   } catch (error) {
     console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error?.stack});
   } finally {
     qb.release();
   }
@@ -56,6 +58,7 @@ async function getMerchantFeatureSellRate(order_detail) {
     response = await qb.query(sql);
   } catch (error) {
     console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error?.stack});
   } finally {
     qb.release();
   }
@@ -75,6 +78,7 @@ async function storeFeatureCharges(data) {
       .insert(`${config.table_prefix}feature_charges`, data);
   } catch (error) {
     console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error?.stack});
   } finally {
     qb.release();
   }

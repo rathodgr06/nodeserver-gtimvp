@@ -1,6 +1,7 @@
 const axios = require('axios')
 const response = require('../response/ServerResponse');
 const statusCode = require('../statuscode/index');
+const logger = require('../../config/logger');
 module.exports = async (req,res) => {
     try {
         const config = {
@@ -18,6 +19,7 @@ module.exports = async (req,res) => {
         res.status(statusCode.ok).send(response.successdatamsg(val,'Ip Details fetch successfully.'))
     } catch (error) {
         
+        logger.error(500,{message: error,stack: error?.stack});
         res.status(statusCode.ok).send(response.errormsg('Unable to fetch ip details.'))
     }
 }

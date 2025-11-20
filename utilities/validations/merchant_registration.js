@@ -12,6 +12,8 @@ const enc_dec = require("../../utilities/decryptor/decryptor");
 const checkifrecordexistandexpiration = require("../../utilities/validations/checkifrecordexistandexpiration");
 const helpers = require("../helper/general_helper");
 const country = require("../../controller/country");
+const logger = require('../../config/logger');
+
 const MerchantRegister = {
   api_register: async (req, res, next) => {
     const schema = Joi.object().keys({
@@ -137,6 +139,7 @@ const MerchantRegister = {
         }
       }
     } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -281,6 +284,7 @@ const MerchantRegister = {
         }
       }
     } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -335,6 +339,7 @@ const MerchantRegister = {
         }
       }
     } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -372,6 +377,7 @@ const MerchantRegister = {
         }
       }
     } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -428,6 +434,7 @@ const MerchantRegister = {
         }
       }
     } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -467,6 +474,7 @@ const MerchantRegister = {
         }
       }
     } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -505,6 +513,7 @@ const MerchantRegister = {
         }
       }
     } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -538,6 +547,7 @@ const MerchantRegister = {
         }
       }
     } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -578,6 +588,7 @@ const MerchantRegister = {
         }
       }
     } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -725,6 +736,7 @@ const MerchantRegister = {
         }
       }
     } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -803,6 +815,7 @@ const MerchantRegister = {
         }
       }
     } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
       console.log(error);
       res
         .status(StatusCode.badRequest)
@@ -873,6 +886,7 @@ const MerchantRegister = {
         next();
       }
     } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
        res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));

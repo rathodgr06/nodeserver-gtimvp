@@ -11,6 +11,7 @@ const pool = require("../../config/database");
 require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../../config/config.json")[env];
+const logger = require('../../config/logger');
 
 const ReferralBonusValidator = {
     add: async (req, res, next) => {
@@ -121,7 +122,7 @@ const ReferralBonusValidator = {
                 }
             }
         } catch (error) {
-            
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -158,7 +159,7 @@ const ReferralBonusValidator = {
                 }
             }
         } catch (error) {
-            
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -197,7 +198,7 @@ const ReferralBonusValidator = {
                 }
             }
         } catch (error) {
-            
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -311,7 +312,7 @@ const ReferralBonusValidator = {
                 }
             }
         } catch (error) {
-            
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );

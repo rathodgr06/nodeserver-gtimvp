@@ -13,6 +13,8 @@ const qrGenerateModule = require("../../models/qrGenerateModule");
 const expiery = require("./check_expierydate");
 const helpers = require("../helper/general_helper");
 const moment = require("moment");
+const logger = require('../../config/logger');
+
 const qr_validation = {
     add: async (req, res, next) => {
 
@@ -125,55 +127,54 @@ const qr_validation = {
                 }),
         });
         try {
-            const result = schema.validate(req.body);
+          const result = schema.validate(req.body);
 
-            if (result.error) {
-                res.status(StatusCode.badRequest).send(
-                    ServerResponse.validationResponse(result.error.message)
-                );
+          if (result.error) {
+            res
+              .status(StatusCode.badRequest)
+              .send(ServerResponse.validationResponse(result.error.message));
+          } else {
+            if (req.body.type_of_qr == "Static_QR") {
+              let record_id = await enc_dec.cjs_decrypt(
+                req.bodyString("sub_merchant_id")
+              );
+              let plan_exist = await checkifrecordexist(
+                {
+                  sub_merchant_id: record_id,
+                  currency: req.bodyString("currency"),
+                },
+                "merchant_qr_codes"
+              );
+
+              if (!plan_exist) {
+                next();
+              } else {
+                res
+                  .status(StatusCode.badRequest)
+                  .send(ServerResponse.validationResponse("QR already exist."));
+              }
             } else {
-                if (req.body.type_of_qr == "Static_QR") {
-                    let record_id = await enc_dec.cjs_decrypt(
-                        req.bodyString("sub_merchant_id")
-                    );
-                    let plan_exist = await checkifrecordexist(
-                        {
-                            sub_merchant_id: record_id,
-                            currency: req.bodyString("currency"),
-                        },
-                        "merchant_qr_codes"
-                    );
-
-                    if (!plan_exist) {
-                        next();
-                    } else {
-                        res.status(StatusCode.badRequest).send(
-                            ServerResponse.validationResponse(
-                                "QR already exist."
-                            )
-                        );
-                    }
-                } else {
-                    let overall_qty_allowed = req.bodyInt(
-                        "overall_qty_allowed"
-                    );
-                    let quantity = req.bodyInt("quantity");
-                    if (quantity > overall_qty_allowed) {
-                        res.status(StatusCode.badRequest).send(
-                            ServerResponse.validationResponse(
-                                "Quantity per user per transaction can't be more than overall allowed quantity."
-                            )
-                        );
-                    } else {
-                        next();
-                    }
-                }
+              let overall_qty_allowed = req.bodyInt("overall_qty_allowed");
+              let quantity = req.bodyInt("quantity");
+              if (quantity > overall_qty_allowed) {
+                res
+                  .status(StatusCode.badRequest)
+                  .send(
+                    ServerResponse.validationResponse(
+                      "Quantity per user per transaction can't be more than overall allowed quantity."
+                    )
+                  );
+              } else {
+                next();
+              }
             }
+          }
         } catch (error) {
-            
-            res.status(StatusCode.badRequest).send(
-                ServerResponse.validationResponse(error)
-            );
+          logger.error(400, { message: error, stack: error?.stack });
+
+          res
+            .status(StatusCode.badRequest)
+            .send(ServerResponse.validationResponse(error));
         }
     },
     open_add: async (req, res, next) => {
@@ -327,6 +328,7 @@ const qr_validation = {
                 }
             }
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             // 
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -467,6 +469,7 @@ const qr_validation = {
                 // }
             }
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error.message)
             );
@@ -519,6 +522,7 @@ const qr_validation = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -571,6 +575,7 @@ const qr_validation = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -616,6 +621,7 @@ const qr_validation = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -673,6 +679,7 @@ const qr_validation = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -902,6 +909,7 @@ const qr_validation = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 console.log(error);
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
@@ -1019,6 +1027,7 @@ const qr_validation = {
                 }
             }
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error.message)
             );
@@ -1087,6 +1096,7 @@ const qr_validation = {
                 next();
             }
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error.message)
             );
@@ -1154,6 +1164,7 @@ const qr_validation = {
                 //   }
             }
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error.message)
             );
@@ -1276,6 +1287,7 @@ const qr_validation = {
                 next();
             }
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error.message)
             );
@@ -1471,6 +1483,7 @@ const qr_validation = {
                 }
             }
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             // 
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -1676,6 +1689,7 @@ const qr_validation = {
                 }
             }
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             // 
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -1719,6 +1733,7 @@ const qr_validation = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -1764,6 +1779,7 @@ const qr_validation = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -1809,6 +1825,7 @@ const qr_validation = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -1922,6 +1939,7 @@ const qr_validation = {
                 next();
             }
         } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error.message)
             );

@@ -6,6 +6,7 @@ const pool = require("../../../config/database");
 const momentFormat = require("../../date_formatter");
 const enc_dec = require("../../../utilities/decryptor/decryptor");
 const helpers = require("../../helper/general_helper");
+const logger = require('../../../config/logger');
 
 async function makeLower(str) {
   return await str.toLocaleLowerCase();
@@ -24,6 +25,7 @@ async function getPsp(psp) {
     response = await qb.query(sql);
   } catch (error) {
     console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error?.stack});
   } finally {
     qb.release();
   }
@@ -37,6 +39,7 @@ async function fetchMerchantDetails(psp) {
     response = await qb.query(sql);
   } catch (error) {
     console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error?.stack});
   } finally {
     qb.release();
   }
@@ -187,6 +190,7 @@ async function getMerchantSellRate(
       console.log(qb.last_query());
     } catch (error) {
       console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error?.stack});
     } finally {
       qb.release();
     }
@@ -344,6 +348,7 @@ async function getMerchantDefaultSellRate( details, is_domestic_international ) 
       console.log(qb.last_query());
     } catch (error) {
       console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error?.stack});
     } finally {
       qb.release();
     }
@@ -432,6 +437,7 @@ async function getMerchantByRate({ merchant_id, currency, scheme, payment_method
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error?.stack});
     } finally {
       qb.release();
     }
@@ -493,6 +499,7 @@ async function getMerchantByRate({ merchant_id, currency, scheme, payment_method
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error?.stack});
     } finally {
       qb.release();
     }
@@ -599,6 +606,7 @@ async function storeTransaction(data) {
       .insert(`${config.table_prefix}transaction_charges`, data);
   } catch (error) {
     console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error?.stack});
   } finally {
     qb.release();
   }
@@ -623,6 +631,7 @@ async function getMidData(data) {
       console.log(qb.last_query());
   } catch (error) {
     console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error?.stack});
   } finally {
     qb.release();
   }

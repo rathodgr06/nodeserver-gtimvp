@@ -8,6 +8,8 @@ const helpers = require('../helper/general_helper');
 const axios = require('axios')
 const xml2js = require('xml2js')
 let psp_url_credentials = require('../../config/credientials')
+const logger = require('../../config/logger');
+
 var isd = 1;
 var isd2 = 1;
 async function captureTelr(transactionToCaptureTelr1) {
@@ -411,6 +413,7 @@ module.exports = async () => {
         return [capturedDetails_Telr, captureDatails_NI,capturedDetails_Paytabs];
         
     } catch (error) {
+        logger.error(500,{message: error,stack: error.stack});
         return error;
     }
    

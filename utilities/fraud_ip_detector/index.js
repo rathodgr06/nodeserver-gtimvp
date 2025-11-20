@@ -10,6 +10,8 @@ var ip = require("ip");
 var geoip = require("geoip-country");
 const merchantOrderModel = require("../../models/merchantOrder");
 const moment = require("moment");
+const logger = require('../../config/logger');
+
 module.exports = async (req, res, next) => {
   // let ip = req.headers.ip;
 
@@ -24,6 +26,7 @@ module.exports = async (req, res, next) => {
         .get(config.table_prefix + "fraud_detections");
     } catch (error) {
       console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error?.stack});
     } finally {
       qb.release();
     }
@@ -233,6 +236,7 @@ updateOrderDetails = async (order_id, payload, order_table) => {
       .update(order_table);
   } catch (error) {
     console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error?.stack});
   } finally {
     qb.release();
   }
@@ -247,6 +251,7 @@ selectDetails = async (selection, condition, table_name) => {
     response = await qb.select(selection).where(condition).get(table_name);
   } catch (error) {
     console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error?.stack});
   } finally {
     qb.release();
   }

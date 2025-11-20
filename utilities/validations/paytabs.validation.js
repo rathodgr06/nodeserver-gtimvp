@@ -6,6 +6,8 @@ const idChecker = require("./idchecker");
 const checkifrecordexist = require("./checkifrecordexist");
 const enc_dec = require("../../utilities/decryptor/decryptor");
 const merchantOrderModel = require("../../models/merchantOrder");
+const logger = require('../../config/logger');
+
 const PayTabsValidator = {
     checkout: async (req, res, next) => {
         try {
@@ -76,6 +78,7 @@ const PayTabsValidator = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             return res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error?.message)
             );

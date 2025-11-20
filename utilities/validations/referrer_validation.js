@@ -11,6 +11,8 @@ const checkifrecordexist = require("../validations/checkifrecordexist");
 let iban_expression = new RegExp(
     /^[a-zA-Z]{2}[0-9]{2}\s?[a-zA-Z0-9]{4}\s?[0-9]{4}\s?[0-9]{3}([a-zA-Z0-9]\s?[a-zA-Z0-9]{0,4}\s?[a-zA-Z0-9]{0,4}\s?[a-zA-Z0-9]{0,4}\s?[a-zA-Z0-9]{0,3})?$/
 );
+const logger = require('../../config/logger');
+
 const ReferrerValidator = {
     add: async (req, res, next) => {
         const schema = Joi.object().keys({
@@ -217,6 +219,7 @@ const ReferrerValidator = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -255,6 +258,7 @@ const ReferrerValidator = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -294,6 +298,7 @@ const ReferrerValidator = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -560,6 +565,7 @@ const ReferrerValidator = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -599,6 +605,7 @@ const ReferrerValidator = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -638,6 +645,7 @@ const ReferrerValidator = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -677,6 +685,7 @@ const ReferrerValidator = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -754,6 +763,7 @@ const ReferrerValidator = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -791,6 +801,7 @@ const ReferrerValidator = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -827,6 +838,7 @@ const ReferrerValidator = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -864,6 +876,7 @@ const ReferrerValidator = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -921,6 +934,7 @@ const ReferrerValidator = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -956,6 +970,7 @@ const ReferrerValidator = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -999,6 +1014,7 @@ const ReferrerValidator = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -1055,6 +1071,7 @@ const ReferrerValidator = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
             );
@@ -1137,6 +1154,7 @@ const ReferrerValidator = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)

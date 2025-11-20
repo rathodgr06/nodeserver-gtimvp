@@ -13,6 +13,7 @@ const { type } = require("os");
 const helpers = require("../helper/general_helper");
 const validator = require('validator');
 const { default: axios } = require("axios");
+const logger = require('../../config/logger');
 
 const rule_validation = {
   add: async (req, res, next) => {
@@ -147,6 +148,7 @@ const rule_validation = {
       req.body.mid_result = mid_result
       next();
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       console.log(error);
       res
         .status(StatusCode.badRequest)
@@ -178,6 +180,7 @@ const rule_validation = {
 
       next();
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       console.log(error);
       res
         .status(StatusCode.badRequest)
@@ -204,6 +207,7 @@ const rule_validation = {
 
       next();
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       console.log(error);
       res
         .status(StatusCode.badRequest)
@@ -230,6 +234,7 @@ const rule_validation = {
 
       next();
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       console.log(error);
       res
         .status(StatusCode.badRequest)
@@ -295,6 +300,7 @@ async function checkAllAttributeHasValidValue(ruleString) {
       let tempObj = JSON.parse(tempStr);
       formattedArray.push({ key: tempObj.text, value: ruleArrayWithValue[1].trim(), operator: operator });
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       validationResult.status = true;
       validationResult.message = 'Invalid rule, please check and try again.';
     }
@@ -530,6 +536,7 @@ async function checkBinResult(bin) {
 
     return lookUpResult;
   } catch (error) {
+    logger.error(400,{message: error,stack: error?.stack});
     return false;
   }
 

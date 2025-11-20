@@ -8,9 +8,10 @@ const X_Username =process.env.X_Username;
 const X_Password =process.env.X_Password;
 const pool = require("../../config/database");
 const axios = require('axios');
+const logger = require('../../config/logger');
 
 module.exports = async (req, res, next) => {
-    try{
+    try {
     let authHeader = req.headers;
     let username=authHeader.xusername;
     let password=authHeader.xpassword;
@@ -101,6 +102,7 @@ module.exports = async (req, res, next) => {
             .get(config.table_prefix + "master_merchant_key_and_secret");
         } catch (error) {
           console.error("Database query failed:", error);
+          logger.error(500,{message: error,stack: error.stack});
         } finally {
           qb.release();
         }
@@ -155,6 +157,7 @@ module.exports = async (req, res, next) => {
     }
     }catch(error){
         console.log(error);
+        logger.error(500,{message: error,stack: error.stack});
         res.status(StatusCode.internalError).send(ServerResponse.validationResponse('Something went wrong','E0001'));
     }
 

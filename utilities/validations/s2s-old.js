@@ -14,6 +14,8 @@ const merchantOrderModel = require("../../models/merchantOrder");
 const helpers = require("../helper/general_helper");
 const encrypt_decrypt = require("../decryptor/encrypt_decrypt");
 const { valid } = require("joi");
+const logger = require('../../config/logger');
+
 const S2SValidator = {
     execuatePayment: async (req, res, next) => {
         try {
@@ -656,10 +658,11 @@ const S2SValidator = {
                     next();
                 }
             }
-        } catch (err) {
-            console.log(err);
+        } catch (error) {
+            console.log(error);
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
-                ServerResponse.validationResponse(err)
+                ServerResponse.validationResponse(error)
             );
         }
 

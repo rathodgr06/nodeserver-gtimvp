@@ -4,6 +4,7 @@ const Joi = require("joi")
 const currency = require("../../controller/currency");
 const ServerResponse = require("../response/ServerResponse");
 const StatusCode = require("../statuscode/index");
+const logger = require('../../config/logger');
 
 const get_payment_method_validator = {
   validate: async (req, res, next) => {
@@ -30,6 +31,7 @@ const get_payment_method_validator = {
         next();
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));

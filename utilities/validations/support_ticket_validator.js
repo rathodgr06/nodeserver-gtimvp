@@ -3,6 +3,7 @@ const Joi = require("joi")
     .extend(require("joi-currency-code"));
 const ServerResponse = require("../response/ServerResponse");
 const StatusCode = require("../statuscode/index");
+const logger = require('../../config/logger');
 
 const support_ticket_validator = {
     add: async (req, res, next) => {
@@ -60,6 +61,7 @@ const support_ticket_validator = {
                 next();
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -109,6 +111,7 @@ const support_ticket_validator = {
                 next();
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -145,6 +148,7 @@ const support_ticket_validator = {
                 next();
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -170,6 +174,7 @@ const support_ticket_validator = {
                 next();
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -227,6 +232,7 @@ const support_ticket_validator = {
                 next();
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)

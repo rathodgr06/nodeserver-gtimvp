@@ -11,6 +11,7 @@ const merchantOrderModel = require("../../models/merchantOrder");
 const helpers = require("../helper/general_helper");
 const encrypt_decrypt = require("../decryptor/encrypt_decrypt");
 const { valid } = require("joi");
+const logger = require('../../config/logger');
 
 const S2SValidator = {
     execuatePayment: async (req, res, next) => {
@@ -420,10 +421,11 @@ const S2SValidator = {
 
             // All validations passed
             next();
-        } catch (err) {
-            console.error("Payment validation error:", err);
+        } catch (error) {
+            console.error("Payment validation error:", error);
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
-                ServerResponse.validationResponse(err.message || "Validation error occurred")
+                ServerResponse.validationResponse(error.message || "Validation error occurred")
             );
         }
     }

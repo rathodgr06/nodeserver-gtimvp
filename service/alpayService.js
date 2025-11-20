@@ -2,6 +2,8 @@ const axios = require("axios");
 const credentials = require("../config/credientials");
 const helpers = require("../utilities/helper/general_helper");
 const { v4: uuidv4 } = require("uuid");
+const logger = require('../config/logger');
+
 const mtnService = {
   token: async (username, password, mode) => {
     try {
@@ -24,6 +26,7 @@ const mtnService = {
       const token = response.data.token;
       return token;
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
         console.log(error);
       return false;
     }
@@ -62,6 +65,7 @@ const mtnService = {
       };
       return verification_data;
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return false;
     }
 
@@ -100,6 +104,7 @@ const mtnService = {
          return final_response;
 
     }catch(error){
+      logger.error(400,{message: error,stack: error?.stack});
         console.log(error);
         return false;
     }

@@ -5,6 +5,7 @@ const tlClient = axios.create({
 
     }
 });
+const logger = require('../../config/logger');
 let smsSender = {
 
     sendOtp: async (mobile,otp,ref_no1,ref_no2) => {
@@ -20,7 +21,7 @@ let smsSender = {
         params.append("test",'0');
         tlClient.post("/send", params).then((response)=>{
         }).catch((error)=>{ 
-           
+           logger.error(500,{message: error,stack: error?.stack});
         });
     }
 }

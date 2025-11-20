@@ -11,6 +11,7 @@ const checkmcc = require("./checkechatgesType");
 const end_date = require("./checkexpiery");
 const qrGenerateModule = require("../../models/qrGenerateModule");
 const expiery = require("./check_expierydate");
+const logger = require('../../config/logger');
 
 const qr_validation = {
     add: async (req, res, next) => {
@@ -153,6 +154,7 @@ const qr_validation = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error)
@@ -282,6 +284,7 @@ const qr_validation = {
                 // }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error.message)
             );
@@ -334,6 +337,7 @@ const qr_validation = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -386,6 +390,7 @@ const qr_validation = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -431,6 +436,7 @@ const qr_validation = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -487,6 +493,7 @@ const qr_validation = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -646,6 +653,7 @@ const qr_validation = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(
                     ServerResponse.validationResponse(error)
                 );
@@ -762,6 +770,7 @@ const qr_validation = {
                 }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error.message)
             );
@@ -830,6 +839,7 @@ const qr_validation = {
                 next();
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error.message)
             );
@@ -897,6 +907,7 @@ const qr_validation = {
                 //   }
             }
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(
                 ServerResponse.validationResponse(error.message)
             );

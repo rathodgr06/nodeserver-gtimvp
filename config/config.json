@@ -2,16 +2,16 @@
     "development": {
         "username": "root",
         "password": "",
-        "database": "uat",
+        "database": "paydart_db",
         "host": "localhost",
         "table_prefix": "pg_",
         "table_prefix1": "fds_",
-        "timezone": "utc"
+        "timezone": "Asia/Kolkata"
     },
     "test": {
         "username": "root",
         "password": "",
-        "database": "uat",
+        "database": "paydart_db",
         "host": "localhost",
         "table_prefix": "pg_",
          "table_prefix1": "fds_"
@@ -19,7 +19,7 @@
     "production": {
         "username": "root",
         "password": "",
-        "database": "uat",
+        "database": "paydart_db",
         "host": "localhost",
         "table_prefix": "pg_",
         "table_prefix1": "fds_"

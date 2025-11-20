@@ -7,6 +7,8 @@ const orderTransactionModel = require("../../models/order_transaction");
 const helpers = require("../helper/general_helper");
 const xml2js = require("xml2js");
 let psp_url_credentials = require("../../config/credientials");
+const logger = require('../../config/logger');
+
 class TelrAutoCaptureClass {
     constructor() {
       this.sendToTelrCallCount = 0;
@@ -42,7 +44,8 @@ class TelrAutoCaptureClass {
   
         return updateResponse;
       } catch (error) {
-        console.error("Error processing transaction:", trans1.order_id, error);
+        console.error("Error processing transaction:", trans1?.order_id, error);
+        logger.error(500,{message: error,stack: error?.stack});
         return null;
       }
     }
@@ -115,6 +118,7 @@ class TelrAutoCaptureClass {
         // return this.parseTelrResponse(parsedData);
       } catch (error) {
         console.error("Error sending to Telr:", error);
+        logger.error(500,{message: error,stack: error?.stack});
         throw error;
       }
     }
@@ -163,6 +167,7 @@ class TelrAutoCaptureClass {
         await this.captureTelr(transactionsToCapture);
       } catch (error) {
         console.error("Error in main process:", error);
+        logger.error(500,{message: error,stack: error?.stack});
       }
     }
   
@@ -184,6 +189,7 @@ class TelrAutoCaptureClass {
         console.log("🚀 ~ TelrAutoCaptureClass ~ telrCaptureRequest ~ networkreq:", networkreq.data)
       } catch (error) {
         console.log("🚀 ~ TelrAutoCaptureClass ~ telrCaptureRequest ~ error:", error)
+        logger.error(500,{message: error,stack: error?.stack});
       }
     }
 

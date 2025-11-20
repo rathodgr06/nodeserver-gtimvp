@@ -49,22 +49,22 @@ module.exports = {
     },
     "orange-money":{
          "test_url": "https://apidev.orange.com.lr/TIMM/v1/",
-         "base_url": "https://192.168.19.200:11003/TIMM/v1/",
+         "base_url": "https://apidev.orange.com.lr/TIMM/v1/",
     },
     "mtn":{
-         "test_url": "https://uat-nodeserver.paydart.co/",
+         "test_url": "http://127.0.0.1:4008/",
         "base_url": "https://proxy.momoapi.mtn.com/"
     },
     "orange":{
-         "test_url": "https://uat-nodeserver.paydart.co/",
+         "test_url": "http://127.0.0.1:4008/",
         "base_url": "https://apidev.orange.com.lr/TIMM/v1/"
     },
     "thunes":{
         test_url:"https://api-mt.pre.thunes.com",
         url:"https://api-mt.thunes.com"
     },
-     "alpay":{
-        "test_url":"https://uat-nodeserver.paydart.co/al/api/",
+    "alpay":{
+        "test_url":"http://127.0.0.1:4008/al/api/",
         "base_url":"https://api.alpaygtway.com/api/"
     }
 }

@@ -3,6 +3,7 @@ require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../../config/config.json")[env];
 const pool = require("../../config/database");
+const logger = require('../../config/logger');
 
 let AutoCaptureModel = {
   fetchAll: async (selection, condition) => {
@@ -26,6 +27,7 @@ let AutoCaptureModel = {
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack});
     } finally {
       qb.release();
     }
@@ -53,6 +55,7 @@ let AutoCaptureModel = {
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack});
     } finally {
       qb.release();
     }

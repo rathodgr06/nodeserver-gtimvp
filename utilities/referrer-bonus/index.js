@@ -8,6 +8,7 @@ const calculateBonus = require('./calculate_bonus');
 const orderTransactionModel = require("../../models/order_transaction");
 
 const referrerCalculationModel = require('../../models/referrer_bonus_calculation_model');
+const logger = require('../../config/logger');
 
 module.exports = async (order_details) => {
     try {
@@ -82,7 +83,7 @@ module.exports = async (order_details) => {
         return true;
 
     } catch (error) {
-        
+        logger.error(500,{message: error,stack: error?.stack});
         return true;
         
     }

@@ -9,7 +9,7 @@ const checkerwithcolumn = require('./checkerwithcolumn');
 const checktransaction = require('./check_transaction');
 const checkerpaymentMode = require('./check_paymentmode');
 const checkmcc = require("./checkechatgesType")
-
+const logger = require('../../config/logger');
 
 const transaction = {
     add: async (req, res, next) => {
@@ -182,6 +182,7 @@ const transaction = {
                         }
                     }
                 } catch (error) {
+                    logger.error(400,{message: error,stack: error?.stack});
                     res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
                 }
 
@@ -324,6 +325,7 @@ const transaction = {
                         }
                     }
                 } catch (error) {
+                    logger.error(400,{message: error,stack: error?.stack});
                     res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
                 }
 
@@ -358,7 +360,7 @@ const transaction = {
                 }
 
             } catch (error) {
-
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
             }
 
@@ -511,7 +513,7 @@ const transaction = {
                     }
 
                 } catch (error) {
-                    
+                    logger.error(400,{message: error,stack: error?.stack});
                     res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
                 }
             } else {
@@ -648,6 +650,7 @@ const transaction = {
                     }
 
                 } catch (error) {
+                    logger.error(400,{message: error,stack: error?.stack});
                     res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
                 }
             } else {
@@ -682,6 +685,7 @@ const transaction = {
                 }
 
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
             }
 
@@ -717,6 +721,7 @@ const transaction = {
                 }
 
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
             }
 
@@ -752,6 +757,7 @@ const transaction = {
                     }
                 }
             } catch (error) {
+                logger.error(400,{message: error,stack: error?.stack});
                 res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error));
             }
 
@@ -819,6 +825,7 @@ const transaction = {
 
 
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error.message));
         }
     },
@@ -889,6 +896,7 @@ const transaction = {
 
 
         } catch (error) {
+            logger.error(400,{message: error,stack: error?.stack});
             res.status(StatusCode.badRequest).send(ServerResponse.validationResponse(error.message));
         }
     },

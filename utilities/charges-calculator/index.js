@@ -3,6 +3,7 @@ require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../../config/config.json")[env];
 const pool = require("../../config/database");
+const logger = require('../../config/logger');
 
 module.exports = async (req, res, next) => {
   let charges = {
@@ -20,6 +21,7 @@ module.exports = async (req, res, next) => {
       .get(config.table_refix + "master_merchant");
   } catch (error) {
     console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error?.stack});
   } finally {
     qb.release();
   }
@@ -46,6 +48,7 @@ module.exports = async (req, res, next) => {
       .get();
   } catch (error) {
     console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error?.stack});
   } finally {
     qb.release();
   }

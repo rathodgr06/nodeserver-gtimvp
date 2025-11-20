@@ -4,6 +4,8 @@ const env = process.env.ENVIRONMENT;
 const config = require("../../config/config.json")[env];
 const pool = require("../../config/database");
 const moment = require("moment");
+const logger = require('../../config/logger');
+
 async function planDetails(conditions, table_name) {
   let qb = await pool.get_connection();
   let response;
@@ -14,6 +16,7 @@ async function planDetails(conditions, table_name) {
       .get(config.table_prefix + table_name);
   } catch (error) {
     console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error?.stack});
   } finally {
     qb.release();
   }
@@ -36,6 +39,7 @@ async function startDate(ref_no) {
     response = await qb.query(sql);
   } catch (error) {
     console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error?.stack});
   } finally {
     qb.release();
   }
@@ -60,6 +64,7 @@ async function expiryDate(ref_no) {
     response = await qb.query(sql);
   } catch (error) {
     console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error?.stack});
   } finally {
     qb.release();
   }
@@ -83,6 +88,7 @@ async function is_plan_expired(ref_no) {
     response = await qb.query(sql);
   } catch (error) {
     console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error?.stack});
   } finally {
     qb.release();
   }

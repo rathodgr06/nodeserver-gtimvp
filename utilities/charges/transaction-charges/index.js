@@ -4,9 +4,9 @@ const merchantOrderModel = require("../../../models/merchantOrder");
 const dotenv = require("dotenv");
 const helper = require('../../helper/general_helper');
 const momentDatePicker = require('../../date_formatter/index');
-const winston = require('../../logmanager/winston');
 const walletDBModel = require("../../../models/wallet");
 const charges_invoice_controller = require("../../../controller/charges_invoice_controller");
+const logger = require('../../../config/logger');
 
 
 dotenv.config({ path: "../.env" });
@@ -29,66 +29,84 @@ const constantTXNStatus = {
 module.exports = async (order_details) => {
   
     try {
-        console.log(`order details mode ${JSON.stringify(order_details)}`)
-        if (order_details.mode == 'test' && process.env.CHARGES_MODE=="live") {
-            return true;
-        }
-        const mid_data = await transactionChargesModel.getMidData(order_details);
-        console.log('transaction mid_result', mid_data);
-       
-        
-        let merchant_details = await merchantOrderModel.selectDynamicONE('register_business_country', { merchant_id: order_details.merchant_id }, 'master_merchant_details');
-         if (mid_data?.country_id) {
-            order_details.country_id = merchant_details.register_business_country;
-        }
-        let country_details = await merchantOrderModel.selectDynamicONE('country_code', { id: merchant_details.register_business_country }, 'country');
+      console.log(`order details mode ${JSON.stringify(order_details)}`);
+      if (order_details.mode == "test" && process.env.CHARGES_MODE == "live") {
+        return true;
+      }
+      const mid_data = await transactionChargesModel.getMidData(order_details);
+      console.log("transaction mid_result", mid_data);
 
-        const is_domestic_international = await checkCountry(order_details.card_country, country_details.country_code);
+      let merchant_details = await merchantOrderModel.selectDynamicONE(
+        "register_business_country",
+        { merchant_id: order_details.merchant_id },
+        "master_merchant_details"
+      );
+      if (mid_data?.country_id) {
+        order_details.country_id = merchant_details.register_business_country;
+      }
+      let country_details = await merchantOrderModel.selectDynamicONE(
+        "country_code",
+        { id: merchant_details.register_business_country },
+        "country"
+      );
 
-        //-------------- Get receiver id ------------------------------
-        let receiver_id =
-            await walletDBModel.get_receiver_by_sub_merchant_id_api_call(
-              order_details?.merchant_id
+      const is_domestic_international = await checkCountry(
+        order_details.card_country,
+        country_details.country_code
+      );
+
+      //-------------- Get receiver id ------------------------------
+      let receiver_id =
+        await walletDBModel.get_receiver_by_sub_merchant_id_api_call(
+          order_details?.merchant_id
+        );
+      console.log("🚀 ~ receiver_id:", receiver_id);
+      if (receiver_id) {
+        order_details.receiver_id = receiver_id;
+      }
+
+      switch (order_details.order_status) {
+        case "CAPTURED":
+          let checkOrderAlreadyExits = await merchantOrderModel.checkOrderExits(
+            {
+              order_id: order_details.order_id,
+              order_status: "CAPTURED",
+            }
+          );
+          console.log(`this is the result`);
+          console.log(checkOrderAlreadyExits);
+          if (!checkOrderAlreadyExits) {
+            const { sellRate } = await calculateRates(
+              order_details,
+              is_domestic_international
             );
-          console.log("🚀 ~ receiver_id:", receiver_id)
-          if (receiver_id) {
-            order_details.receiver_id = receiver_id;
+
+            await storeTransactionData(
+              order_details,
+              sellRate,
+              is_domestic_international
+            );
+          } else {
+            return true;
           }
-
-        switch(order_details.order_status){
-            case 'CAPTURED':
-                let checkOrderAlreadyExits = await merchantOrderModel.checkOrderExits({
-                  order_id: order_details.order_id,
-                  order_status: "CAPTURED",
-                });
-                console.log(`this is the result`);
-                console.log(checkOrderAlreadyExits);
-                if (!checkOrderAlreadyExits) {
-                  const { sellRate } = await calculateRates(
-                    order_details,
-                    is_domestic_international
-                  );
-
-                  await storeTransactionData(
-                    order_details,
-                    sellRate,
-                    is_domestic_international
-                  );
-                } else {
-                  return true;
-                }
-            break;
-            case 'REFUNDED':
-                await storeRefundData(order_details,is_domestic_international);
-            break;
-            case 'CAPTURE-REVERSAL':
-                await storeCaptureReversalData(order_details,is_domestic_international);
-            break;
-            case 'REFUND-REVERSAL':
-                await storeRefundReversalData(order_details,is_domestic_international);
-            break;
-        }
-       /* if (order_details.order_status == "CAPTURED") {
+          break;
+        case "REFUNDED":
+          await storeRefundData(order_details, is_domestic_international);
+          break;
+        case "CAPTURE-REVERSAL":
+          await storeCaptureReversalData(
+            order_details,
+            is_domestic_international
+          );
+          break;
+        case "REFUND-REVERSAL":
+          await storeRefundReversalData(
+            order_details,
+            is_domestic_international
+          );
+          break;
+      }
+      /* if (order_details.order_status == "CAPTURED") {
           
             const { sellRate } = await calculateRates(order_details, is_domestic_international);
             await storeTransactionData(order_details, sellRate, is_domestic_international);
@@ -98,63 +116,64 @@ module.exports = async (order_details) => {
             await storeRefundData(order_details,is_domestic_international);
         } */
 
-        if (order_details.order_status == "CAPTURED") {
-          const created_date = await momentDatePicker.created_date_time();
-          let wallet_id = await helper.make_sequential_no();
-          let sub_merchant_id = order_details?.merchant_id;
-          let currency = order_details?.currency;
+      if (order_details.order_status == "CAPTURED") {
+        const created_date = await momentDatePicker.created_date_time();
+        let wallet_id = await helper.make_sequential_no();
+        let sub_merchant_id = order_details?.merchant_id;
+        let currency = order_details?.currency;
 
-          if (!receiver_id) {
-            receiver_id =
-              await walletDBModel.get_receiver_by_sub_merchant_id_api_call(
-                order_details?.merchant_id
-              );
-            console.log("🚀 ~ receiver_id:", receiver_id);
-          }
-
-          let create_payload = {
-            wallet_id: wallet_id,
-            sub_merchant_id: sub_merchant_id,
-            beneficiary_id: receiver_id,
-            currency: currency,
-            created_at: created_date,
-            updated_at: created_date,
-          };
-
-          let checkdata = {
-            currency: currency,
-          };
-
-          if (sub_merchant_id) {
-            checkdata.sub_merchant_id = sub_merchant_id;
-          }
-
-            //   if (receiver_id) {
-            //     checkdata.beneficiary_id = receiver_id;
-            //   }
-
-          walletDBModel
-            .checkAndCreate(create_payload, checkdata)
-            .then((result) => {
-              console.log("🚀 ~ .then ~ result:", result);
-            })
-            .catch((error) => {
-              console.log("🚀 ~ module.exports= ~ error:", error);
-              winston.error(error);
-            });
+        if (!receiver_id) {
+          receiver_id =
+            await walletDBModel.get_receiver_by_sub_merchant_id_api_call(
+              order_details?.merchant_id
+            );
+          console.log("🚀 ~ receiver_id:", receiver_id);
         }
 
-        // Update transaction charges old records
-        if (order_details?.merchant_id, receiver_id) {
-            let result = await charges_invoice_controller.updateCharges2(order_details?.merchant_id, receiver_id);
-            console.log("🚀 ~ result:", result)
+        let create_payload = {
+          wallet_id: wallet_id,
+          sub_merchant_id: sub_merchant_id,
+          beneficiary_id: receiver_id,
+          currency: currency,
+          created_at: created_date,
+          updated_at: created_date,
+        };
+
+        let checkdata = {
+          currency: currency,
+        };
+
+        if (sub_merchant_id) {
+          checkdata.sub_merchant_id = sub_merchant_id;
         }
 
+        //   if (receiver_id) {
+        //     checkdata.beneficiary_id = receiver_id;
+        //   }
 
+        walletDBModel
+          .checkAndCreate(create_payload, checkdata)
+          .then((result) => {
+            console.log("🚀 ~ .then ~ result:", result);
+          })
+          .catch((error) => {
+            console.log("🚀 ~ module.exports= ~ error:", error);
+            logger.error(500,{message: error,stack: error?.stack});
+          });
+      }
+
+      // Update transaction charges old records
+      if ((order_details?.merchant_id, receiver_id)) {
+        let result = await charges_invoice_controller.updateCharges2(
+          order_details?.merchant_id,
+          receiver_id
+        );
+        console.log("🚀 ~ result:", result);
+      }
     } catch (error) {
-        // winston.error(err);
-        console.log('transaction error', error);
-        return true;
+      console.log("transaction error", error);
+      logger.error(500, { message: error, stack: error?.stack });
+      return true;
     }
 
 };

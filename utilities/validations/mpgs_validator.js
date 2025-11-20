@@ -4,6 +4,8 @@ const StatusCode = require("../statuscode/index");
 const checkifrecordexist = require("./checkifrecordexist");
 const enc_dec = require("../decryptor/decryptor");
 const merchantOrderModel = require("../../models/merchantOrder");
+const logger = require('../../config/logger');
+
 const MPGS_Validator = {
   session: async (req, res, next) => {
     try {
@@ -138,6 +140,7 @@ const MPGS_Validator = {
         }
       }
     } catch (error) {
+      logger.error(400,{message: error,stack: error?.stack});
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
