@@ -6,7 +6,7 @@ const submerchantModel = require("../models/submerchantmodel");
 const { encrypt_mobile_no_and_code } = require("./auth");
 require("dotenv").config({ path: "../.env" });
 const moment = require("moment");
-const winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 
 const transaction = {
   transaction_add: async (req, res) => {
@@ -146,12 +146,13 @@ const transaction = {
           .send(response.successmsg("Added successfully"));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
 
   transaction_list: async (req, res) => {
+    try{
     const psp_name = await maintenanceModule.getPSPName();
     let limit = {
       perpage: 0,
@@ -206,10 +207,14 @@ const transaction = {
           total_count
         )
       );
+    }catch(error){
+      logger.error(500,{message: error,stack: error.stack}); 
+    }
   },
 
   transaction_details: async (req, res) => {
-    let id = await enc_dec.cjs_decrypt(req.bodyString("setup_id"));
+    try{
+    let id =  enc_dec.cjs_decrypt(req.bodyString("setup_id"));
     const psp_name = await maintenanceModule.getPSPName();
     maintenanceModule
       .selectOne({ id: id })
@@ -264,15 +269,18 @@ const transaction = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
       });
+    }catch(error){
+      logger.error(500,{message: error,stack: error.stack}); 
+    }
   },
 
   transaction_update: async (req, res) => {
-    let setup_id = await enc_dec.cjs_decrypt(req.bodyString("setup_id"));
+    let setup_id =  enc_dec.cjs_decrypt(req.bodyString("setup_id"));
     let charges_type = req.bodyString("charges_type");
     let buy = req.body.buy_sell;
     let sell = req.body.sell;
@@ -411,7 +419,7 @@ const transaction = {
               .send(response.errormsg("Select Valid Charges Type"));
           }
         } catch (error) {
-          winston.error(error);
+          logger.error(500,{message: error,stack: error.stack}); 
           res.status(statusCode.internalError).send(response.errormsg(error));
         }
         res
@@ -419,13 +427,13 @@ const transaction = {
           .send(response.successmsg("Record updated successfully"));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
 
   transaction_deactivate: async (req, res) => {
-    let setup_id = await enc_dec.cjs_decrypt(req.bodyString("setup_id"));
+    let setup_id =  enc_dec.cjs_decrypt(req.bodyString("setup_id"));
     try {
       var insdata = {
         status: "1",
@@ -442,7 +450,7 @@ const transaction = {
         .status(statusCode.ok)
         .send(response.successmsg("Record deactivated successfully"));
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -467,7 +475,7 @@ const transaction = {
         .status(statusCode.ok)
         .send(response.successmsg("Record activated successfully"));
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -485,7 +493,7 @@ const transaction = {
         .status(statusCode.ok)
         .send(response.successmsg("Record deactivated successfully"));
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -493,12 +501,12 @@ const transaction = {
   },
 
   slab_add: async (req, res) => {
-    let setup_id = await enc_dec.cjs_decrypt(req.bodyString("setup_id"));
+    let setup_id =  enc_dec.cjs_decrypt(req.bodyString("setup_id"));
     let register_at = moment().format("YYYY-MM-DD HH:mm:ss");
     let type = req.bodyString("charges_type");
     let buy = req.body.buy;
     let sell = req.body.sell;
-    let check_data = await maintenanceModule
+   maintenanceModule
       .selectOne({ id: setup_id })
       .then(async (result) => {
         let resp = [];
@@ -635,7 +643,7 @@ const transaction = {
           .send(response.successmsg("Added successfully"));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -680,7 +688,7 @@ const transaction = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -783,7 +791,7 @@ const transaction = {
           .send(response.errormsg("Details not available."));
       }
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -851,7 +859,7 @@ const transaction = {
           .send(response.successmsg("Added successfully"));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -859,6 +867,7 @@ const transaction = {
   },
 
   payment_mode_list: async (req, res) => {
+    try{
     let limit = {
       perpage: 0,
       page: 0,
@@ -931,8 +940,12 @@ const transaction = {
           total_count
         )
       );
+    }catch(error){
+      logger.error(500,{message: error,stack: error.stack}); 
+    }
   },
   card_scheme: async (req, res) => {
+    try{
     let like_search = {};
 
     like_search.deleted = req.bodyString("deleted");
@@ -950,6 +963,9 @@ const transaction = {
     res
       .status(statusCode.ok)
       .send(response.successdatamsg(send_res, "List fetched successfully."));
+  }catch(error){
+    logger.error(500,{message: error,stack: error.stack}); 
+  }
   },
 };
 module.exports = transaction;

@@ -15,7 +15,7 @@ const { encrypt } = require("crypto-js/aes");
 const encrypt_decrypt = require("../utilities/decryptor/encrypt_decrypt");
 const moment = require("moment");
 require("dotenv").config({ path: "../.env" });
-const winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 const nodeCache = require("../utilities/helper/CacheManeger");
 
 var Setting = {
@@ -52,7 +52,7 @@ var Setting = {
         .status(statusCode.ok)
         .send(response.successmsg("Language changed successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -87,7 +87,7 @@ var Setting = {
         .status(statusCode.ok)
         .send(response.successmsg("Theme changed successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -359,7 +359,7 @@ var Setting = {
         .send(response.successdatamsg(data, "Data fetched successfully", null));
     } catch (error) {
       console.log(error);
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -446,7 +446,7 @@ var Setting = {
         .status(statusCode.ok)
         .send(response.successdatamsg(data, "Dada fetched successfully", null));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -474,7 +474,7 @@ var Setting = {
         .status(statusCode.ok)
         .send(response.successdatamsg(data, "Dada fetched successfully", null));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -575,14 +575,14 @@ var Setting = {
         })
         .catch((error) => {
           console.log(error);
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     } catch (error) {
       console.log(error);
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -646,13 +646,13 @@ var Setting = {
             .send(response.successmsg("Record updated successfully"));
         })
         .catch((error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -720,7 +720,7 @@ var Setting = {
         .send(response.successdatamsg(data, "Data fetched successfully", null));
     } catch (error) {
       console.log(error);
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -763,7 +763,7 @@ var Setting = {
         .status(statusCode.ok)
         .send(response.successmsg("Environment changed successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -850,7 +850,7 @@ var Setting = {
         }
       }
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg("Something went wrong"));
@@ -885,7 +885,7 @@ var Setting = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -903,7 +903,7 @@ var Setting = {
         .status(statusCode.ok)
         .send(response.successmsg("Transaction limit deleted successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -940,7 +940,7 @@ var Setting = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -962,7 +962,7 @@ var Setting = {
         .status(statusCode.ok)
         .send(response.successmsg("Suspicious IP deleted successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -994,7 +994,7 @@ var Setting = {
                     .send({ status: true, message: "Updated successfully" });
                 })
                 .catch((error) => {
-                  winston.error(error);
+                 logger.error(500,{message: error,stack: error.stack}); 
                   res
                     .status(statusCode.internalError)
                     .send(response.errormsg(error.message));
@@ -1003,13 +1003,13 @@ var Setting = {
           }
         })
         .catch((error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg("Something went wrong"));
@@ -1029,7 +1029,7 @@ var Setting = {
           .send(response.successdatamsg(res1, "Details fetched successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1051,7 +1051,7 @@ var Setting = {
           .send(response.successmsg("Details updated successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1073,7 +1073,7 @@ var Setting = {
           .send(response.successmsg("Details updated successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1103,7 +1103,7 @@ var Setting = {
         .status(statusCode.ok)
         .send(response.successmsg("Submerchant changed successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1123,7 +1123,7 @@ var Setting = {
           .send(response.successdatamsg(res1, "Details fetched successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1149,7 +1149,7 @@ var Setting = {
           .send(response.successdatamsg(res1, "Details fetched successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1177,7 +1177,7 @@ var Setting = {
       })
       .catch((error) => {
         console.log(error);
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));

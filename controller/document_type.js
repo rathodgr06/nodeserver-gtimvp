@@ -11,7 +11,7 @@ const QRCode = require('qrcode')
 const moment = require('moment');
 const EntityModel = require("../models/entityModel");
 const date_formatter = require("../utilities/date_formatter/index"); // date formatter module
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 
 var referrer = {
     add: async (req, res) => {
@@ -35,7 +35,7 @@ var referrer = {
             
             res.status(statusCode.ok).send(response.successmsg('Document added successfully.'));
         }).catch((error) => {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         })
     },
@@ -102,7 +102,7 @@ var referrer = {
             let total_count = await document_model.get_count(condition1);
             res.status(statusCode.ok).send(response.successdatamsg(send_res, 'Document list fetched successfully.',total_count));
         }).catch((error) => {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         })
     },
@@ -177,7 +177,7 @@ var referrer = {
             let total_count = await document_model.get_count(condition1);
             res.status(statusCode.ok).send(response.successdatamsg(send_res, 'Document list fetched successfully.',total_count_document));
         }).catch((error) => {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         })
     },
@@ -197,7 +197,7 @@ var referrer = {
             }
             res.status(statusCode.ok).send(response.successdatamsg(send_res, 'Details fetched successfully.'));
         }).catch((error) => {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         })
     },
@@ -207,7 +207,7 @@ var referrer = {
         document_model.updateDetails({ id: id }, update_data).then((result) => {
             res.status(statusCode.ok).send(response.successmsg('User deleted successfully.'));
         }).catch((error) => {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         })
 
@@ -241,12 +241,12 @@ var referrer = {
                 document_model.updateDetails({ id: document_id }, ins_data).then((result) => {
                     res.status(statusCode.ok).send(response.successmsg('Document updated successfully.'));
                 }).catch((error) => {
-                    winston.error(error);
+                    logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(response.errormsg(error.message));
                 })
             }
         }).catch((error) => {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         })
     },
@@ -257,7 +257,7 @@ var referrer = {
         //    let entity= await  EntityModel.insert({document: id }, {deleted:0})
             res.status(statusCode.ok).send(response.successmsg('Document activated successfully.'));
         }).catch((error) => {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         })
 
@@ -269,7 +269,7 @@ var referrer = {
            let entity= await  EntityModel.removeEntityDoc({document: id })
             res.status(statusCode.ok).send(response.successmsg('Document deactivated successfully.'));
         }).catch((error) => {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         })
 
@@ -327,14 +327,14 @@ var referrer = {
                         );
                     })
                     .catch((error) => {
-                        winston.error(error);
+                        logger.error(500,{message: error,stack: error.stack}); 
                         res.status(statusCode.internalError).send(
                             response.errormsg(error)
                         );
                     });
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error)
                 );
@@ -389,7 +389,7 @@ var referrer = {
                             });
                         })
                         .catch((error) => {
-                            winston.error(error);
+                            logger.error(500,{message: error,stack: error.stack}); 
                             res.status(statusCode.internalError).send(
                                 response.errormsg(error)
                             );
@@ -401,9 +401,9 @@ var referrer = {
                 }
             })
             .catch((err) => {
-                winston.error(err);
+               logger.error(500,{message: err,stack: err.stack}); 
                 res.status(statusCode.internalError).send(
-                    response.errormsg(error)
+                    response.errormsg(err)
                 );
             });
     },

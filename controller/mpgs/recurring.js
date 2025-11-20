@@ -7,6 +7,7 @@ const winston = require("../../utilities/logmanager/winston");
 const helpers = require('../../utilities/helper/general_helper');
 const cred = require('../../config/credientials');
 const { v4: uuidv4 } = require('uuid')
+const logger = require('../../config/logger');
 
 makeRecurringRequest = async (values, _terminalcred) => {
     console.log(`this is the mpgs`);
@@ -53,9 +54,7 @@ makeRecurringRequest = async (values, _terminalcred) => {
         console.log(response.data);
         return response.data;
     } catch (error) {
-        console.log(error.response.data);
-        winston.error(error);
-
+        logger.error(500,{message: error,stack: error.stack}); 
         return null;
     }
 };

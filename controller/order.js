@@ -7,7 +7,7 @@ const encrypt_decrypt = require("../utilities/decryptor/encrypt_decrypt");
 const TempModel = require("../models/temp");
 const merchantOrderModel = require("../models/merchantOrder");
 const moment = require("moment");
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 
 var res_data = {
     add: async (req, res) => {
@@ -55,7 +55,7 @@ var res_data = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -95,7 +95,7 @@ var res_data = {
     );
 
   } catch (error) {
-    winston.error(error);
+   logger.error(500,{message: error,stack: error.stack}); 
     res.status(statusCode.internalError).send(
       response.errormsg(error.message)
     );
@@ -136,7 +136,7 @@ var res_data = {
     );
 
   } catch (error) {
-    winston.error(error);
+   logger.error(500,{message: error,stack: error.stack}); 
     res.status(statusCode.internalError).send(
       response.errormsg(error.message)
     );
@@ -177,7 +177,7 @@ var res_data = {
     );
 
   } catch (error) {
-    winston.error(error);
+   logger.error(500,{message: error,stack: error.stack}); 
     res.status(statusCode.internalError).send(
       response.errormsg(error.message)
     );
@@ -664,7 +664,7 @@ var res_data = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -800,7 +800,7 @@ var res_data = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -1796,7 +1796,7 @@ var res_data = {
             })
             .catch((error) => {
                 console.log(error);
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -1840,7 +1840,7 @@ var res_data = {
                 response.successdatamsg(rest_data, "List fetched successfully.")
             );
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -1898,7 +1898,7 @@ var res_data = {
                 )
             );
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -1922,7 +1922,7 @@ var res_data = {
                 response.successmsg("Record updated successfully")
             );
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -2131,7 +2131,7 @@ var res_data = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -2165,7 +2165,7 @@ var res_data = {
                 response.successmsg("Record updated successfully")
             );
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );

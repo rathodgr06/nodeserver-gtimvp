@@ -13,6 +13,7 @@ const { send_webhook_data } = require("../webhook_settings");
 const PspModel = require("../../models/psp");
 const credientials = require("../../config/credientials");
 const MerchantRegistrationModel = require('../../models/merchant_registration');
+const logger = require('../../config/logger');
 const Pay = async (req, res) => {
   let payment_id;
   const order_id = req.body.order_id;
@@ -200,7 +201,7 @@ const Pay = async (req, res) => {
       status: "success",
     });
   } catch (error) {
-    console.log(error);
+     logger.error(500,{message: error,stack: error.stack}); 
     let invalidMid = false;
     if (error?.response?.status == "401") {
       invalidMid = true;

@@ -4,7 +4,7 @@ const PspModel = require("../models/psp");
 const helpers = require("../utilities/helper/general_helper");
 const ServerResponse = require("../utilities/response/ServerResponse");
 const StatusCode = require("../utilities/statuscode/index");
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 const moment = require('moment');
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
@@ -460,7 +460,7 @@ class TerminalControllerClass {
       }
     } catch (error) {
       console.log(error);
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       return res
         .status(StatusCode.internalError)
         .send(ServerResponse.errormsg(error?.message));
@@ -473,7 +473,7 @@ class TerminalControllerClass {
       const _getstatus = await merchantOrderModel.order_query(query);
       return res.status(StatusCode.badRequest).send(_getstatus);
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       return res.status(StatusCode.internalError).send(error?.message);
     }
   };

@@ -1,4 +1,5 @@
 const path = require("path");
+const logger = require('../config/logger');
 require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
@@ -14,7 +15,7 @@ async function addDynamic(data, table_name) {
   try {
     response = await qb.query(query);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -35,7 +36,7 @@ async function getCustomerCard(order_id) {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -50,7 +51,7 @@ async function getSubscription(order_no) {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -64,7 +65,7 @@ async function checkCard({ cid, last_4_digit }) {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }

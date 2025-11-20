@@ -5,7 +5,7 @@ const helpers = require("../utilities/helper/general_helper");
 const enc_dec = require("../utilities/decryptor/decryptor");
 const admin_activity_logger = require("../utilities/activity-logger/admin_activity_logger");
 const date_formatter = require("../utilities/date_formatter/index"); // date formatter module
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 
 var city = {
     add: async (req, res) => {
@@ -39,14 +39,14 @@ var city = {
                         );
                     })
                     .catch((error) => {
-                        winston.error(error);
+                        logger.error(500,{message: error,stack: error.stack}); 
                         res.status(statusCode.internalError).send(
                             response.errormsg(error.message)
                         );
                     });
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -147,14 +147,14 @@ var city = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
             });
     },
     details: async (req, res) => {
-        let city_id = await enc_dec.cjs_decrypt(req.bodyString("city_id"));
+        let city_id =  enc_dec.cjs_decrypt(req.bodyString("city_id"));
         CityModel.selectOne("*", { id: city_id, deleted: 0 })
             .then(async (result) => {
                 let send_res = [];
@@ -181,7 +181,7 @@ var city = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );
@@ -221,13 +221,13 @@ var city = {
                     );
                 })
                 .catch((error) => {
-                    winston.error(error);
+                    logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(
                         response.errormsg(error.message)
                     );
                 });
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -256,13 +256,13 @@ var city = {
                     );
                 })
                 .catch((error) => {
-                    winston.error(error);
+                    logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(
                         response.errormsg(error.message)
                     );
                 });
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -291,13 +291,13 @@ var city = {
                     );
                 })
                 .catch((error) => {
-                    winston.error(error);
+                    logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(
                         response.errormsg(error.message)
                     );
                 });
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -326,13 +326,13 @@ var city = {
                     );
                 })
                 .catch((error) => {
-                    winston.error(error);
+                    logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(
                         response.errormsg(error.message)
                     );
                 });
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );

@@ -8,7 +8,7 @@ require("dotenv").config({ path: "../.env" });
 const date_formatter = require("../utilities/date_formatter/index"); // date formatter module
 const moment = require("moment");
 require("dotenv").config({ path: "../.env" });
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 
 var admin_user = {
     list: async (req, res) => {
@@ -84,7 +84,7 @@ var admin_user = {
                 );
             })
             .catch((error) => {
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error.message)
                 );

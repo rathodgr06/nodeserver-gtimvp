@@ -4,7 +4,7 @@ const response = require("../utilities/response/ServerResponse");
 const helpers = require("../utilities/helper/general_helper")
 const enc_dec = require("../utilities/decryptor/decryptor")
 const moment = require('moment');
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 
 var type_of_business = {
     add: async(req, res) => {
@@ -23,7 +23,7 @@ var type_of_business = {
                 type_of_business_model.add(ins_body).then((result) => {
                     res.status(statusCode.ok).send(response.successmsg('Added successfully.'));
                 }).catch((error) => {
-                    winston.error(error);
+                   logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(response.errormsg(error.message));
                 });
             }
@@ -57,7 +57,7 @@ var type_of_business = {
                 res.status(statusCode.ok).send(response.successdatamsg(send_res,'List fetched successfully.',total_count));
             })
             .catch((error) => {
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
                 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             });
@@ -80,7 +80,7 @@ var type_of_business = {
                 res.status(statusCode.ok).send(response.successdatamsg(send_res,'Details fetched successfully.'));
             })
             .catch((error) => {
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             });
     },
@@ -96,7 +96,7 @@ var type_of_business = {
             $ins_id = await type_of_business_model.updateDetails({id:type_of_business_id},insdata);
             res.status(statusCode.ok).send(response.successmsg('Record updated successfully'));
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },
@@ -112,7 +112,7 @@ var type_of_business = {
             $ins_id = await type_of_business_model.updateDetails({id:type_of_business_id},insdata);
             res.status(statusCode.ok).send(response.successmsg('Record deactivated successfully'));
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },
@@ -128,7 +128,7 @@ var type_of_business = {
             $ins_id = await type_of_business_model.updateDetails({id:type_of_business_id},insdata);
             res.status(statusCode.ok).send(response.successmsg('Record activated successfully'));
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },
@@ -144,7 +144,7 @@ var type_of_business = {
             $ins_id = await type_of_business_model.updateDetails({id:type_of_business_id},insdata);
             res.status(statusCode.ok).send(response.successmsg('Record deleted successfully'));
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },

@@ -18,7 +18,7 @@ const pool = require("../config/database");
 const date_formatter = require("../utilities/date_formatter/index"); // date formatter module
 const { EventEmitter } = require("events");
 const mailEventEmitter = new EventEmitter();
-const winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 
 mailEventEmitter.on("email", async ({ data }) => {
   try {
@@ -26,8 +26,7 @@ mailEventEmitter.on("email", async ({ data }) => {
 
     mailEventEmitter.emit("emailSent");
   } catch (error) {
-    winston.error(error);
-    console.error(error);
+   logger.error(500,{message: error,stack: error.stack}); 
     mailEventEmitter.emit("emailError", error);
   }
 });
@@ -111,7 +110,7 @@ const qr_generate = {
                 });
               })
               .catch((error) => {
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
                 res
                   .status(statusCode.internalError)
                   .send(response.errormsg(error.message));
@@ -125,7 +124,7 @@ const qr_generate = {
           }
         })
         .catch((error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
@@ -215,7 +214,7 @@ const qr_generate = {
               });
             })
             .catch((error) => {
-              winston.error(error);
+             logger.error(500,{message: error,stack: error.stack}); 
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error.message));
@@ -225,8 +224,7 @@ const qr_generate = {
           // res.status(statusCode.ok).send(response.successdatamsg(data, 'Payment link generated successfully'));
         })
         .catch((error) => {
-          console.log(error);
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
 
           res
             .status(statusCode.internalError)
@@ -241,7 +239,7 @@ const qr_generate = {
 
   update: async (req, res) => {
     let date = moment().format("YYYY-MM-DD HH:mm:ss");
-    let id = await enc_dec.cjs_decrypt(req.bodyString("id"));
+    let id =  enc_dec.cjs_decrypt(req.bodyString("id"));
     let check_data = await qrGenerateModule.selectOne({ id: id });
     if (check_data) {
       if (check_data.type_of_qr_code == "Dynamic_QR") {
@@ -323,7 +321,7 @@ const qr_generate = {
                     );
                 })
                 .catch((error) => {
-                  winston.error(error);
+                 logger.error(500,{message: error,stack: error.stack}); 
                   res
                     .status(statusCode.internalError)
                     .send(response.errormsg(error.message));
@@ -407,7 +405,7 @@ const qr_generate = {
                 );
             })
             .catch((error) => {
-              winston.error(error);
+             logger.error(500,{message: error,stack: error.stack}); 
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error.message));
@@ -426,6 +424,7 @@ const qr_generate = {
   },
 
   details: async (req, res) => {
+    try{
     const merchant_name = await qrGenerateModule.getMerchantName();
     // const merchant_code = await qrGenerateModule.getMerchantcode();
     // const merchant_mobile = await qrGenerateModule.getMerchantmobile();
@@ -584,12 +583,17 @@ const qr_generate = {
         .send(response.successdatamsg(resp, "Details fetched successfully."));
     } else {
       res
-        .status(statusCode.internalError)
+        .status(statusCode.badRequest)
         .send(response.errormsg("Invalid id."));
     }
+  }catch(error){
+     logger.error(500,{message: error,stack: error.stack}); 
+    res.status(statusCode.internalError).send(response.errorMsg("Something went wrong"));
+  }
   },
 
   link_details: async (req, res) => {
+    try{
     const merchant_name = await qrGenerateModule.getMerchantName();
     const merchant_code = await qrGenerateModule.getMerchantcode();
     const merchant_mobile = await qrGenerateModule.getMerchantmobile();
@@ -693,9 +697,13 @@ const qr_generate = {
         .send(response.successdatamsg(resp, "Details fetched successfully."));
     } else {
       res
-        .status(statusCode.internalError)
+        .status(statusCode.badRequest)
         .send(response.errormsg("Invalid id."));
     }
+  }catch(error){
+     logger.error(500,{message: error,stack: error.stack}); 
+res.status(statusCode.internalError).send(response.errorMsg("Something went wrong"));
+  }
   },
   payment_link_details: async (req, res) => {
     let company_name = await qrGenerateModule.get_company_name();
@@ -761,8 +769,7 @@ const qr_generate = {
             .send(response.successansmsg(data, "Details fetch successfully."));
       })
       .catch((error) => {
-        console.log(error);
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1102,7 +1109,7 @@ const qr_generate = {
           )
         );
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1269,7 +1276,7 @@ const qr_generate = {
         .status(statusCode.ok)
         .send(response.successdatamsg(send_res, "List fetched successfully."));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1315,7 +1322,7 @@ const qr_generate = {
     qrGenerateModule
       .add(data_link)
       .then(async (result) => {
-        let link_d = await encrypt_decrypt("encrypt", result.insertId);
+        let link_d =  encrypt_decrypt("encrypt", result.insertId);
         let logs_data = {
           merchant_id: req.credentials.merchant_id,
           // sub_merchant_id: await enc_dec.cjs_decrypt(
@@ -1366,14 +1373,14 @@ const qr_generate = {
             });
           })
           .catch((error) => {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res
               .status(statusCode.internalError)
               .send(response.errormsg(error.message));
           });
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1481,7 +1488,7 @@ const qr_generate = {
             .where({ payment_id: val.qr_id })
             .get(config.table_prefix + "qr_payment");
         } catch (error) {
-          console.error("Database query failed:", error);
+          logger.error(500,{message: error,stack: error.stack}); 
         } finally {
           qb.release();
         }
@@ -1558,7 +1565,7 @@ const qr_generate = {
 
   reset: async (req, res) => {
     const merchant_name = await qrGenerateModule.getMerchantName();
-    let id = await enc_dec.cjs_decrypt(req.bodyString("id"));
+    let id =  enc_dec.cjs_decrypt(req.bodyString("id"));
     let find_data = await qrGenerateModule.selectOne_type({
       id: id,
       type_of_qr_code: "Static_QR",
@@ -1650,7 +1657,7 @@ const qr_generate = {
                         );
                     })
                     .catch((error) => {
-                      winston.error(error);
+                     logger.error(500,{message: error,stack: error.stack}); 
                       res
                         .status(statusCode.internalError)
                         .send(response.errormsg(error.message));
@@ -1667,14 +1674,14 @@ const qr_generate = {
               });
             })
             .catch((error) => {
-              winston.error(error);
+             logger.error(500,{message: error,stack: error.stack}); 
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error.message));
             });
         })
         .catch((error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
@@ -1718,7 +1725,7 @@ const qr_generate = {
               );
           })
           .catch((error) => {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res
               .status(statusCode.internalError)
               .send(response.errormsg(error.message));
@@ -1760,14 +1767,14 @@ const qr_generate = {
               );
           })
           .catch((error) => {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res
               .status(statusCode.internalError)
               .send(response.errormsg(error.message));
           });
       }
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1806,7 +1813,7 @@ const qr_generate = {
               .send(response.successmsg("Payment link activated successfully"));
           })
           .catch((error) => {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res
               .status(statusCode.internalError)
               .send(response.errormsg(error.message));
@@ -1859,7 +1866,7 @@ const qr_generate = {
                   );
               })
               .catch((error) => {
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
                 res
                   .status(statusCode.internalError)
                   .send(response.errormsg(error.message));
@@ -1901,7 +1908,7 @@ const qr_generate = {
                 );
             })
             .catch((error) => {
-              winston.error(error);
+             logger.error(500,{message: error,stack: error.stack}); 
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error.message));
@@ -1909,7 +1916,7 @@ const qr_generate = {
         }
       }
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1920,12 +1927,12 @@ const qr_generate = {
     let register_at = moment().format("YYYY-MM-DD HH:mm:ss");
     const merchant_name = await qrGenerateModule.getMerchantName();
     const merchant_logo = await qrGenerateModule.getMerchantlogo();
-    let id = await enc_dec.cjs_decrypt(req.bodyString("id"));
+    let id =  enc_dec.cjs_decrypt(req.bodyString("id"));
     let qr_data = await qrGenerateModule.selectOne({ id: id });
     if (qr_data) {
       if (qr_data.type_of_qr_code == "Static_QR") {
         let data = {
-          id: await enc_dec.cjs_encrypt(id),
+          id:  enc_dec.cjs_encrypt(id),
           qr_id: qr_data.qr_id,
           merchant_name: merchant_name[qr_data.sub_merchant_id]
             ? merchant_name[qr_data.sub_merchant_id]
@@ -1993,7 +2000,7 @@ const qr_generate = {
                 .send(response.successmsg("Mail sent successfully"));
             })
             .catch((error) => {
-              winston.error(error);
+             logger.error(500,{message: error,stack: error.stack}); 
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error.message));
@@ -2087,7 +2094,7 @@ const qr_generate = {
                   .send(response.successmsg("Mail sent successfully"));
               })
               .catch((error) => {
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
                 res
                   .status(statusCode.internalError)
                   .send(response.errormsg(error.message));
@@ -2182,7 +2189,7 @@ const qr_generate = {
                     .send(response.successmsg("Mail sent successfully"));
                 })
                 .catch((error) => {
-                  winston.error(error);
+                 logger.error(500,{message: error,stack: error.stack}); 
                   res
                     .status(statusCode.internalError)
                     .send(response.errormsg(error.message));
@@ -2201,7 +2208,7 @@ const qr_generate = {
       }
     } else {
       res
-        .status(statusCode.internalError)
+        .status(statusCode.badRequest)
         .send(response.errormsg("Invalid id"));
     }
   },
@@ -2244,7 +2251,7 @@ const qr_generate = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2504,7 +2511,7 @@ const qr_generate = {
           )
         );
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -2562,7 +2569,7 @@ const qr_generate = {
       .add(data_link)
       .then(async (result) => {
         let de_qr_id = helpers.formatNumber(result.insertId);
-        let link_d = await encrypt_decrypt("encrypt", result.insertId);
+        let link_d =  encrypt_decrypt("encrypt", result.insertId);
         let logs_data = {
           sub_merchant_id: req.credentials.merchant_id,
           merchant_id: req.credentials.super_merchant_id,
@@ -2618,14 +2625,14 @@ const qr_generate = {
             });
           })
           .catch((error) => {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res
               .status(statusCode.internalError)
               .send(response.errormsg(error.message));
           });
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2724,7 +2731,7 @@ const qr_generate = {
         });
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2833,7 +2840,7 @@ const qr_generate = {
             .where({ payment_id: val.qr_id })
             .get(config.table_prefix + "qr_payment");
         } catch (error) {
-          console.error("Database query failed:", error);
+         logger.error(500,{message: error,stack: error.stack}); 
         } finally {
           qb.release();
         }
@@ -2958,13 +2965,13 @@ const qr_generate = {
             .send(response.successmsg("Payment link deactivated successfully"));
         })
         .catch((error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -3010,19 +3017,20 @@ const qr_generate = {
             .send(response.successmsg("Payment link activated successfully"));
         })
         .catch((error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
     }
   },
   open_paymentLink_details: async (req, res) => {
+    try{
     let qr_id = req.queryString("data_id");
 
     result = await qrGenerateModule.selectOne({
@@ -3095,41 +3103,55 @@ const qr_generate = {
         .send(response.successdatamsg(resp, "Details fetched successfully."));
     } else {
       res
-        .status(statusCode.internalError)
+        .status(statusCode.badRequest)
         .send(response.errormsg("Invalid id."));
     }
+  }catch(error){
+    logger.error(500,{message: error,stack: error.stack}); 
+    res.status(statusCode.internalError).send(response.errorMsg("Something went wrong"));
+  }
   },
   open_view_static_qr:async(req,res)=>{
-    console.log(req.credentials);
-    let result = await qrGenerateModule.selectOpenStaticQR({
-      'qr.deleted':0,
-      'qr.status':0,
-      'qr.is_reseted':0,
-      // 'qr.merchant_id':req.credentials.super_merchant_id,
-      'qr.sub_merchant_id':req.credentials.merchant_id,
-      'qr.type_of_qr_code':"Static_QR",
-      "qr.mode":req.credentials.type,
-      'mid.status':0,
-      'mid.deleted':0
-    },'merchant_qr_codes','mid');
-    if(result.length>0){
-      let data = [];
-      for(let row of result){
-        let obj = {
-          payment_link:process.env.QR_PAY_URL+row.qr_id,
-          qr_code: await QRCode.toDataURL(qr_link_url + row.qr_id)
+    try {
+      console.log(req.credentials);
+      let result = await qrGenerateModule.selectOpenStaticQR(
+        {
+          "qr.deleted": 0,
+          "qr.status": 0,
+          "qr.is_reseted": 0,
+          // 'qr.merchant_id':req.credentials.super_merchant_id,
+          "qr.sub_merchant_id": req.credentials.merchant_id,
+          "qr.type_of_qr_code": "Static_QR",
+          "qr.mode": req.credentials.type,
+          "mid.status": 0,
+          "mid.deleted": 0,
+        },
+        "merchant_qr_codes",
+        "mid"
+      );
+      if (result.length > 0) {
+        let data = [];
+        for (let row of result) {
+          let obj = {
+            payment_link: process.env.QR_PAY_URL + row.qr_id,
+            qr_code: await QRCode.toDataURL(qr_link_url + row.qr_id),
+          };
+          data.push(obj);
         }
-        data.push(obj);
+        res
+          .status(statusCode.ok)
+          .send(response.successdatamsg(data, "Details fetched successfully."));
+      } else {
+        res
+          .status(statusCode.ok)
+          .send(response.successdatamsg(result, "Mid is not added."));
       }
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
       res
-      .status(statusCode.ok)
-      .send(response.successdatamsg(data, "Details fetched successfully."));
-    }else{
-      res
-      .status(statusCode.ok)
-      .send(response.successdatamsg(result, "Mid is not added."));
+        .status(statusCode.internalError)
+        .send(response.errorMsg("Something went wrong"));
     }
-   
   }
 };
 

@@ -2,7 +2,7 @@ const statusCode = require("../utilities/statuscode/index");
 const response = require("../utilities/response/ServerResponse");
 const axios = require("axios");
 const FormData = require("form-data");
-const winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 
 const support_ticket_controller = {
   add: async (req, res) => {
@@ -91,7 +91,7 @@ const support_ticket_controller = {
           );
       })
       .catch(function (error) {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -177,7 +177,7 @@ const support_ticket_controller = {
           );
       })
       .catch(function (error) {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -234,7 +234,7 @@ const support_ticket_controller = {
           );
       })
       .catch(function (error) {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -256,7 +256,7 @@ const support_ticket_controller = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -294,7 +294,7 @@ const support_ticket_controller = {
           );
       })
       .catch(function (error) {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -366,7 +366,7 @@ const support_ticket_controller = {
           );
       })
       .catch(function (error) {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)
@@ -392,7 +392,7 @@ const support_ticket_controller = {
     axios(config)
       .then(function (response) {})
       .catch(function (error) {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
       });
   },
 
@@ -435,7 +435,7 @@ const support_ticket_controller = {
           );
       })
       .catch(function (error) {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
 
         res
           .status(statusCode.internalError)

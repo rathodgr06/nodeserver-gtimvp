@@ -7,7 +7,7 @@ const helpers = require("../utilities/helper/general_helper")
 const enc_dec = require("../utilities/decryptor/decryptor")
 const admin_activity_logger =require('../utilities/activity-logger/admin_activity_logger')
 const moment = require('moment');
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 
 const path = require('path');
 require('dotenv').config({ path: "../.env" });
@@ -70,11 +70,11 @@ var Entity = {
                 admin_activity_logger.add(module_and_user,added_name,headers).then((result)=>{
                     res.status(statusCode.ok).send(response.successmsg('Entity added successfully.'));
                 }).catch((error)=>{
-                    winston.error(error);
+                    logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(response.errormsg(error.message));
                 })
             }).catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             });
         }
@@ -123,7 +123,7 @@ var Entity = {
             })
         
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             });
         
@@ -200,13 +200,13 @@ var Entity = {
                 res.status(statusCode.ok).send(response.successdatamsg(send_res, 'List fetched successfully.', total_count));
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             });
         
     },
     details: async (req, res) => {
-      
+        try{
         let entity_id = enc_dec.cjs_decrypt(req.bodyString("entity_id"));
         let submerchant_id = enc_dec.cjs_decrypt(req.bodyString("submerchant_id"));
      
@@ -328,9 +328,13 @@ var Entity = {
                 res.status(statusCode.ok).send(response.successdatamsg(send_res, 'Details fetched successfully.'));
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             });
+        }catch(error){
+            
+            logger.error(500,{message: error,stack: error.stack}); 
+        }
     },
 
     update: async (req, res) => {
@@ -389,7 +393,7 @@ var Entity = {
                     admin_activity_logger.edit(module_and_user,entity_id,headers).then((result)=>{
                         res.status(statusCode.ok).send(response.successmsg('Entity type updated successfully'));
                     }).catch((error)=>{
-                        winston.error(error);
+                        logger.error(500,{message: error,stack: error.stack}); 
                         res.status(statusCode.internalError).send(response.errormsg(error.message));
                     })
                 
@@ -399,7 +403,7 @@ var Entity = {
                 }
             }
         } catch(error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },
@@ -425,11 +429,11 @@ var Entity = {
             admin_activity_logger.deactivate(module_and_user,entity_id,headers).then((result)=>{
                 res.status(statusCode.ok).send(response.successmsg('Entity type deactivated successfully'));
             }).catch((error)=>{
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             })
         } catch(error)  {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },
@@ -454,11 +458,11 @@ var Entity = {
             admin_activity_logger.activate(module_and_user,entity_id,headers).then((result)=>{
                 res.status(statusCode.ok).send(response.successmsg('Entity type activated successfully'));
             }).catch((error)=>{
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             })
         } catch(error)  {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },
@@ -480,11 +484,11 @@ var Entity = {
             admin_activity_logger.delete(module_and_user,entity_id,headers).then((result)=>{
                 res.status(statusCode.ok).send(response.successmsg('Entity type deleted successfully'));
             }).catch((error)=>{
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             })
         } catch(error)  {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },

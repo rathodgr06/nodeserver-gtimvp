@@ -1,4 +1,5 @@
 const path = require("path");
+const logger = require('../config/logger');
 require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
@@ -23,7 +24,7 @@ var MerchantEkycModel = {
     try {
       response = await qb.select(selection).where(condition).get(db_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -40,7 +41,7 @@ var MerchantEkycModel = {
         .get(db_table);
         console.log(qb.last_query());
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -55,7 +56,7 @@ var MerchantEkycModel = {
         .where(condition)
         .get(super_merchant_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -70,7 +71,7 @@ var MerchantEkycModel = {
         .where({ deleted: 0, status: 0 })
         .get(config.table_prefix + "master_mcc_category");
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -86,7 +87,7 @@ var MerchantEkycModel = {
         .where(condition)
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -104,7 +105,7 @@ var MerchantEkycModel = {
         '",mcc) AND status=0 AND deleted=0';
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -120,7 +121,7 @@ var MerchantEkycModel = {
         .where(condition)
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -132,7 +133,7 @@ var MerchantEkycModel = {
     try {
       response = await qb.returning("id").insert(merchantDetailTable, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -144,7 +145,7 @@ var MerchantEkycModel = {
     try {
       response = await qb.returning("id").insert(merchantPSPStatus, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -156,7 +157,7 @@ var MerchantEkycModel = {
     try {
       response = await qb.returning("id").insert(merchantPSPOnboard, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -172,7 +173,7 @@ var MerchantEkycModel = {
         .where(condition)
         .update(merchantDetailTable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -184,7 +185,7 @@ var MerchantEkycModel = {
     try {
       response = await qb.set(data).where(condition).update(db_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -199,7 +200,7 @@ var MerchantEkycModel = {
         .where(condition)
         .update(super_merchant_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -211,7 +212,7 @@ var MerchantEkycModel = {
     try {
       response = await qb.set(data).where(condition).update(table_name);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -223,7 +224,7 @@ var MerchantEkycModel = {
     try {
       response = await qb.returning("id").insert(businessOwnerTable, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -238,7 +239,7 @@ var MerchantEkycModel = {
         .where(condition)
         .get(businessOwnerTable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -250,7 +251,7 @@ var MerchantEkycModel = {
     try {
       response = await qb.returning("id").insert(executiveTable, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -262,7 +263,7 @@ var MerchantEkycModel = {
     try {
       response = await qb.select(selection).where(condition).get(table_name);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -279,7 +280,7 @@ var MerchantEkycModel = {
         .group_by("document_for")
         .get(table_name);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -291,7 +292,7 @@ var MerchantEkycModel = {
     try {
       response = await qb.select(selection).where(condition).get(table_name);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -303,7 +304,7 @@ var MerchantEkycModel = {
     try {
       response = await qb.select(selection).where(condition).get(table_name);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -318,7 +319,7 @@ var MerchantEkycModel = {
         .where(condition)
         .get(merchantDetailTable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -379,7 +380,7 @@ var MerchantEkycModel = {
         .where(condition)
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -439,7 +440,7 @@ var MerchantEkycModel = {
         .where(condition)
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -451,7 +452,7 @@ var MerchantEkycModel = {
     try {
       response = await qb.set(data).where(condition).update(merchantDocTable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -463,7 +464,7 @@ var MerchantEkycModel = {
     try {
       response = await qb.returning("id").insert(merchantDocTable, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -475,7 +476,7 @@ var MerchantEkycModel = {
     try {
       response = await qb.returning("id").insert(table, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -507,7 +508,7 @@ var MerchantEkycModel = {
         .order_by("med.id", "desc")
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -543,7 +544,7 @@ var MerchantEkycModel = {
         .order_by("med.id", "desc")
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -578,7 +579,7 @@ var MerchantEkycModel = {
         .order_by("med.id", "desc")
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -602,7 +603,7 @@ var MerchantEkycModel = {
         .join(merchant_key_and_secret + " m", "s.id=m.merchant_id")
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -618,7 +619,7 @@ var MerchantEkycModel = {
         .order_by("id", "desc")
         .get(super_merchant_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -644,7 +645,7 @@ var MerchantEkycModel = {
               limit.start
           );
         } catch (error) {
-          console.error("Database query failed:", error);
+          logger.error(500,{message: error,stack: error.stack}); 
         } finally {
           qb.release();
         }
@@ -658,7 +659,7 @@ var MerchantEkycModel = {
             .limit(limit.perpage, limit.start)
             .get(super_merchant_table);
         } catch (error) {
-          console.error("Database query failed:", error);
+          logger.error(500,{message: error,stack: error.stack}); 
         } finally {
           qb.release();
         }
@@ -678,7 +679,7 @@ var MerchantEkycModel = {
               " order by id desc"
           );
         } catch (error) {
-          console.error("Database query failed:", error);
+          logger.error(500,{message: error,stack: error.stack}); 
         } finally {
           qb.release();
         }
@@ -691,7 +692,7 @@ var MerchantEkycModel = {
             .order_by("id", "desc")
             .get(super_merchant_table);
         } catch (error) {
-          console.error("Database query failed:", error);
+          logger.error(500,{message: error,stack: error.stack}); 
         } finally {
           qb.release();
         }
@@ -709,7 +710,7 @@ var MerchantEkycModel = {
         "select count('id') as count from " + table_name + " where " + condition
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -728,7 +729,7 @@ var MerchantEkycModel = {
           " and (ekyc_done=1 or ekyc_done=4) "
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -740,7 +741,7 @@ var MerchantEkycModel = {
     try {
       response = await qb.delete(merchantDocTable, condition);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -758,7 +759,7 @@ var MerchantEkycModel = {
         .limit("1")
         .get(doctable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -774,7 +775,7 @@ var MerchantEkycModel = {
         .order_by("id", "asc")
         .get(db_table);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -805,7 +806,7 @@ var MerchantEkycModel = {
         );
       }
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -824,7 +825,7 @@ var MerchantEkycModel = {
           condition
       );
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -840,7 +841,7 @@ var MerchantEkycModel = {
         .where(condition)
         .get();
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -907,7 +908,7 @@ var MerchantEkycModel = {
         },
       };
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
       response = {
         error: true,
         message: "Database query failed",
@@ -925,7 +926,7 @@ var MerchantEkycModel = {
     try {
       response = await qb.returning("id").insert("pg_merchant_accounts", data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -1023,7 +1024,7 @@ var MerchantEkycModel = {
       console.log("🚀 ~ qb query:", query);
 
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -1047,7 +1048,7 @@ var MerchantEkycModel = {
       response = await qb.query(query)
       console.log("query....", qb.last_query())
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }

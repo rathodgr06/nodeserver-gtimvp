@@ -11,7 +11,7 @@ const checkifrecordexist = require("../utilities/validations/checkifrecordexist"
 const moment = require("moment");
 const pricing_model = require("../models/pricing_plan");
 const country = require("./country");
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 
 require("dotenv").config({ path: "../.env" });
 
@@ -89,7 +89,7 @@ var pricing_plan = {
                 });
             })
             .catch((error) => {
-                winston.error(error);
+               logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(
                     response.errormsg(error)
                 );
@@ -272,10 +272,10 @@ var pricing_plan = {
                     );
                 })
                 .catch((error) => {
-                    winston.error(error);
+                   logger.error(500,{message: error,stack: error.stack}); 
                 });
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(
                 response.errormsg(error.message)
             );
@@ -375,7 +375,7 @@ var pricing_plan = {
                 .status(statusCode.ok)
                 .send(response.successmsg("Pricing plan deleted successfully"));
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error));
         }
     },
@@ -446,7 +446,7 @@ var pricing_plan = {
 
                     })
                     .catch((error) => {
-                        winston.error(error);
+                       logger.error(500,{message: error,stack: error.stack}); 
                         fault++;
 
                     });
@@ -462,7 +462,7 @@ var pricing_plan = {
                     })
                     .catch((error) => {
 
-                        winston.error(error);
+                       logger.error(500,{message: error,stack: error.stack}); 
 
                         fault++;
                         // res.status(statusCode.internalError).send(
@@ -586,7 +586,7 @@ var pricing_plan = {
                     response.successmsg("Transaction rate deleted successfully")
                 );
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
 
             res.status(statusCode.internalError).send(response.errormsg(error));
         }
@@ -628,7 +628,7 @@ var pricing_plan = {
                         );
                     })
                     .catch((error) => {
-                        winston.error(error);
+                       logger.error(500,{message: error,stack: error.stack}); 
                         return res.status(statusCode.internalError).send(
                             response.errormsg(error)
                         );
@@ -656,7 +656,7 @@ var pricing_plan = {
             //             );
             //         })
             //         .catch((error) => {
-            //             winston.error(error);
+            //            logger.error(500,{message: error,stack: error.stack}); 
             //             return res.status(statusCode.internalError).send(
             //                 response.errormsg(error)
             //             );
@@ -685,7 +685,7 @@ var pricing_plan = {
             //             );
             //         })
             //         .catch((error) => {
-            //             winston.error(error);
+            //            logger.error(500,{message: error,stack: error.stack}); 
             //             return res.status(statusCode.internalError).send(
             //                 response.errormsg(error)
             //             );
@@ -694,7 +694,7 @@ var pricing_plan = {
 
 
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error));
         }
     },
@@ -918,7 +918,7 @@ var pricing_plan = {
                      );
                  })
                  .catch((error) => {
-                     winston.error(error);
+                    logger.error(500,{message: error,stack: error.stack}); 
                      res.status(statusCode.internalError).send(
                          response.errormsg(error)
                      );
@@ -926,7 +926,7 @@ var pricing_plan = {
          });*/
         } catch (error) {
             console.log(error);
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error));
         }
     },
@@ -1144,7 +1144,7 @@ var pricing_plan = {
                             );
                         })
                         .catch((error) => {
-                        winston.error(error);
+                       logger.error(500,{message: error,stack: error.stack}); 
                             
                             res.status(statusCode.internalError).send(
                                 response.errormsg(error)
@@ -1153,7 +1153,7 @@ var pricing_plan = {
                 });*/
         } catch (error) {
             console.log(error);
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error));
         }
     },
@@ -1306,7 +1306,7 @@ var pricing_plan = {
                 )
             );
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error));
         }
     },
@@ -1348,7 +1348,7 @@ var pricing_plan = {
 
                     })
                     .catch((error) => {
-                        winston.error(error);
+                       logger.error(500,{message: error,stack: error.stack}); 
                         fault++;
 
                     });
@@ -1364,7 +1364,7 @@ var pricing_plan = {
                         pass++;
                     })
                     .catch((error) => {
-                        winston.error(error);
+                       logger.error(500,{message: error,stack: error.stack}); 
                         fault++;
                         // res.status(statusCode.internalError).send(
                         //     response.errormsg(error)
@@ -1441,7 +1441,7 @@ var pricing_plan = {
                 .status(statusCode.ok)
                 .send(response.successmsg("Feature rate deleted successfully"));
         } catch (error) {
-            winston.error(error);
+           logger.error(500,{message: error,stack: error.stack}); 
 
             res.status(statusCode.internalError).send(response.errormsg(error));
         }

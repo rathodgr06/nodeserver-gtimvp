@@ -8,7 +8,7 @@ const helpers = require("../utilities/helper/general_helper");
 const server_addr = process.env.SERVER_LOAD;
 const port = process.env.SERVER_PORT;
 const moment = require("moment");
-const winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 
 var data_set = {
   add: async (req, res) => {
@@ -57,7 +57,7 @@ var data_set = {
         .status(statusCode.ok)
         .send(response.successmsg("Merchant registered successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -152,7 +152,7 @@ var data_set = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -191,7 +191,7 @@ var data_set = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -233,7 +233,7 @@ var data_set = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -285,7 +285,7 @@ var data_set = {
         .status(statusCode.ok)
         .send(response.successmsg("Merchant updated successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -304,7 +304,7 @@ var data_set = {
         .status(statusCode.ok)
         .send(response.successmsg("Merchant deactivated successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -322,7 +322,7 @@ var data_set = {
         .status(statusCode.ok)
         .send(response.successmsg("Merchant activated successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -340,7 +340,7 @@ var data_set = {
         .status(statusCode.ok)
         .send(response.successmsg("Merchant deleted successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -358,7 +358,7 @@ var data_set = {
         .status(statusCode.ok)
         .send(response.successmsg("Merchant blocked successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -376,7 +376,7 @@ var data_set = {
         .status(statusCode.ok)
         .send(response.successmsg("Merchant unblocked successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -400,7 +400,7 @@ var data_set = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -428,7 +428,7 @@ var data_set = {
         .status(statusCode.ok)
         .send(response.successmsg("Merchant branding updated successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -458,7 +458,7 @@ var data_set = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -487,7 +487,7 @@ var data_set = {
           response.successmsg("Merchant pricing plan updated successfully")
         );
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -520,13 +520,13 @@ var data_set = {
             );
         })
         .catch((error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -722,7 +722,7 @@ var data_set = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -763,7 +763,7 @@ var data_set = {
         .status(statusCode.ok)
         .send(response.successmsg("Meeting added successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -806,7 +806,7 @@ var data_set = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -873,7 +873,7 @@ var data_set = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -894,7 +894,7 @@ var data_set = {
         .status(statusCode.ok)
         .send(response.successmsg("Meeting updated successfully"));
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },

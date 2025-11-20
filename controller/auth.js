@@ -30,9 +30,10 @@ const pool = require("../config/database");
 const date_formatter = require("../utilities/date_formatter/index"); // date formatter module
 const winston = require("../utilities/logmanager/winston");
 const nodeCache = require("../utilities/helper/CacheManeger");
-
+const logger = require('../config/logger');
 var Auth = {
   login: async (req, res) => {
+    try{
     let username = req.bodyString("username");
     let password = req.bodyString("password");
 
@@ -237,6 +238,9 @@ var Auth = {
         .status(statusCode.unauthorized)
         .send(response.errormsg("Invalid email or password"));
     }
+  }catch(error){
+     logger.error(500,{message: error,stack: error.stack}); 
+  }
   },
 
   verify: async (req, res) => {
@@ -302,7 +306,7 @@ var Auth = {
         }
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -366,6 +370,7 @@ var Auth = {
     }
   },
   merchantlogin: async (req, res) => {
+    try{
     let username = req.bodyString("username");
     let password = req.bodyString("password");
 
@@ -456,11 +461,15 @@ var Auth = {
         .status(statusCode.unauthorized)
         .send(response.errormsg("Invalid username or password"));
     }
+  }catch(error){
+     logger.error(500,{message: error,stack: error.stack}); 
+  }
   },
   profile: async (req, res) => {
     res.status(statusCode.ok).send(response.successmsg());
   },
   changepassword: async (req, res) => {
+    try{
     let new_password = req.bodyString("new_password");
     let hashPassword = await encrypt_decrypt("encrypt", new_password);
     if (req.user.type == "admin") {
@@ -487,9 +496,13 @@ var Auth = {
     res
       .status(statusCode.ok)
       .send(response.successmsg("Password updated successfully"));
+  }catch(error){
+     logger.error(500,{message: error,stack: error.stack}); 
+  }
   },
 
   updatePassword: async (req, res) => {
+    try{
     let email = req.bodyString("email");
     let foundUser = await AdminModel.findsingle({ email: email });
     if (foundUser) {
@@ -520,9 +533,15 @@ var Auth = {
         .status(statusCode.ok)
         .send(response.errormsg("Malicious Activity Performed"));
     }
+  }catch(error){
+     logger.error(500,{message: error,stack: error.stack}); 
+  }
+
+
   },
 
   forget_password: async (req, res) => {
+    try{
     let email = req.bodyString("email");
     let type = req.bodyString("user");
     let foundUser;
@@ -584,9 +603,13 @@ var Auth = {
           response.successmsg("This email ID is not associated to any account.")
         );
     }
+  }catch(error){
+     logger.error(500,{message: error,stack: error.stack}); 
+  }
   },
 
   updateForgetPassword: async (req, res) => {
+    try{
     let authtoken = req.bodyString("authtoken");
     let check_auth_token = await checkCustomToken(authtoken);
 
@@ -621,8 +644,12 @@ var Auth = {
     res
       .status(statusCode.ok)
       .send(response.successdatamsg(data, "Password update successfully."));
+  }catch(error){
+     logger.error(500,{message: error,stack: error.stack}); 
+  }
   },
   encrypt_mobile_no_and_code: async (req, res) => {
+    try{
     let data = {
       mobile_no: encrypt_decrypt(
         "encrypt",
@@ -643,8 +670,12 @@ var Auth = {
     res
       .status(statusCode.ok)
       .send(response.successdatamsg(data, "Encrypted successfully."));
+  }catch(error){
+     logger.error(500,{message: error,stack: error.stack}); 
+  }
   },
   receive_sms: async (req, res) => {
+    try{
     let msg = req.body.Body;
     let from = req.body.From;
     let dec_msg = encrypt_decrypt("decrypt", msg);
@@ -764,11 +795,15 @@ var Auth = {
         .status(statusCode.ok)
         .send(response.errormsg("Unable to verify mobile no."));
     }
+  }catch(error){
+     logger.error(500,{message: error,stack: error.stack}); 
+  }
   },
   receive_sms_fail: async (req, res) => {
     res.status(statusCode.internalError).send(response.errormsg("SMS Fail"));
   },
   registerCustomer: async (req, res) => {
+    try{
     let is_existing = req.bodyString("is_existing");
     if (is_existing == 1) {
       let foundCust = await CustomerModel.selectOne("email,name,id", {
@@ -826,14 +861,18 @@ var Auth = {
             );
         })
         .catch((error) => {
-          winston.error(error);
+          logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     }
+  }catch(error){
+     logger.error(500,{message: error,stack: error.stack}); 
+  }
   },
   customerPin: async (req, res) => {
+    try{
     let selection = "id,mobile_code,mobile_no";
     let condition = {
       id: encrypt_decrypt("decrypt", req.bodyString("cid")),
@@ -857,11 +896,14 @@ var Auth = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
       });
+    }catch(error){
+       logger.error(500,{message: error,stack: error.stack}); 
+    }
   },
   customer_login: async (req, res) => {
     let cid = encrypt_decrypt("decrypt", req.bodyString("cid"));
@@ -916,7 +958,7 @@ var Auth = {
         res.status(statusCode.ok).send(response.errormsg("Invalid cid or pin"));
       }
     } catch (error) {
-      winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -952,7 +994,7 @@ var Auth = {
         res.status(statusCode.ok).send(response.errorMsg("Unable to logout."));
       }
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));

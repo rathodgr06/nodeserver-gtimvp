@@ -1,4 +1,5 @@
 const path = require("path");
+const logger = require('../config/logger');
 require("dotenv").config({ path: "../.env" });
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
@@ -16,7 +17,7 @@ async function getFeatureMerchant() {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -30,7 +31,7 @@ async function getTransactionMerchant() {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -65,7 +66,7 @@ async function getTransactionData(sub_merchant_id) {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -79,7 +80,7 @@ async function getTransactionPayDartChargesData(sub_merchant_id) {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -97,7 +98,7 @@ async function getSubMerchantData(sub_merchant_id, created_at) {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -119,7 +120,7 @@ async function getFeatureData(sub_merchant_id) {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -140,7 +141,7 @@ async function getFeatureBuyData(sub_merchant_id) {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -155,7 +156,7 @@ async function create_invoice(data, table_name) {
       .returning("id")
       .insert(`${config.table_prefix}${table_name}`, data);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -169,7 +170,7 @@ async function update_transaction_status(merchant_id) {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -182,7 +183,7 @@ async function update_feature_status(merchant_id) {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -196,7 +197,7 @@ async function getInvoiceToMerchant(sub_merchant_id, created_at) {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -221,7 +222,7 @@ async function checkInvoiceToMerchant(sub_merchant_id, type) {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -241,7 +242,7 @@ async function sub_merchantInvoice(sub_merchant_id, created_at) {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -261,7 +262,7 @@ async function getInvoiceToPsp(sub_merchant_id, created_at) {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -279,7 +280,7 @@ async function checkInvoiceToPsp(sub_merchant_id, type) {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }
@@ -306,7 +307,7 @@ async function getTransactionBuyRateAndSellRateDiff(sub_merchant_id) {
   try {
     response = await qb.query(sql);
   } catch (error) {
-    console.error("Database query failed:", error);
+    logger.error(500,{message: error,stack: error.stack}); 
   } finally {
     qb.release();
   }

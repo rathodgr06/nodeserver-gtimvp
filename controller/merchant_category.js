@@ -5,7 +5,7 @@ const helpers = require("../utilities/helper/general_helper")
 const enc_dec = require("../utilities/decryptor/decryptor")
 const moment = require('moment');
 const date_formatter = require("../utilities/date_formatter/index"); // date formatter module
-const winston = require('../utilities/logmanager/winston');
+const logger = require('../config/logger');
 
 var merchant_category = {
     add: async(req, res) => {
@@ -26,7 +26,7 @@ var merchant_category = {
                 MerchantCategoryModel.add(ins_body).then((result) => {
                     res.status(statusCode.ok).send(response.successmsg('Added successfully.'));
                 }).catch((error) => {
-                    winston.error(error);
+                    logger.error(500,{message: error,stack: error.stack}); 
                     res.status(statusCode.internalError).send(response.errormsg(error.message));
                 });
             }
@@ -56,7 +56,7 @@ var merchant_category = {
                 res.status(statusCode.ok).send(response.successdatamsg(send_res,'List fetched successfully.'));
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             });
     },
@@ -78,7 +78,7 @@ var merchant_category = {
                 res.status(statusCode.ok).send(response.successdatamsg(send_res,'Details fetched successfully.'));
             })
             .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res.status(statusCode.internalError).send(response.errormsg(error.message));
             });
     },
@@ -99,7 +99,7 @@ var merchant_category = {
             
             res.status(statusCode.ok).send(response.successmsg('Merchant category updated successfully'));
         } catch (error) {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     }

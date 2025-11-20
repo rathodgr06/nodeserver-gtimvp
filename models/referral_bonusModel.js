@@ -4,7 +4,7 @@ const config = require("../config/config.json")[env];
 const pool = require("../config/database");
 const dbtable = config.table_prefix + "referral_bonus";
 const helpers = require("../utilities/helper/general_helper");
-
+const logger = require('../config/logger');
 var dbModel = {
   // insert a record
   addBonus: async (data) => {
@@ -13,7 +13,7 @@ var dbModel = {
     try {
       response = await qb.returning("id").insert(dbtable, data);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -60,7 +60,7 @@ var dbModel = {
     try {
       response = await qb.query(query);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }
@@ -75,7 +75,7 @@ var dbModel = {
     try {
       response = await qb.set(data).where(condition).update(dbtable);
     } catch (error) {
-      console.error("Database query failed:", error);
+      logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
     }

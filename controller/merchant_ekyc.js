@@ -27,7 +27,7 @@ const referrer_model = require("../models/referrer_model");
 const pool = require("../config/database");
 const nationality = require("./nationality");
 const date_formatter = require("../utilities/date_formatter/index"); // date formatter module
-let winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 const admin_activity_logger = require("../utilities/activity-logger/admin_activity_logger");
 const nodeCache = require("../utilities/helper/CacheManeger");
 const MerchantSetupModal = require("../models/MerchantSetupModal");
@@ -124,7 +124,7 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -161,7 +161,7 @@ var MerchantEkyc = {
           .send(response.successdatamsg(tree, "mcc codes fetch successfully"));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -284,8 +284,7 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-        console.log(error);
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -315,7 +314,7 @@ var MerchantEkyc = {
           .send(response.successdatamsg(send_res, "psp fetch successfully"));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -361,7 +360,7 @@ var MerchantEkyc = {
               await helpers.complete_kyc_step(submerchant_id, 1);
             })
             .catch((error) => {
-              winston.error(error);
+              logger.error(500,{message: error,stack: error.stack}); 
               err = error;
             });
         } else {
@@ -396,8 +395,8 @@ var MerchantEkyc = {
               );
               await helpers.complete_kyc_step(submerchant_id, 1);
             })
-            .catch((err) => {
-              winston.error(err);
+            .catch((error) => {
+             logger.error(500,{message: error,stack: error.stack}); 
               err = error;
             });
         }
@@ -411,7 +410,7 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -448,7 +447,7 @@ var MerchantEkyc = {
               await helpers.complete_kyc_step(submerchant_id, 1);
             })
             .catch((error) => {
-              winston.error(error);
+              logger.error(500,{message: error,stack: error.stack}); 
               err = error;
             });
         } else {
@@ -475,8 +474,8 @@ var MerchantEkyc = {
               );
               await helpers.complete_kyc_step(submerchant_id, 1);
             })
-            .catch((err) => {
-              winston.error(error);
+            .catch((error) => {
+              logger.error(500,{message: error,stack: error.stack}); 
               err = error;
             });
         }
@@ -617,7 +616,7 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -695,7 +694,7 @@ var MerchantEkyc = {
               await helpers.complete_kyc_step(submerchant_id, 2);
             })
             .catch((error) => {
-              winston.error(error);
+              logger.error(500,{message: error,stack: error.stack}); 
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error));
@@ -776,7 +775,7 @@ var MerchantEkyc = {
                 .send(response.successmsg("Updated successfully"));
             })
             .catch((error) => {
-              winston.error(error);
+              logger.error(500,{message: error,stack: error.stack}); 
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error));
@@ -906,11 +905,12 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
   representative_update: async (req, res) => {
+    try{
     //step-3
     let err = "";
     let entity_id = encrypt_decrypt("decrypt", req.bodyString("entity_type"));
@@ -996,7 +996,7 @@ var MerchantEkyc = {
                 await helpers.complete_kyc_step(submerchant_id, 3);
               })
               .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res
                   .status(statusCode.internalError)
                   .send(response.errormsg(error));
@@ -1036,7 +1036,7 @@ var MerchantEkyc = {
                 await helpers.complete_kyc_step(submerchant_id, 3);
               })
               .catch((error) => {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 res
                   .status(statusCode.internalError)
                   .send(response.errormsg(error));
@@ -1168,10 +1168,13 @@ var MerchantEkyc = {
           }
         })
         .catch((error) => {
-          winston.error(error);
+          logger.error(500,{message: error,stack: error.stack}); 
           res.status(statusCode.internalError).send(response.errormsg(error));
         });
     }
+  }catch(error){
+     logger.error(500,{message: error,stack: error.stack}); 
+  }
   },
   add_business_owner: async (req, res) => {
     //step-4
@@ -1440,7 +1443,7 @@ var MerchantEkyc = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
     // }
@@ -1600,12 +1603,12 @@ var MerchantEkyc = {
               );
           })
           .catch((error) => {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error));
           });
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -1747,7 +1750,7 @@ var MerchantEkyc = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -1795,7 +1798,7 @@ var MerchantEkyc = {
                 .send(response.successmsg("Updated successfully"));
             })
             .catch((error) => {
-              winston.error(error);
+              logger.error(500,{message: error,stack: error.stack}); 
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error));
@@ -1825,7 +1828,7 @@ var MerchantEkyc = {
                 .send(response.successmsg("Updated successfully"));
             })
             .catch((error) => {
-              winston.error(error);
+              logger.error(500,{message: error,stack: error.stack}); 
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error));
@@ -1833,7 +1836,7 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -1888,7 +1891,7 @@ var MerchantEkyc = {
                 .send(response.successmsg("Updated successfully"));
             })
             .catch((error) => {
-              winston.error(error);
+              logger.error(500,{message: error,stack: error.stack}); 
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error));
@@ -1926,7 +1929,7 @@ var MerchantEkyc = {
                 .send(response.successmsg("Updated successfully"));
             })
             .catch((error) => {
-              winston.error(error);
+              logger.error(500,{message: error,stack: error.stack}); 
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error));
@@ -1934,7 +1937,7 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -2349,7 +2352,7 @@ var MerchantEkyc = {
                     });
                   }
                 } catch (error) {
-                  winston.error(error);
+                  logger.error(500,{message: error,stack: error.stack}); 
                   return error.response;
                 }
               });
@@ -2372,7 +2375,7 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -2784,7 +2787,7 @@ var MerchantEkyc = {
                   );
                 }
               } catch (error) {
-                winston.error(error);
+                logger.error(500,{message: error,stack: error.stack}); 
                 return error.response;
               }
             });
@@ -2806,7 +2809,7 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -2824,12 +2827,13 @@ var MerchantEkyc = {
           .send(response.successmsg("Video kyc status updated successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
 
   send_psp_mail: async (req, res) => {
+    try{
     let submerchant_id = encrypt_decrypt("decrypt", req.body.submerchant_id);
     let merchant_details = await MerchantEkycModel.selectMerchantDetails("*", {
       merchant_id: submerchant_id,
@@ -3655,6 +3659,12 @@ var MerchantEkyc = {
     res
       .status(statusCode.ok)
       .send(response.successmsg("Mail send successfully"));
+  }catch(error){
+     logger.error(500,{message: error,stack: error.stack}); 
+      res
+      .status(statusCode.internalError)
+      .send(response.errorMsg("Something went wrong"));
+  }
   },
   send_psp_mail_old: async (req, res) => {
     let submerchant_id = encrypt_decrypt("decrypt", req.body.submerchant_id);
@@ -5210,7 +5220,7 @@ var MerchantEkyc = {
           .send(response.successmsg("Business owner deleted successfully"));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -5249,7 +5259,7 @@ var MerchantEkyc = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -5287,7 +5297,7 @@ var MerchantEkyc = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -5304,7 +5314,7 @@ var MerchantEkyc = {
           .send(response.successmsg("Business executive deleted successfully"));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -5751,13 +5761,12 @@ var MerchantEkyc = {
           })
           .catch((error) => {
             console.log(error);
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error));
           });
       })
       .catch((error) => {
-        console.log(error);
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -6549,13 +6558,12 @@ var MerchantEkyc = {
           })
           .catch((error) => {
             console.log(error);
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res.status(statusCode.internalError).send(response.errormsg(error));
           });
       })
       .catch((error) => {
-        console.log(error);
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -6686,8 +6694,8 @@ var MerchantEkyc = {
                   }
                 })
 
-                .catch((err) => {
-                  winston.error(err);
+                .catch((error) => {
+                 logger.error(500,{message: error,stack: error.stack}); 
                 });
 
             // event code here
@@ -6726,13 +6734,13 @@ var MerchantEkyc = {
                       // );
                     })
                     .catch((error) => {
-                      winston.error(error);
+                      logger.error(500,{message: error,stack: error.stack}); 
                       res
                         .status(statusCode.internalError)
                         .send(response.errormsg(error.message));
                     });
                 } catch (error) {
-                  winston.error(error);
+                  logger.error(500,{message: error,stack: error.stack}); 
                   referralEmitter.emit("registerReferralError", error);
                 }
               }
@@ -6752,7 +6760,7 @@ var MerchantEkyc = {
           .send(response.successmsg("Ekyc status updated successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -6783,7 +6791,7 @@ var MerchantEkyc = {
           response.successmsg("Supermerchant profile updated successfully")
         );
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -6841,7 +6849,7 @@ var MerchantEkyc = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -6934,14 +6942,15 @@ var MerchantEkyc = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
       });
   },
   update_owners_status: async (req, res) => {
-    let owner_id = await enc_dec.cjs_decrypt(req.bodyString("owner_id"));
+    try{
+    let owner_id =  enc_dec.cjs_decrypt(req.bodyString("owner_id"));
     let status = req.bodyString("status");
 
     let common_email = await MerchantEkycModel.selectDynamicOwnerData(
@@ -6970,9 +6979,14 @@ var MerchantEkyc = {
     );
 
     res.status(statusCode.ok).send(response.successmsg("Updated successfully"));
+  }catch(error){
+     logger.error(500,{message: error,stack: error.stack}); 
+     res.status(statusCode.internalError).send(response.errorMsg("Something went wrong"));
+  }
   },
   update_exe_status: async (req, res) => {
-    let owner_id = await enc_dec.cjs_decrypt(req.bodyString("executive_id"));
+    try{
+    let owner_id =  enc_dec.cjs_decrypt(req.bodyString("executive_id"));
 
     let status = req.bodyString("status");
 
@@ -7001,9 +7015,13 @@ var MerchantEkyc = {
     );
 
     res.status(statusCode.ok).send(response.successmsg("Updated successfully"));
+  }catch(error){
+     logger.error(500,{message: error,stack: error.stack}); 
+     res.status(statusCode.internalError).send(response.errorMsg("Something went wrong"));
+  }
   },
   merchant_data: async (req, res) => {
-    let submerchant_id = await enc_dec.cjs_decrypt(req.bodyString("token"));
+    let submerchant_id =  enc_dec.cjs_decrypt(req.bodyString("token"));
     MerchantEkycModel.selectMerchantDetails("*", {
       merchant_id: submerchant_id,
     })
@@ -7064,7 +7082,7 @@ var MerchantEkyc = {
           .send(response.successdatamsg(res1, "Details fetched successfully."));
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -7294,8 +7312,7 @@ var MerchantEkyc = {
             );
         })
         .catch((error) => {
-          console.log(error);
-          winston.error(error);
+          logger.error(500,{message: error,stack: error.stack}); 
           res.status(statusCode.internalError).send(response.errormsg(error));
         });
     } else {
@@ -7402,7 +7419,7 @@ var MerchantEkyc = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -7423,7 +7440,7 @@ var MerchantEkyc = {
         .status(statusCode.ok)
         .send(response.successmsg("Submerchant deactivated successfully"));
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -7446,7 +7463,7 @@ var MerchantEkyc = {
         .status(statusCode.ok)
         .send(response.successmsg("Merchant activated successfully"));
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -7473,7 +7490,7 @@ var MerchantEkyc = {
         .status(statusCode.ok)
         .send(response.successmsg("Updated successfully"));
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -7500,7 +7517,7 @@ var MerchantEkyc = {
         .status(statusCode.ok)
         .send(response.successmsg("Updated successfully"));
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -7527,7 +7544,7 @@ var MerchantEkyc = {
         .status(statusCode.ok)
         .send(response.successmsg("Updated successfully"));
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -7554,7 +7571,7 @@ var MerchantEkyc = {
         .status(statusCode.ok)
         .send(response.successmsg("Updated successfully"));
     } catch (error) {
-      winston.error(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -7625,8 +7642,8 @@ var MerchantEkyc = {
             (referrer_data.tax_per = master_bonus.tax_per);
         }
       })
-      .catch((err) => {
-        winston.error(err);
+      .catch((error) => {
+       logger.error(500,{message: error,stack: error.stack}); 
       });
 
     // event code here
@@ -7663,13 +7680,13 @@ var MerchantEkyc = {
             // );
           })
           .catch((error) => {
-            winston.error(error);
+            logger.error(500,{message: error,stack: error.stack}); 
             res
               .status(statusCode.internalError)
               .send(response.errormsg(error.message));
           });
       } catch (error) {
-        winston.error(error);
+        logger.error(500,{message: error,stack: error.stack}); 
         referralEmitter.emit("registerReferralError", error);
       }
     });
@@ -7710,6 +7727,7 @@ var MerchantEkyc = {
           .send(response.errormsg("Invalid super merchant id"));
       }
     } catch (error) {
+       logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -7749,7 +7767,7 @@ var MerchantEkyc = {
           .send(response.errormsg("Invalid super merchant id"));
       }
     } catch (error) {
-      console.log(error);
+      logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -7787,6 +7805,7 @@ var MerchantEkyc = {
           .send(response.errormsg("Invalid sub merchant id"));
     }
     }catch(error){
+       logger.error(500,{message: error,stack: error.stack}); 
        res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));

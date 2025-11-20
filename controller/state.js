@@ -5,7 +5,7 @@ const helpers = require("../utilities/helper/general_helper");
 const enc_dec = require("../utilities/decryptor/decryptor");
 const admin_activity_logger = require("../utilities/activity-logger/admin_activity_logger");
 const moment = require("moment");
-const winston = require("../utilities/logmanager/winston");
+const logger = require('../config/logger');
 
 var states = {
   add: async (req, res) => {
@@ -43,14 +43,14 @@ var states = {
                 .send(response.successmsg("State added successfully."));
             })
             .catch((error) => {
-              winston.error(error);
+             logger.error(500,{message: error,stack: error.stack}); 
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error.message));
             });
         })
         .catch((error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
@@ -137,7 +137,7 @@ var states = {
         })
         .catch((error) => {
           console.log(error);
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           return res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
@@ -173,7 +173,7 @@ var states = {
           );
       })
       .catch((error) => {
-        winston.error(error);
+       logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -209,13 +209,13 @@ var states = {
             .send(response.successmsg("State updated successfully"));
         })
         .catch((error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -244,13 +244,13 @@ var states = {
             .send(response.successmsg("State deactivated successfully"));
         })
         .catch((error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -279,13 +279,13 @@ var states = {
             .send(response.successmsg("State activated successfully"));
         })
         .catch((error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -314,13 +314,13 @@ var states = {
             .send(response.successmsg("State deleted successfully"));
         })
         .catch((error) => {
-          winston.error(error);
+         logger.error(500,{message: error,stack: error.stack}); 
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-      winston.error(error);
+     logger.error(500,{message: error,stack: error.stack}); 
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
