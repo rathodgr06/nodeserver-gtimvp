@@ -39,10 +39,12 @@ var protector = {
           return false;
         }
        const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
-         if (!base64Regex.test(cipher_text)) {
-          logger.error(500,{message: `Text which decoded ${cipher_text} containts invalid characters`,stack: error?.stack});
-            return false;
-         }
+        if (!base64Regex.test(cipher_text)) {
+          logger.error(500, {
+            message: `Text which decoded ${cipher_text} contains invalid characters`,
+          });
+          return false;
+        }
         try {
             let string = cipher_text.toString();
             let secret_key = process.env.SECRET_KEY;
