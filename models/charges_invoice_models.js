@@ -2366,7 +2366,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
       qb.release();
     }
     // return response.length > 0 ? response[0] : null;
-    return response.length > 0 ? response[0].net_amount : 0;
+    return response.length > 0 ? response[0].net_amount || 0 : 0;
   },
   addWalletSnap: async (data) => {
     let qb = await pool.get_connection();
@@ -2748,7 +2748,6 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
       where = where + " AND t.receiver_id IN (" + condition.receivers_ids + ")";
     }
     
-    
     // if (condition.order_status) {
     //   where = where + "order_status = " + condition.order_status;
     // }
@@ -2767,8 +2766,8 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
     }else{
       // query =
       //  "WITH RECURSIVE date_range AS ( SELECT DATE('" + condition.from_date + "') AS dt UNION ALL SELECT DATE_ADD(dt, INTERVAL 1 DAY) FROM date_range WHERE dt < DATE('" + condition.to_date + "') ) SELECT dr.dt AS transaction_date, COALESCE(SUM(t.amount), 0) AS total_day_amount, COALESCE(COUNT(t.amount), 0) AS total_transactions FROM date_range dr LEFT JOIN pg_transaction_charges t ON DATE(t.created_at) = dr.dt AND t.order_status = '" + condition.order_status + "'" + where + " GROUP BY dr.dt ORDER BY dr.dt DESC;";
-      query =
-       "WITH RECURSIVE date_range AS ( SELECT DATE('" + condition.from_date + "') AS dt UNION ALL SELECT DATE_ADD(dt, INTERVAL 1 DAY) FROM date_range WHERE dt < DATE('" + condition.to_date + "') ) SELECT dr.dt AS transaction_date, COALESCE(SUM(t.amount), 0) AS total_day_amount, COALESCE(COUNT(t.amount), 0) AS total_transactions FROM date_range dr LEFT JOIN pg_transaction_charges t ON DATE(t.created_at) = dr.dt AND t.order_status = '" + condition.order_status + "'" + where + " LEFT JOIN pg_master_merchant_details mmd ON t.sub_merchant_id = mmd.merchant_id LEFT JOIN pg_bus_reg_country_master cm ON mmd.register_business_country = cm.id WHERE cm.country_code = '" + condition.country + "'" + " GROUP BY dr.dt ORDER BY dr.dt DESC;";
+      
+       query = "WITH RECURSIVE date_range AS ( SELECT DATE('" + condition.from_date + "') AS dt UNION ALL SELECT DATE_ADD(dt, INTERVAL 1 DAY) FROM date_range WHERE dt < DATE('" + condition.to_date + "') ) SELECT dr.dt AS transaction_date, COALESCE(SUM(t.amount), 0) AS total_day_amount, COALESCE(COUNT(t.id), 0) AS total_transactions, COALESCE(COUNT(DISTINCT t.sub_merchant_id), 0) AS unique_merchants FROM date_range dr LEFT JOIN pg_transaction_charges t ON DATE(t.created_at) = dr.dt AND t.order_status = 'PAID' AND t.currency = '" + condition.currency + "' LEFT JOIN pg_master_merchant_details mmd ON t.sub_merchant_id = mmd.merchant_id LEFT JOIN pg_bus_reg_country_master cm ON mmd.register_business_country = cm.id AND cm.country_code = '" + condition.country + "' WHERE cm.country_code = '" + condition.country + "'" + " GROUP BY dr.dt ORDER BY dr.dt DESC;"
     }
 
     // var query ='
