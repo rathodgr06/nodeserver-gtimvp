@@ -1380,7 +1380,7 @@ LEFT JOIN pending_payouts pp ON (
     }
     return response.length > 0 ? response?.[0] : false;
   },
- fetchWalletBalance: async (condition) => {
+ fetchWalletBalanceBefore: async (condition) => {
   let qb;
   try {
     qb = await pool.get_connection();
@@ -1454,7 +1454,7 @@ LEFT JOIN pending_payouts pp ON (
           ls.beneficiary_id,
           COALESCE(SUM(
             CASE
-              WHEN ls.snap_date IS NOT NULL AND tc.created_at > TIMESTAMP(ls.snap_date, '23:59:59') 
+              WHEN ls.snap_date IS NOT NULL AND tc.created_at > CONCAT(ls.snap_date, '23:59:59') 
                 THEN tc.net_amount
               WHEN ls.snap_date IS NULL 
                 THEN tc.net_amount
@@ -1482,7 +1482,7 @@ LEFT JOIN pending_payouts pp ON (
           naf.id,
           COALESCE(SUM(
             CASE
-              WHEN naf.snap_date IS NOT NULL AND pp.created_at > TIMESTAMP(naf.snap_date, '23:59:59')
+              WHEN naf.snap_date IS NOT NULL AND pp.created_at > CONCAT(naf.snap_date, '23:59:59')
                 THEN pp.amount
               WHEN naf.snap_date IS NULL
                 THEN pp.amount
@@ -1552,6 +1552,184 @@ LEFT JOIN pending_payouts pp ON (
       qb.release();
   }
 },
+fetchWalletBalance: async (condition) => {
+  let qb;
+  try {
+    qb = await pool.get_connection();
+    
+    let walletId = condition.wallet_id;
+    
+    // Step 1: If wallet_id not provided, fetch it first (fast lookup)
+    if (!walletId) {
+      let lookupQuery;
+      
+      if (condition.sub_merchant_id && condition.currency) {
+        lookupQuery = `
+          SELECT wallet_id 
+          FROM pg_wallet 
+          WHERE sub_merchant_id = ${qb.escape(condition.sub_merchant_id)} 
+            AND currency = ${qb.escape(condition.currency)}
+            AND active = 1
+            AND deleted = 0
+          LIMIT 1
+        `;
+      } 
+      else if (condition.receiver_id && condition.currency) {
+        lookupQuery = `
+          SELECT wallet_id 
+          FROM pg_wallet 
+          WHERE beneficiary_id = ${qb.escape(condition.receiver_id)} 
+            AND currency = ${qb.escape(condition.currency)}
+            AND active = 1
+            AND deleted = 0
+          LIMIT 1
+        `;
+      } 
+      else {
+        throw new Error('Invalid condition: provide wallet_id OR (sub_merchant_id + currency) OR (receiver_id + currency)');
+      }
+      
+      console.log('Fetching wallet_id with lookup query');
+      const lookupResult = await qb.query(lookupQuery);
+      
+      if (!lookupResult || lookupResult.length === 0) {
+        console.log('No wallet found for conditions:', condition);
+        return null;
+      }
+      
+      walletId = lookupResult[0].wallet_id;
+      console.log('Found wallet_id:', walletId);
+    }
+    
+    // Step 2: Fetch balance using wallet_id (fastest path)
+    const query = `
+      WITH latest_snap AS (
+        SELECT
+          w.id, w.wallet_id, w.sub_merchant_id, w.currency, w.beneficiary_id,
+          s.balance, s.snap_date, s.total_balance, s.pending_balance
+        FROM pg_wallet w
+        LEFT JOIN (
+          SELECT
+            s1.wallet_id, s1.balance, s1.snap_date, s1.total_balance, s1.pending_balance
+          FROM pg_wallet_snap s1
+          INNER JOIN (
+            SELECT wallet_id, MAX(snap_date) AS snap_date
+            FROM pg_wallet_snap
+            GROUP BY wallet_id
+          ) s2 ON s1.wallet_id = s2.wallet_id AND s1.snap_date = s2.snap_date
+        ) s ON w.wallet_id = s.wallet_id
+        WHERE w.wallet_id = ${qb.escape(walletId)}
+      ),
+      transaction_charges_after_snap AS (
+        SELECT
+          ls.id, 
+          ls.wallet_id, 
+          ls.sub_merchant_id, 
+          ls.currency,
+          ls.balance AS snap_balance, 
+          ls.total_balance AS snap_total_balance,
+          ls.pending_balance AS snap_pending_balance,
+          ls.snap_date, 
+          ls.beneficiary_id,
+          COALESCE(SUM(
+            CASE
+              WHEN ls.snap_date IS NOT NULL AND tc.created_at > CONCAT(ls.snap_date, '23:59:59') 
+                THEN tc.net_amount
+              WHEN ls.snap_date IS NULL 
+                THEN tc.net_amount
+              ELSE 0
+            END
+          ), 0) AS transaction_charges_after_snap
+        FROM latest_snap ls
+        LEFT JOIN pg_transaction_charges tc ON (
+          tc.currency = ls.currency
+          AND (
+            (ls.sub_merchant_id IS NOT NULL AND ls.sub_merchant_id != 0 
+              AND tc.sub_merchant_id = ls.sub_merchant_id)
+            OR 
+            ((ls.sub_merchant_id IS NULL OR ls.sub_merchant_id = 0) 
+              AND ls.beneficiary_id IS NOT NULL AND ls.beneficiary_id != 0 
+              AND tc.receiver_id = ls.beneficiary_id)
+          )
+        )
+        GROUP BY
+          ls.id, ls.wallet_id, ls.sub_merchant_id, ls.currency,
+          ls.balance, ls.total_balance, ls.pending_balance, ls.snap_date, ls.beneficiary_id
+      ),
+      pending_payouts_after_snap AS (
+        SELECT
+          naf.id,
+          COALESCE(SUM(
+            CASE
+              WHEN naf.snap_date IS NOT NULL AND pp.created_at > CONCAT(naf.snap_date, '23:59:59')
+                THEN pp.amount
+              WHEN naf.snap_date IS NULL
+                THEN pp.amount
+              ELSE 0
+            END
+          ), 0) AS pending_payouts_after_snap
+        FROM transaction_charges_after_snap naf
+        LEFT JOIN pg_payout_pending_transactions pp ON (
+          pp.status = 0 
+          AND pp.order_status = 'PENDING'
+          AND pp.currency = naf.currency
+          AND (
+            (naf.sub_merchant_id IS NOT NULL AND naf.sub_merchant_id != 0 
+              AND pp.sub_merchant_id = naf.sub_merchant_id)
+            OR 
+            ((naf.sub_merchant_id IS NULL OR naf.sub_merchant_id = 0) 
+              AND naf.beneficiary_id IS NOT NULL AND naf.beneficiary_id != 0 
+              AND pp.receiver_id = naf.beneficiary_id)
+          )
+          AND NOT EXISTS (
+            SELECT 1 
+            FROM pg_transaction_charges tx
+            WHERE tx.order_id = pp.order_id
+              AND tx.currency = pp.currency
+              AND (
+                (pp.sub_merchant_id != 0 AND tx.sub_merchant_id = pp.sub_merchant_id)
+                OR
+                (pp.sub_merchant_id = 0 AND pp.receiver_id != 0 AND tx.receiver_id = pp.receiver_id)
+              )
+          )
+        )
+        GROUP BY naf.id
+      )
+      SELECT
+        naf.wallet_id, 
+        CASE WHEN naf.sub_merchant_id = 0 THEN NULL ELSE naf.sub_merchant_id END as sub_merchant_id,
+        CASE WHEN naf.beneficiary_id = 0 THEN NULL ELSE naf.beneficiary_id END as receiver_id, 
+        naf.currency,
+        COALESCE(naf.snap_total_balance, 0) + naf.transaction_charges_after_snap AS total_balance,
+        COALESCE(naf.snap_pending_balance, 0) + COALESCE(pp.pending_payouts_after_snap, 0) AS pending_balance,
+        (COALESCE(naf.snap_total_balance, 0) + naf.transaction_charges_after_snap) 
+          - (COALESCE(naf.snap_pending_balance, 0) + COALESCE(pp.pending_payouts_after_snap, 0)) AS balance
+      FROM transaction_charges_after_snap naf
+      LEFT JOIN pending_payouts_after_snap pp ON naf.id = pp.id
+      LIMIT 1
+    `.trim();
+    
+    console.log('Executing wallet balance query for wallet_id:', walletId);
+    const response = await qb.query(query);
+    
+    if (response.length === 0) {
+      console.log('No balance data found for wallet_id:', walletId);
+      return null;
+    }
+    
+    return response[0];
+    
+  } catch (error) {
+    console.error('Failed to fetch wallet balance:', {
+      error: error.message,
+      condition,
+      stack: error.stack
+    });
+    throw new Error(`Wallet balance fetch failed: ${error.message}`);
+  } finally {
+    qb.release();
+  }
+},
 fetchWalletBalances: async (walletIds) => {
   let qb;
   try {
@@ -1598,7 +1776,7 @@ fetchWalletBalances: async (walletIds) => {
           ls.beneficiary_id,
           COALESCE(SUM(
             CASE
-              WHEN ls.snap_date IS NOT NULL AND tc.created_at > TIMESTAMP(ls.snap_date, '23:59:59') 
+              WHEN ls.snap_date IS NOT NULL AND tc.created_at > CONCAT(ls.snap_date, '23:59:59') 
                 THEN tc.net_amount
               WHEN ls.snap_date IS NULL 
                 THEN tc.net_amount
@@ -1626,7 +1804,7 @@ fetchWalletBalances: async (walletIds) => {
           naf.id,
           COALESCE(SUM(
             CASE
-              WHEN naf.snap_date IS NOT NULL AND pp.created_at > TIMESTAMP(naf.snap_date, '23:59:59')
+              WHEN naf.snap_date IS NOT NULL AND pp.created_at > CONCAT(naf.snap_date, '23:59:59')
                 THEN pp.amount
               WHEN naf.snap_date IS NULL
                 THEN pp.amount

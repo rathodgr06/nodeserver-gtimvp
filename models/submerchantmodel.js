@@ -283,7 +283,7 @@ var dbModel = {
               dbtable +
               " s INNER JOIN " +
               merchant_details +
-              " m ON s.id=m.merchant_id where (s.ekyc_required=1 or s.ekyc_required=0) and " +
+              " m ON s.id=m.merchant_id where " +
               condition +
               " and " +
               condition2 +
@@ -302,7 +302,7 @@ var dbModel = {
               dbtable +
               " s INNER JOIN " +
               merchant_details +
-              " m ON s.id=m.merchant_id where (s.ekyc_required=1 or s.ekyc_required=0) and " +
+              " m ON s.id=m.merchant_id where " +
               condition +
               " and (" +
               search_text +
@@ -328,7 +328,7 @@ var dbModel = {
               dbtable +
               " s INNER JOIN " +
               merchant_details +
-              " m ON s.id=m.merchant_id where (s.ekyc_required=1 or s.ekyc_required=0) and " +
+              " m ON s.id=m.merchant_id where " +
               condition +
               " and " +
               condition2 +
@@ -343,8 +343,8 @@ var dbModel = {
               .select(select)
               .from(dbtable + " s")
               .join(merchant_details + " m", "s.id=m.merchant_id","inner")
-              .limit(limit.perpage, limit.start)
               .order_by("s.id", "desc")
+               .limit(limit.perpage, limit.start)
               .get();
               console.log(qb.last_query());
           }
@@ -366,7 +366,7 @@ var dbModel = {
               dbtable +
               " s INNER JOIN " +
               merchant_details +
-              " m ON  s.id=m.merchant_id where (s.ekyc_required=1 or s.ekyc_required=0) and " +
+              " m ON  s.id=m.merchant_id where " +
               condition +
               " and " +
               condition2 +
@@ -382,7 +382,7 @@ var dbModel = {
               dbtable +
               " s INNER JOIN " +
               merchant_details +
-              " m ON  s.id=m.merchant_id where (s.ekyc_required=1 or s.ekyc_required=0) and " +
+              " m ON  s.id=m.merchant_id where " +
               condition +
               " and (" +
               search_text +
@@ -404,7 +404,7 @@ var dbModel = {
               dbtable +
               " s INNER JOIN " +
               merchant_details +
-              " m ON  s.id=m.merchant_id where (s.ekyc_required=1 or s.ekyc_required=0) and " +
+              " m ON  s.id=m.merchant_id where " +
               condition +
               " and " +
               condition2 +
