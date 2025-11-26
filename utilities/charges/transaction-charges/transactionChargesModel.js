@@ -291,7 +291,7 @@ async function getMerchantDefaultSellRate( details, is_domestic_international ) 
   const pricing_plan_txn_rate = `${config.table_prefix}pricing_plan_txn_rate`;
 
    
-  let encrypted_scheme = enc_dec.cjs_decrypt(scheme);
+  let encrypted_scheme = is_mobile_wallet?'':enc_dec.cjs_decrypt(scheme);
   console.log("🚀 ~ getMerchantDefaultSellRate ~ encrypted_scheme:", encrypted_scheme)
 
     let enc_payment_scheme_id = await helpers.getPaymentSchemeEnc(is_mobile_wallet?"MOBILE WALLET":scheme);

@@ -1633,7 +1633,7 @@ fetchWalletBalance: async (condition) => {
           ls.beneficiary_id,
           COALESCE(SUM(
             CASE
-              WHEN ls.snap_date IS NOT NULL AND tc.created_at > CONCAT(ls.snap_date, '23:59:59') 
+              WHEN ls.snap_date IS NOT NULL AND tc.created_at > TIMESTAMP(ls.snap_date, '23:59:59') 
                 THEN tc.net_amount
               WHEN ls.snap_date IS NULL 
                 THEN tc.net_amount
@@ -1661,7 +1661,7 @@ fetchWalletBalance: async (condition) => {
           naf.id,
           COALESCE(SUM(
             CASE
-              WHEN naf.snap_date IS NOT NULL AND pp.created_at > CONCAT(naf.snap_date, '23:59:59')
+              WHEN naf.snap_date IS NOT NULL AND pp.created_at > TIMESTAMP(naf.snap_date, '23:59:59')
                 THEN pp.amount
               WHEN naf.snap_date IS NULL
                 THEN pp.amount
@@ -1710,6 +1710,7 @@ fetchWalletBalance: async (condition) => {
     `.trim();
     
     console.log('Executing wallet balance query for wallet_id:', walletId);
+    console.log(query);
     const response = await qb.query(query);
     
     if (response.length === 0) {
@@ -1776,7 +1777,7 @@ fetchWalletBalances: async (walletIds) => {
           ls.beneficiary_id,
           COALESCE(SUM(
             CASE
-              WHEN ls.snap_date IS NOT NULL AND tc.created_at > CONCAT(ls.snap_date, '23:59:59') 
+              WHEN ls.snap_date IS NOT NULL AND tc.created_at > TIMESTAMP(ls.snap_date, '23:59:59') 
                 THEN tc.net_amount
               WHEN ls.snap_date IS NULL 
                 THEN tc.net_amount
@@ -1804,7 +1805,7 @@ fetchWalletBalances: async (walletIds) => {
           naf.id,
           COALESCE(SUM(
             CASE
-              WHEN naf.snap_date IS NOT NULL AND pp.created_at > CONCAT(naf.snap_date, '23:59:59')
+              WHEN naf.snap_date IS NOT NULL AND pp.created_at > TIMESTAMP(naf.snap_date, '23:59:59')
                 THEN pp.amount
               WHEN naf.snap_date IS NULL
                 THEN pp.amount
@@ -2251,6 +2252,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
         .where("created_at <=", condition.currentDate);
 
        response = await qb.get("pg_transaction_charges");
+       console.log(qb.last_query());
 
 
 //       let query = `WITH latest_snap AS (
@@ -2375,6 +2377,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
       response = await qb
         .returning("id")
         .insert(config.table_prefix + "wallet_snap", data);
+        console.log(qb.last_query());
     } catch (error) {
       logger.error(500,{message: error,stack: error.stack}); 
     } finally {
