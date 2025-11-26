@@ -2762,19 +2762,16 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
     // + where
     // + " GROUP BY DATE(created_at) ORDER BY created_at DESC;";
 
+    // const result = adjustDateRange(condition.from_date, condition.to_date);
+    // console.log("🚀 ~ result:", result)
+
     var query;
     if(condition.order_status && condition.order_status == 'CAPTURED'){
       query =
        "WITH RECURSIVE date_range AS ( SELECT DATE('" + condition.from_date + "') AS dt UNION ALL SELECT DATE_ADD(dt, INTERVAL 1 DAY) FROM date_range WHERE dt < DATE('" + condition.to_date + "') ) SELECT dr.dt AS transaction_date,  mmd.merchant_id, mmd.register_business_country, cm.country_name, cm.country_code, COALESCE(SUM(t.amount), 0) AS total_day_amount, COALESCE(COUNT(t.amount), 0) AS total_transactions FROM date_range dr LEFT JOIN pg_transaction_charges t ON DATE(t.created_at) = dr.dt AND t.order_status = '" + condition.order_status + "'" + where + " LEFT JOIN pg_master_merchant_details mmd ON t.sub_merchant_id = mmd.merchant_id LEFT JOIN pg_bus_reg_country_master cm ON mmd.register_business_country = cm.id WHERE cm.country_code = '" + condition.country + "'" + " GROUP BY dr.dt ORDER BY dr.dt DESC;"
     }else{
-      // query =
-      //  "WITH RECURSIVE date_range AS ( SELECT DATE('" + condition.from_date + "') AS dt UNION ALL SELECT DATE_ADD(dt, INTERVAL 1 DAY) FROM date_range WHERE dt < DATE('" + condition.to_date + "') ) SELECT dr.dt AS transaction_date, COALESCE(SUM(t.amount), 0) AS total_day_amount, COALESCE(COUNT(t.amount), 0) AS total_transactions FROM date_range dr LEFT JOIN pg_transaction_charges t ON DATE(t.created_at) = dr.dt AND t.order_status = '" + condition.order_status + "'" + where + " GROUP BY dr.dt ORDER BY dr.dt DESC;";
-      
-       query = "WITH RECURSIVE date_range AS ( SELECT DATE('" + condition.from_date + "') AS dt UNION ALL SELECT DATE_ADD(dt, INTERVAL 1 DAY) FROM date_range WHERE dt < DATE('" + condition.to_date + "') ) SELECT dr.dt AS transaction_date, COALESCE(SUM(t.amount), 0) AS total_day_amount, COALESCE(COUNT(t.id), 0) AS total_transactions, COALESCE(COUNT(DISTINCT t.sub_merchant_id), 0) AS unique_merchants FROM date_range dr LEFT JOIN pg_transaction_charges t ON DATE(t.created_at) = dr.dt AND t.order_status = 'PAID' AND t.currency = '" + condition.currency + "' LEFT JOIN pg_master_merchant_details mmd ON t.sub_merchant_id = mmd.merchant_id LEFT JOIN pg_bus_reg_country_master cm ON mmd.register_business_country = cm.id AND cm.country_code = '" + condition.country + "' WHERE cm.country_code = '" + condition.country + "'" + " GROUP BY dr.dt ORDER BY dr.dt DESC;"
+      query = "WITH RECURSIVE date_range AS ( SELECT DATE('" + condition.from_date + "') AS dt UNION ALL SELECT DATE_ADD(dt, INTERVAL 1 DAY) FROM date_range WHERE dt < DATE('" + condition.to_date + "') ) SELECT dr.dt AS transaction_date, COALESCE(SUM(t.amount), 0) AS total_day_amount, COALESCE(COUNT(t.id), 0) AS total_transactions FROM date_range dr LEFT JOIN pg_transaction_charges t ON DATE(t.created_at) = dr.dt AND t.order_status = 'PAID' AND t.currency = '" + condition.currency + "' LEFT JOIN pg_master_merchant_details mmd ON t.sub_merchant_id = mmd.merchant_id LEFT JOIN pg_bus_reg_country_master cm ON mmd.register_business_country = cm.id WHERE cm.country_code = '" + condition.country + "' OR cm.country_code IS NULL GROUP BY dr.dt ORDER BY dr.dt DESC; "
     }
-
-    // var query ='
-    //   "WITH RECURSIVE date_range AS ( SELECT DATE('" + condition.from_date + "') AS dt UNION ALL SELECT DATE_ADD(dt, INTERVAL 1 DAY) FROM date_range WHERE dt < DATE('" + condition.to_date + "') ) SELECT dr.dt AS transaction_date, COALESCE(SUM(t.amount), 0) AS total_day_amount, COALESCE(COUNT(t.amount), 0) AS total_transactions FROM date_range dr LEFT JOIN pg_transaction_charges t ON DATE(t.created_at) = dr.dt AND t.order_status = '" + condition.order_status + "'" + where + " GROUP BY dr.dt ORDER BY dr.dt DESC;";
 
     console.log("🚀 ~ query:", query)
 
@@ -2783,6 +2780,7 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
     try {
       response = await qb.query(query);
     } catch (error) {
+      console.log("🚀 ~ error:", error)
       logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
@@ -2820,5 +2818,27 @@ async function updateOrderStatus(order_id, newStatus, status) {
   }
   return response;
 }
+
+function adjustDateRange(fromDate, toDate) {
+    const start = new Date(fromDate);
+    const end = new Date(toDate);
+
+    // Calculate difference in days
+    const diffTime = end - start;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+    // If number of days < 7, extend the to_date
+    if (diffDays < 7) {
+        const extraDays = 7 - diffDays;
+        end.setDate(end.getDate() + extraDays);
+    }
+
+    // Format back to YYYY-MM-DD
+    const finalFrom = start.toISOString().split("T")[0];
+    const finalTo = end.toISOString().split("T")[0];
+
+    return { from_date: finalFrom, to_date: finalTo };
+}
+
 
 module.exports = charges_invoice_models;
