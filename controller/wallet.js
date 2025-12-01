@@ -13,6 +13,8 @@ const currency = require("./currency");
 const walletDBModel = require("../models/wallet");
 const transacationChargesModel = require('../models/charges_invoice_models');
 const encrypt_decrypt = require("../utilities/decryptor/encrypt_decrypt");
+// const walletRollout = require("../utilities/wallet-snap/index.js");
+const { exec } = require("child_process");
 
 var wallet = {
   create: async (req, res) => {
@@ -1018,6 +1020,29 @@ var wallet = {
         });
     } catch (error) {
       logger.error(500,{message: error,stack: error.stack}); 
+      res
+        .status(statusCode.internalError)
+        .send(response.errormsg(error.message));
+    }
+  },
+  rollout_wallets: async (req, res) => {
+    try {
+      //  await walletRollout();
+      // exec("./rollout_wallet.sh", (error, stdout, stderr) => {
+      //   if (error) {
+      //     console.error(`Error executing script: ${error.message}`);
+      //     return;
+      //   }
+
+      //   if (stderr) {
+      //     console.error(`Script error output: ${stderr}`);
+      //   }
+
+      //   console.log(`Script output:\n${stdout}`);
+      // });
+       res.status(statusCode.ok).send(response.successansmsg("Wallet rollout completed"));
+    } catch (error) {
+      logger.error(500,{message: error,stack: error.stack});
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));

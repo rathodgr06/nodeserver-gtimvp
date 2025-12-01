@@ -1069,6 +1069,26 @@ var MerchantEkycModel = {
       qb.release();
     }
     return response;
+  },
+  getMerchantDetails: async (condition) => {
+    let qb = await pool.get_connection();
+    let response;
+
+    try {
+      response = await qb
+        .select("`mm.id`,`mm.super_merchant_id`,`mm.name`, `mm.email`, `mm.code`, `mm.mobile_no`,`mm.referral_code`,`mm.register_at`,`mmd.company_name`,`pc.country_code as register_business_country`")
+        .join("pg_master_merchant_details as mmd", "mmd.merchant_id = mm.id")
+        .join("pg_country as pc", "mmd.register_business_country = pc.id")
+        .where(condition)
+        .limit(1)             // <-- LIMIT 1 added here
+        .get("pg_master_merchant as mm");
+    } catch (error) {
+      console.error("Database query failed:", error);
+    } finally {
+      qb.release();
+    }
+
+    return response?.[0];
   }
 
 };

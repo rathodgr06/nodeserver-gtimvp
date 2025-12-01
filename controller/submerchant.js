@@ -450,6 +450,7 @@ var all_data = {
   /* Optimise list function is below */
   list: async (req, res) => {
     try {
+      console.log("🚀 ~ req:", req.body);
       // 1. Extract and validate pagination parameters
       const { perpage, page } = extractPaginationParams(req);
       const limit = calculatePagination(perpage, page);
@@ -3428,6 +3429,13 @@ var all_data = {
       delete fundingData.is_active;
       delete fundingData.account_for;
 
+      // If Payer ID is AlPay get institutionCode from payer id
+      if (payer_id.includes("MAP_")) {
+        fundingData.institutionCode = payer_id?.replace("MAP_", "");
+      }else if (payer_id.includes("AP_")) {
+        fundingData.institutionCode = payer_id?.replace("AP_", "");
+      }
+
       let fundingDetails = {
         account_id: account_id,
         type: type,
@@ -3913,20 +3921,12 @@ var all_data = {
         let send_res = [];
         console.log(`the service id is here`);
         console.log(service_id);
-        send_res = await alpay_payer_list(service_id);
-        // send_res = [
-        //     {
-        //       country_iso_code: country_iso_code,
-        //       country: country_iso_code,
-        //       currency: currency,
-        //       funding_type: service_id,
-        //       funding_source_type: service_id,
-        //       id: "AL_PAY",
-        //       name: "AL PAY",
-        //       payer_id: "AL_PAY",
-        //       payer_name: "AL PAY",
-        //     },
-        //   ];
+        // send_res = await alpay_payer_list(service_id);
+        if (process.env.CHARGES_MODE === 'live') {
+          send_res = await  alpay_payer_list(service_id);
+        }else{
+          send_res = await  mock_alpay_payer_list(service_id);
+        }
         res
           .status(statusCode.ok)
           .send(
@@ -3938,52 +3938,60 @@ var all_data = {
         if (service_id == "1") {
           console.log(`the service id is here`);
           console.log(service_id);
-          send_res = [
-            {
-              country_iso_code: country_iso_code,
-              country: country_iso_code,
-              currency: currency,
-              funding_type: service_id,
-              funding_source_type: service_id,
-              id: "MTN_MOMO",
-              name: "MTN MOMO",
-              payer_id: "MTN_MOMO",
-              payer_name: "MTN MOMO",
-            },
-            // {
-            //   country_iso_code: country_iso_code,
-            //   country: country_iso_code,
-            //   currency: currency,
-            //   funding_type: service_id,
-            //   funding_source_type: service_id,
-            //   id: "MTN",
-            //   name: "MTN",
-            //   payer_id: "MTN",
-            //   payer_name: "MTN",
-            // },
-            {
-              country_iso_code: country_iso_code,
-              country: country_iso_code,
-              currency: currency,
-              funding_type: service_id,
-              funding_source_type: service_id,
-              id: "ORANGE_MONEY",
-              name: "Orange Money",
-              payer_id: "ORANGE_MONEY",
-              payer_name: "Orange Money",
-            },
-            // {
-            //   country_iso_code: country_iso_code,
-            //   country: country_iso_code,
-            //   currency: currency,
-            //   funding_type: service_id,
-            //   funding_source_type: service_id,
-            //   id: "ORANGE",
-            //   name: "ORANGE",
-            //   payer_id: "ORANGE",
-            //   payer_name: "ORANGE",
-            // },
-          ];
+
+          if (process.env.CHARGES_MODE == "test") {
+            send_res = [
+              {
+                country_iso_code: country_iso_code,
+                country: country_iso_code,
+                currency: currency,
+                funding_type: service_id,
+                funding_source_type: service_id,
+                id: "MTN",
+                name: "MTN",
+                payer_id: "MTN",
+                payer_name: "MTN",
+              },
+              {
+                country_iso_code: country_iso_code,
+                country: country_iso_code,
+                currency: currency,
+                funding_type: service_id,
+                funding_source_type: service_id,
+                id: "ORANGE",
+                name: "ORANGE",
+                payer_id: "ORANGE",
+                payer_name: "ORANGE",
+              },
+            ];
+          } else {
+            send_res = [
+              {
+                country_iso_code: country_iso_code,
+                country: country_iso_code,
+                currency: currency,
+                funding_type: service_id,
+                funding_source_type: service_id,
+                id: "MTN_MOMO",
+                name: "MTN MOMO",
+                payer_id: "MTN_MOMO",
+                payer_name: "MTN MOMO",
+              },
+              {
+                country_iso_code: country_iso_code,
+                country: country_iso_code,
+                currency: currency,
+                funding_type: service_id,
+                funding_source_type: service_id,
+                id: "ORANGE_MONEY",
+                name: "Orange Money",
+                payer_id: "ORANGE_MONEY",
+                payer_name: "Orange Money",
+              },
+            ];
+          }
+
+          
         }
         res
           .status(statusCode.ok)
@@ -3992,7 +4000,7 @@ var all_data = {
           );
       }
     } catch (error) {
-    logger.error(500,{message: error,stack: error.stack}); 
+    logger.error(500,{message: error,stack: error.stack});
       res
         .status(statusCode.badRequest)
         .send(
@@ -4032,7 +4040,7 @@ var all_data = {
           status: "success",
           code: "00",
         });
-      } else if (payer_id.includes("AP")) {
+      } else if (payer_id.includes("MAP") || payer_id.includes("AP")) {
         let payer = await get_alpay_payer_by_id(payer_id);
         console.log("🚀 ~ payer:", payer)
         res.status(statusCode.ok).send({
@@ -4048,7 +4056,7 @@ var all_data = {
           increment: null,
           maximum_transaction_amount: null,
           minimum_transaction_amount: null,
-          data: "accountNumber",
+          data: "accountNumber, accountName",
           required_documents: [],
           purpose_of_remittance: [],
           transaction_attachment_type: transaction_attachment_type,
@@ -4751,15 +4759,19 @@ var all_data = {
   },
   get_ghana_payers_list: async (req, res) => {
     try {
-      let bank_list = await alpay_payer_list(req.body.funding_type);
+      // let bank_list = await alpay_payer_list(req.body.funding_type);
+      let bank_list = [];
+      if (process.env.CHARGES_MODE === "live") {
+        bank_list = await alpay_payer_list(req.body.funding_type);
+      } else {
+        bank_list = await mock_alpay_payer_list(req.body.funding_type);
+      }
       if (bank_list) {
         res
           .status(statusCode.ok)
           .send(response.successdatamsg(bank_list, "Payers list"));
       } else {
-        res
-          .status(statusCode.ok)
-          .send(response.errormsg("Payers not found"));
+        res.status(statusCode.ok).send(response.errormsg("Payers not found"));
       }
     } catch (error) {
      logger.error(500,{message: error,stack: error.stack}); 
@@ -4835,6 +4847,7 @@ async function buildQueryConditions(req) {
   applyStringFilter(req, condition, condition2, "type_of_business", "m.type_of_business", true);
   applyStringFilter(req, condition, condition2, "industry_type", "m.mcc_codes", true);
   applyStringFilter(req, condition, condition2, "super_merchant", "s.super_merchant_id", true);
+  applyStringFilter(req, condition, condition2, "super_merchant_id", "s.super_merchant_id", false);
   applyStatusFilter(req, condition);
   applyStringFilter(req, condition, condition2, "company_name", "m.company_name", false);
   applyEkycStatusFilter(req, condition, condition2);
@@ -5008,11 +5021,16 @@ async function get_receiver_by_sub_merchant_id_api_call(sub_merchant_id) {
     return 0;
   }
 }
+
 async function get_alpay_payer_by_id(payer_id) {
-console.log("🚀 ~ get_alpay_payer_by_id ~ payer_id:", payer_id)
+  console.log("🚀 ~ get_alpay_payer_by_id ~ payer_id:", payer_id)
 
-  let list = await  alpay_payer_list();
-
+    let list = [];
+    if (process.env.CHARGES_MODE === 'live') {
+      list = await  alpay_payer_list();
+    }else{
+      list = await  mock_alpay_payer_list();
+    }
 
     if (payer_id) {
       // Filter based on both conditions
@@ -5447,6 +5465,448 @@ async function alpay_payer_list(funding_type) {
         id: "AP_300597",
         name: "YUP GHANA LIMITED",
         payer_id: "AP_300597",
+        payer_name: "YUP GHANA LIMITED",
+      },
+    ];
+
+    if (funding_type) {
+      // Filter based on both conditions
+      const filteredData = payer_list.filter(
+        (item) =>
+          item.funding_type == funding_type &&
+          item.funding_source_type == funding_type
+      );
+
+      return filteredData;
+    }
+
+    return payer_list;
+    
+  } catch (error) {
+   logger.error(500,{message: error,stack: error.stack}); 
+    return [];
+  }
+}
+
+async function mock_alpay_payer_list(funding_type) {
+  try {
+    let payer_list = [
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300302",
+        name: "STANDARD CHARTERED BANK",
+        payer_id: "MAP_300302",
+        payer_name: "STANDARD CHARTERED BANK",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300303",
+        name: "ABSA BANK GHANA LIMITED",
+        payer_id: "MAP_300303",
+        payer_name: "ABSA BANK GHANA LIMITED",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300304",
+        name: "GCB BANK LIMITED",
+        payer_id: "MAP_300304",
+        payer_name: "GCB BANK LIMITED",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300305",
+        name: "NATIONAL INVESTMENT BANK",
+        payer_id: "MAP_300305",
+        payer_name: "NATIONAL INVESTMENT BANK",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300306",
+        name: "ARB APEX BANK LIMITED",
+        payer_id: "MAP_300306",
+        payer_name: "ARB APEX BANK LIMITED",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300307",
+        name: "AGRICULTURAL DEVELOPMENT BANK",
+        payer_id: "MAP_300307",
+        payer_name: "AGRICULTURAL DEVELOPMENT BANK",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300308",
+        name: "SOCIETE GENERALE GHANA",
+        payer_id: "MAP_300308",
+        payer_name: "SOCIETE GENERALE GHANA",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300309",
+        name: "UNIVERSAL MERCHANT BANK",
+        payer_id: "MAP_300309",
+        payer_name: "UNIVERSAL MERCHANT BANK",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300310",
+        name: "REPUBLIC BANK LIMITED",
+        payer_id: "MAP_300310",
+        payer_name: "REPUBLIC BANK LIMITED",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300311",
+        name: "ZENITH BANK GHANA LTD",
+        payer_id: "MAP_300311",
+        payer_name: "ZENITH BANK GHANA LTD",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300312",
+        name: "ECOBANK GHANA LTD",
+        payer_id: "MAP_300312",
+        payer_name: "ECOBANK GHANA LTD",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300313",
+        name: "CAL BANK LIMITED",
+        payer_id: "MAP_300313",
+        payer_name: "CAL BANK LIMITED",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300316",
+        name: "FIRST ATLANTIC BANK",
+        payer_id: "MAP_300316",
+        payer_name: "FIRST ATLANTIC BANK",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300317",
+        name: "PRUDENTIAL BANK LTD",
+        payer_id: "MAP_300317",
+        payer_name: "PRUDENTIAL BANK LTD",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300318",
+        name: "STANBIC BANK",
+        payer_id: "MAP_300318",
+        payer_name: "STANBIC BANK",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300319",
+        name: "FIRST BANK OF NIGERIA",
+        payer_id: "MAP_300319",
+        payer_name: "FIRST BANK OF NIGERIA",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300320",
+        name: "BANK OF AFRICA",
+        payer_id: "MAP_300320",
+        payer_name: "BANK OF AFRICA",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300322",
+        name: "GUARANTY TRUST BANK",
+        payer_id: "MAP_300322",
+        payer_name: "GUARANTY TRUST BANK",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300323",
+        name: "FIDELITY BANK LIMITED",
+        payer_id: "MAP_300323",
+        payer_name: "FIDELITY BANK LIMITED",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300324",
+        name: "SAHEL SAHARA BANK",
+        payer_id: "MAP_300324",
+        payer_name: "SAHEL SAHARA BANK",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300325",
+        name: "UNITED BANK OF AFRICA",
+        payer_id: "MAP_300325",
+        payer_name: "UNITED BANK OF AFRICA",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300328",
+        name: "BANK OF GHANA",
+        payer_id: "MAP_300328",
+        payer_name: "BANK OF GHANA",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300329",
+        name: "ACCESS BANK LTD",
+        payer_id: "MAP_300329",
+        payer_name: "ACCESS BANK LTD",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300331",
+        name: "CONSOLIDATED BANK GHANA",
+        payer_id: "MAP_300331",
+        payer_name: "CONSOLIDATED BANK GHANA",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300333",
+        name: "BAYPORT SAVINGS AND LOANS",
+        payer_id: "MAP_300333",
+        payer_name: "BAYPORT SAVINGS AND LOANS",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300334",
+        name: "FIRST NATIONAL BANK",
+        payer_id: "MAP_300334",
+        payer_name: "FIRST NATIONAL BANK",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300345",
+        name: "ADEHYEMAN SAVINGS AND LOANS",
+        payer_id: "MAP_300345",
+        payer_name: "ADEHYEMAN SAVINGS AND LOANS",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300349",
+        name: "OPPORTUNITY INTERNALTIONALSAVINGS AND LOANS",
+        payer_id: "MAP_300349",
+        payer_name: "OPPORTUNITY INTERNALTIONALSAVINGS AND LOANS",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300356",
+        name: "SINAPI ABA SAVINGS AND LOANS",
+        payer_id: "MAP_300356",
+        payer_name: "SINAPI ABA SAVINGS AND LOANS",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300361",
+        name: "SERVICES INTEGRITY SAVINGS &LOANS",
+        payer_id: "MAP_300361",
+        payer_name: "SERVICES INTEGRITY SAVINGS &LOANS",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 2,
+        funding_source_type: 2,
+        id: "MAP_300362",
+        name: "GHL Bank",
+        payer_id: "MAP_300362",
+        payer_name: "GHL Bank",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 1,
+        funding_source_type: 1,
+        id: "MAP_300479",
+        name: "ZEEPAY GHANA LIMITED",
+        payer_id: "MAP_300479",
+        payer_name: "ZEEPAY GHANA LIMITED",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 1,
+        funding_source_type: 1,
+        id: "MAP_300574",
+        name: "G-MONEY",
+        payer_id: "MAP_300574",
+        payer_name: "G-MONEY",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 1,
+        funding_source_type: 1,
+        id: "MAP_300591",
+        name: "MTN",
+        payer_id: "MAP_300591",
+        payer_name: "MTN",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 1,
+        funding_source_type: 1,
+        id: "MAP_300592",
+        name: "AIRTELTIGO MONEY",
+        payer_id: "MAP_300592",
+        payer_name: "AIRTELTIGO MONEY",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 1,
+        funding_source_type: 1,
+        id: "MAP_300594",
+        name: "VODAFONE CASH",
+        payer_id: "MAP_300594",
+        payer_name: "VODAFONE CASH",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 1,
+        funding_source_type: 1,
+        id: "MAP_300595",
+        name: "GHANAPAY",
+        payer_id: "MAP_300595",
+        payer_name: "GHANAPAY",
+      },
+      {
+        country_iso_code: "GHA",
+        country: "GHA",
+        currency: "GHS",
+        funding_type: 1,
+        funding_source_type: 1,
+        id: "MAP_300597",
+        name: "YUP GHANA LIMITED",
+        payer_id: "MAP_300597",
         payer_name: "YUP GHANA LIMITED",
       },
     ];

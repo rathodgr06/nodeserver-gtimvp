@@ -83,10 +83,8 @@ module.exports = async () => {
         // }
       // }
         
-  }
-    
-  }
-    return;
+      }
+    }
   } catch (error) {
     logger.error(400,{message: error,stack: error?.stack});
     console.error("Error in auto capture:", error);

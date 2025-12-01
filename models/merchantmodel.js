@@ -784,5 +784,20 @@ var dbModel = {
     }
     return response?.[0];
   },
+  select_merchant_webhook_details: async (select, condition) => {
+    let qb = await pool.get_connection();
+    let response;
+    try {
+      response = await qb
+        .select(select)
+        .where(condition)
+        .get(config.table_prefix + "webhook_settings");
+    } catch (error) {
+      console.error("Database query failed:", error);
+    } finally {
+      qb.release();
+    }
+    return response;
+  },
 };
 module.exports = dbModel;
