@@ -13,7 +13,9 @@ module.exports = async () => {
     let fetchWallets = await transacationChargesModel.getWallets();
     // if the wallets are fetched successfully, you can process them as needed
     if (fetchWallets.length > 0) {
+      
       for (let row of fetchWallets) {
+        //if(row.wallet_id=="494104627940"){
         // fetch last snap for the particular wallet if no data then it return total,available and pending balance is 0 and last_snap date is 1970-01-01
         let lastSnapDetails = await transacationChargesModel.getLastSnapDate(
           row.wallet_id
@@ -35,22 +37,19 @@ module.exports = async () => {
         let pending_balance = await transacationChargesModel.getPendingBalance(
           pendingBalancePayload
         );
+        console.log(`pending balance`);
+        console.log(pending_balance);
         // fetch the sum of the net amount transaction which are in pending but turned to Failed Or Completed
         let pendingTurnedBalancePayload = {
           receiver_id: row?.beneficiary_id,
           sub_merchant_id: row?.sub_merchant_id,
           currency: row?.currency
         };
-         let pendingTurnedBalance = await transacationChargesModel.getPendingTurnedBalance(
-          pendingBalancePayload
-        );
-
-        // update the pending turned balance as counted 
-        let updateRes = await transacationChargesModel.updatePendingTurnedBalance(pendingTurnedBalancePayload);
-
+        
+     
         // calculate total pending balance 
         let lastSnapPendingBalance = isNaN(parseFloat(lastSnapDetails.pending_balance)) ? 0 : parseFloat(lastSnapDetails.pending_balance);
-        let totalPendingBalance = lastSnapPendingBalance+pending_balance-pendingTurnedBalance;
+        let totalPendingBalance = lastSnapPendingBalance+pending_balance;
         // fetch the transaction charges after the snap
          let conditionForSum = {
           receiver_id: row.beneficiary_id,
@@ -67,7 +66,7 @@ module.exports = async () => {
         let totalBalance = lastTotalBalance+sum;
         // calculate total available balance
         let totalAvailableBalance = totalBalance-totalPendingBalance;
-        if(sum>0 || pending_balance>0 || pendingTurnedBalance>0){
+        // if(sum>0 || pending_balance>0 || pendingTurnedBalance>0){
         //prepare data to insert 
           let snapData = {
             wallet_id: row.wallet_id,
@@ -81,7 +80,8 @@ module.exports = async () => {
           let snapResult = await transacationChargesModel.addWalletSnap(
             snapData
           );
-        }
+        // }
+      // }
         
   }
     
