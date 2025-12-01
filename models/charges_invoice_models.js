@@ -2229,140 +2229,17 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
   getSumOfWallets: async (condition) => {
     let response;
     let qb = await pool.get_connection();
-    try {
-      qb.select_sum("net_amount");
-
-      // Apply sub_merchant_id filter only if it has a numeric value
-    const subMerchantId = Number(condition.sub_merchant_id);
-
-    if (Number.isFinite(subMerchantId) && subMerchantId > 0) {
-      qb.where("sub_merchant_id", subMerchantId);
-    }
-
-    // Apply beneficiary_id filter only if it has a numeric value
+     const subMerchantId = Number(condition.sub_merchant_id);
+     // Apply beneficiary_id filter only if it has a numeric value
     const beneficiary_id = Number(condition.receiver_id);
-    if (Number.isFinite(beneficiary_id) && beneficiary_id > 0) {
-      qb.where("receiver_id", beneficiary_id);
-    }
-
-      // Apply other filters
-      qb.where("currency", condition.currency)
-        .where("status", 0)
-        .where("created_at >=", condition.last_cut_off_date)
-        .where("created_at <=", condition.currentDate);
-
-       response = await qb.get("pg_transaction_charges");
-       console.log(qb.last_query());
-
-
-//       let query = `WITH latest_snap AS (
-//     SELECT
-//         w.id,
-//         w.wallet_id,
-//         w.sub_merchant_id,
-//         w.currency,
-//         w.beneficiary_id,
-//         s.balance,
-//         s.snap_date
-//     FROM pg_wallet w
-//     LEFT JOIN (
-//         SELECT s1.wallet_id, s1.balance, s1.snap_date
-//         FROM pg_wallet_snap s1
-//         JOIN (
-//             SELECT wallet_id, MAX(snap_date) AS snap_date
-//             FROM pg_wallet_snap
-//             GROUP BY wallet_id
-//         ) s2 ON s1.wallet_id = s2.wallet_id AND s1.snap_date = s2.snap_date
-//     ) s ON w.wallet_id = s.wallet_id
-//     WHERE 
-//         w.currency = '${condition.currency}'
-//         AND (
-//             (w.sub_merchant_id = ${condition.sub_merchant_id} AND ${condition.sub_merchant_id} != 0)
-//             OR
-//             (w.sub_merchant_id = 0 AND w.beneficiary_id = ${condition.receiver_id})
-//         )
-// ),
-// net_amounts_filtered AS (
-//     SELECT
-//         ls.id,
-//         ls.wallet_id,
-//         ls.sub_merchant_id,
-//         ls.currency,
-//         ls.balance,
-//         ls.snap_date,
-//         ls.beneficiary_id,
-//         SUM(
-//             CASE
-//     WHEN ls.snap_date IS NOT NULL AND tc.created_at >= DATE_ADD(ls.snap_date, INTERVAL 86399 SECOND) THEN tc.net_amount
-//     WHEN ls.snap_date IS NULL THEN tc.net_amount
-//     ELSE 0
-// END
-//         ) AS net_amount_after_snapshot
-//     FROM latest_snap ls
-//     LEFT JOIN pg_transaction_charges tc ON (
-//         (ls.sub_merchant_id IS NOT NULL AND ls.sub_merchant_id != 0 AND tc.sub_merchant_id = ls.sub_merchant_id AND tc.currency = ls.currency)
-//         OR
-//         ((ls.sub_merchant_id IS NULL OR ls.sub_merchant_id = 0) AND ls.beneficiary_id IS NOT NULL AND ls.beneficiary_id != 0 AND tc.receiver_id = ls.beneficiary_id AND tc.currency = ls.currency)
-//     )
-//     GROUP BY
-//         ls.id, ls.wallet_id, ls.sub_merchant_id, ls.currency, ls.balance, ls.snap_date, ls.beneficiary_id
-// ),
-// pending_payouts AS (
-//     SELECT
-//         sub_merchant_id,
-//         receiver_id,
-//         currency,
-//         SUM(amount) AS pending_amount
-//     FROM pg_payout_pending_transactions
-//     WHERE status = 0 AND order_status = 'PENDING'
-//     GROUP BY sub_merchant_id, receiver_id, currency
-// ),
-// txn_sum AS (
-//     SELECT
-//         COALESCE(SUM(net_amount), 0) AS total_amount,
-//         sub_merchant_id,
-//         receiver_id,
-//         currency
-//     FROM pg_transaction_charges
-//     WHERE status = 0
-//         AND sub_merchant_id = ${condition.sub_merchant_id}
-//         AND receiver_id = ${condition.receiver_id}
-//         AND currency = '${condition.currency}'
-//         AND created_at >= '${condition.last_cut_off_date}'
-//         AND created_at <= '${condition.currentDate}'
-//     GROUP BY sub_merchant_id, receiver_id, currency
-// )
-// SELECT
-//     naf.wallet_id,
-//     CASE WHEN naf.sub_merchant_id = 0 THEN NULL ELSE naf.sub_merchant_id END AS sub_merchant_id,
-//     CASE WHEN naf.beneficiary_id = 0 THEN NULL ELSE naf.beneficiary_id END AS receiver_id,
-//     naf.currency,
-//     COALESCE(naf.balance, 0) + COALESCE(naf.net_amount_after_snapshot, 0) AS total_balance,
-//     COALESCE(pp.pending_amount, 0) AS pending_balance,
-//     COALESCE(naf.balance, 0) + COALESCE(naf.net_amount_after_snapshot, 0) - COALESCE(pp.pending_amount, 0) AS balance,
-//     ts.total_amount
-// FROM net_amounts_filtered naf
-// LEFT JOIN pending_payouts pp ON (
-//     (naf.sub_merchant_id IS NOT NULL AND naf.sub_merchant_id != 0 AND pp.sub_merchant_id = naf.sub_merchant_id AND pp.currency = naf.currency)
-//     OR
-//     ((naf.sub_merchant_id IS NULL OR naf.sub_merchant_id = 0) AND naf.beneficiary_id IS NOT NULL AND naf.beneficiary_id != 0 AND pp.receiver_id = naf.beneficiary_id AND pp.currency = naf.currency)
-// )
-// LEFT JOIN txn_sum ts ON 
-//     ts.sub_merchant_id = naf.sub_merchant_id
-//     AND ts.receiver_id = naf.beneficiary_id
-//     AND ts.currency = naf.currency
-// WHERE
-//     naf.sub_merchant_id = ${condition.sub_merchant_id}
-//     AND naf.beneficiary_id = ${condition.receiver_id}
-//     AND naf.currency = '${condition.currency}'
-// LIMIT 1;
-// `;
-
-      // console.log("Database query failed:", query);
-      // response = await qb.query(query);
-      // console.log("🚀 ~ response:", response)
-
+    try {
+      let query =`SELECT SUM(net_amount) as net_amount FROM pg_transaction_charges WHERE (sub_merchant_id = '${subMerchantId}' OR receiver_id='${beneficiary_id}') AND currency ='${condition.currency}' AND status = 0 AND created_at >= '${condition.last_cut_off_date}' AND created_at <= '${condition.currentDate}';`;
+      console.log(query);
+       response = await qb.query(query);
+       console.log(`response of the code`);
+       console.log(response);
     } catch (error) {
+
       logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();
@@ -2678,14 +2555,15 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
     };
   },
   getPendingBalance: async (condition) => {
-    if (!condition?.receiver_id) {
-      return 0;
-    }
+    // if (!condition?.receiver_id) {
+    //   return 0;
+    // }
     let response;
     let qb = await pool.get_connection();
     try {
-      let query = `SELECT SUM(amount) AS pending_balance FROM pg_payout_pending_transactions WHERE sub_merchant_id = ${condition.sub_merchant_id} AND receiver_id = ${condition.receiver_id} AND currency = '${condition.currency}' AND order_status = 'PENDING' AND status = 0 AND created_at >= '${condition.last_cut_off_date}' AND created_at <= '${condition.current_date}';`;
+      let query = `SELECT SUM(amount) AS pending_balance FROM pg_payout_pending_transactions WHERE (sub_merchant_id = ${condition.sub_merchant_id} OR receiver_id = ${condition.receiver_id}) AND currency = '${condition.currency}' AND order_status = 'PENDING' AND status = 0 AND created_at >= '${condition.last_cut_off_date}' AND created_at <= '${condition.current_date}';`;
       response = await qb.query(query);
+      console.log(query);
     } catch (error) {
       logger.error(500,{message: error,stack: error.stack}); 
     } finally {
@@ -2699,14 +2577,16 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
     }
   },
    getPendingTurnedBalance: async (condition) => {
-    if (!condition?.receiver_id) {
-      return 0;
-    }
+    // if (!condition?.receiver_id) {
+    //   return 0;
+    // }
     let response;
     let qb = await pool.get_connection();
     try {
       let query = `SELECT SUM(amount) AS pending_turned_balance FROM pg_payout_pending_transactions WHERE sub_merchant_id = ${condition.sub_merchant_id} AND receiver_id = ${condition.receiver_id} AND currency = '${condition.currency}' AND (order_status = 'COMPLETED' OR order_status='FAILED') AND status = 0`;
       response = await qb.query(query);
+      console.log(`this is turning queries`);
+      console.log(query);
     } catch (error) {
       logger.error(500,{message: error,stack: error.stack}); 
     } finally {

@@ -4946,13 +4946,13 @@ app.post(
 app.post("/wallet-list", apiRateLimiter, WalletValidator.wallet_list, wallet.list);
 app.post("/manage-wallet", CheckHeader, WalletValidator.manage, wallet.manage);
 app.get("/get-wallet-by-id/:id", WalletValidator.get_wallet_by_id, wallet.get_wallet_details_by_id);
-app.post('/roll-out-wallet', walletRollout);
+// app.post('/roll-out-wallet', walletRollout);
 
-schedule.scheduleJob('0 2 * * *', async function () {
-  console.log("🕑 Starting Wallet Snapshot Job at 2:00 AM");
-  await walletRollout();
-  console.log("✅ Wallet Snapshot Job Completed");
-});
+// schedule.scheduleJob('0 2 * * *', async function () {
+//   console.log("🕑 Starting Wallet Snapshot Job at 2:00 AM");
+//   await walletRollout();
+//   console.log("✅ Wallet Snapshot Job Completed");
+// });
 app.get('/roll-out',walletRollout);
 app.post("/get-wallet", WalletValidator.get_wallet, wallet.get_wallet);
 app.post("/load-wallet", WalletValidator.load_wallet, wallet.load_wallet);
@@ -4999,7 +4999,7 @@ app.post('/update-alpay-status',function(req,res){
     console.log(`This is log when we got webhook from ALPAY`);
     console.log(req.body);
 })
-app.get('/roll-out-wallet',walletRollout);
+// app.get('/roll-out-wallet',walletRollout);
 const { seedWallets } = require('../../../scripts/seed-wallets.js');
 app.post('/admin/seed-wallets', async (req, res) => {
   try {
