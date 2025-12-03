@@ -467,7 +467,7 @@ var all_data = {
       const [result, total_count] = await Promise.all([
         SubmerchantModel.select(condition, filter, limit, condition2),
         SubmerchantModel.get_sub_merchant_count(condition, filter, condition2),
-      ]);
+      ]); 
 
       // 5. Process results efficiently
       const send_res = await processResultsInParallel(result);
@@ -804,24 +804,24 @@ var all_data = {
 
           let resp = {
             super_merchant_id: val
-              ? enc_dec.cjs_encrypt(val.super_merchant_id)
+              ? enc_dec.cjs_encrypt(val?.super_merchant_id)
               : 0,
-            submerchant_id: val ? enc_dec.cjs_encrypt(val.id) : 0,
+            submerchant_id: val ? enc_dec.cjs_encrypt(val?.id) : 0,
             merchant_name: val
-              ? await helpers.get_merchantdetails_name_by_id(val.id)
+              ? await helpers.get_merchantdetails_name_by_id(val?.id)
               : "",
-            icon_name: val ? val.icon : "",
-            logo_name: val.logo !== null ? val.logo : company_logo,
+            icon_name: val ? val?.icon : "",
+            logo_name: val?.logo !== null ? val?.logo : company_logo,
             language: val
-              ? await enc_dec.cjs_encrypt(val.default_language)
+              ? await enc_dec.cjs_encrypt(val?.default_language)
               : "",
-            accept_image_name: val ? val.we_accept_image : "",
+            accept_image_name: val ? val?.we_accept_image : "",
             icon: val
-              ? process.env.STATIC_URL + "/static/files/" + val.icon
+              ? process.env.STATIC_URL + "/static/files/" + val?.icon
               : "",
             logo:
-              val.logo !== null
-                ? process.env.STATIC_URL + "/static/files/" + val.logo
+              val?.logo !== null
+                ? process.env.STATIC_URL + "/static/files/" + val?.logo
                 : process.env.STATIC_URL + "/static/images/" + company_logo,
             payment_methods: await SubmerchantModel.selectPaymentMethod(
               rec_id,
@@ -829,23 +829,23 @@ var all_data = {
             ),
             available_payment_method: available_payment_method,
             accept_image: val
-              ? val.we_accept_image != ""
+              ? val?.we_accept_image != ""
                 ? process.env.STATIC_URL +
                   "/static/files/" +
-                  val.we_accept_image
+                  val?.we_accept_image
                 : process.env.STATIC_URL + "/static/files/" + "payment-list.png"
               : process.env.STATIC_URL + "/static/files/" + "payment-list.png",
-            use_logo_instead_icon: val ? val.use_logo : "",
-            brand_color: val ? val.brand_color : "",
-            accent_color: val ? val.accent_color : "",
-            card_payment_scheme: val ? val.card_payment_scheme : "",
-            stored_card_scheme: val ? val.stored_card_scheme : "",
+            use_logo_instead_icon: val ? val?.use_logo : "",
+            brand_color: val ? val?.brand_color : "",
+            accent_color: val ? val?.accent_color : "",
+            card_payment_scheme: val ? val?.card_payment_scheme : "",
+            stored_card_scheme: val ? val?.stored_card_scheme : "",
             fonts: await fontModel.select(),
-            font_name: val ? val.font_name : "",
+            font_name: val ? val?.font_name : "",
             card_payment_methods: card_result,
             is_back_transfer: check_bank_transfer,
-            test_card_payment_scheme: val ? val.test_card_payment_scheme : "",
-            test_stored_card_scheme: val ? val.test_stored_card_scheme : "",
+            test_card_payment_scheme: val ? val?.test_card_payment_scheme : "",
+            test_stored_card_scheme: val ? val?.test_stored_card_scheme : "",
           };
           send_res = resp;
 
