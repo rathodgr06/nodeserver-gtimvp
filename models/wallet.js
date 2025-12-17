@@ -63,46 +63,80 @@ var walletDBModel = {
     let data;
     let qb = await pool.get_connection();
     try {
-
       page = parseInt(page);
       limit = parseInt(limit);
-      page=page-1;
-      let offset = page * limit;
+      let offset = (page - 1) * limit;
 
-      // 1. Get total count
-      const countResult = await qb
-        .select("COUNT(*) AS total", false)
-        .where(condition)
-        .get(dbtable);
+      // ----------------------------------------
+      // 1. Build WHERE clause safely
+      // ----------------------------------------
+      let whereParts = [];
 
-      totalCount = countResult[0]?.total || 0;
+      for (let [key, value] of Object.entries(condition)) {
+          if (typeof value === "string") {
+              whereParts.push(`${key} = '${value}'`);
+          } else {
+              whereParts.push(`${key} = ${value}`);
+          }
+      }
 
-      // 2. Reset query builder for the main query
-      // qb = await pool.get_connection();
+      // Add super merchant filter (JOIN condition)
+      if (condition.super_merchant_id) {
+          whereParts.push(`mm.super_merchant_id = '${condition.super_merchant_id}'`);
+      }
 
-      // 3. Get paginated data
-      const whereClause = Object.entries(condition)
-      .map(([key, value]) => `${key} = ${typeof value === 'string' ? `'${value}'` : value}`)
-      .join(' AND ');
+      let whereClause = whereParts.length ? whereParts.join(" AND ") : "1=1";
 
-      const query = ` SELECT * FROM pg_wallet WHERE ${whereClause} ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}; `;
-      data = await qb.query(query);
-      console.log(query);
+      // ----------------------------------------
+      // 2. Total Count with JOIN
+      // ----------------------------------------
+      const countQuery = `
+          SELECT COUNT(*) AS total
+          FROM pg_wallet pw
+          INNER JOIN pg_master_merchant mm 
+              ON pw.sub_merchant_id = mm.id
+          WHERE ${whereClause}
+      `;
+
+      const countResult = await qb.query(countQuery);
+      let totalCount = countResult[0]?.total || 0;
+
+      // ----------------------------------------
+      // 3. Fetch paginated records
+      // ----------------------------------------
+      const dataQuery = `
+          SELECT pw.*, mm.super_merchant_id, mmd.company_name
+          FROM pg_wallet pw
+          INNER JOIN pg_master_merchant mm 
+              ON pw.sub_merchant_id = mm.id
+          INNER JOIN pg_master_merchant_details mmd 
+              ON pw.sub_merchant_id = mmd.merchant_id
+          WHERE ${whereClause}
+          ORDER BY pw.created_at DESC
+          LIMIT ${limit} OFFSET ${offset}
+      `;
+      console.log("🚀 ~ dataQuery:", dataQuery)
+
+      data = await qb.query(dataQuery);
+
+      console.log("COUNT QUERY:", countQuery);
+      console.log("DATA QUERY:", dataQuery);
+
       response = {
-      status: 200,
-      message: "Data fetched successfully",
-      data,
-      totalCount,
-      page,
-      limit,
-    };
+          status: 200,
+          message: "Data fetched successfully",
+          data,
+          totalCount,
+          page,
+          limit
+      };
 
-    } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+  } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
       response = { status: 400, message: error.message };
-    } finally {
+  } finally {
       qb.release();
-    }
+  }
     return response;
   },
   update: async (data, condition) => {

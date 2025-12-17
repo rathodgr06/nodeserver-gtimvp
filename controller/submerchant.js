@@ -4461,10 +4461,18 @@ var all_data = {
     }
   },
   getAllFundingDetails: async (req, res) => {
+    console.log("🚀 ~ req:", req.body)
     try {
       let page = req.bodyString("page") || 0;
       let per_page = req.bodyString("per_page") || 50;
       let sub_merchant_id = req.bodyString("sub_merchant_id") || null;
+      let super_merchant_id = req.bodyString("super_merchant_id") || null;
+      let receiver_id = req.bodyString("receiver_id") || null;
+      let account_type = req.bodyString("account_type") || null;
+      let bank_verified = req.bodyString("bank_verified") || null;
+      let country = req.bodyString("country") || null;
+      let currency = req.bodyString("currency") || null;
+      let status = req.bodyString("status") || null;
 
       let where = {
         page: page,
@@ -4479,9 +4487,38 @@ var all_data = {
         where.submerchant_id = sub_merchant_id;
       }
 
+      if (super_merchant_id) {
+        if (super_merchant_id.length > 10) {
+          super_merchant_id = await enc_dec.cjs_decrypt(super_merchant_id);
+        }
+        where.super_merchant_id = super_merchant_id;
+      }
+
+      if (receiver_id) {
+        where.receiver_id = receiver_id;
+      }
+
+      if (country) {
+        where.country = country;
+      }
+
+      if (currency) {
+        where.currency = currency;
+      }
+      if (account_type) {
+        where.account_type = account_type;
+      }
+      if (bank_verified || bank_verified == 0) {
+        where.bank_verified = bank_verified;
+      }
+      if (status || status == 0) {
+        where.status = status;
+      }
+
       let merchantResult = await MerchantEkycModel.fetchAllMerchantDetails(
         where
       );
+      console.log("🚀 ~ merchantResult:", merchantResult)
 
       res
         .status(statusCode.ok)

@@ -7344,6 +7344,8 @@ var MerchantEkyc = {
     }
   },
   super_merchant_master: async (req, res) => {
+    console.log("req.body......",req.body);
+    
     let condition = {};
     if (req.user.type == "admin") {
       condition = {
@@ -7358,6 +7360,28 @@ var MerchantEkyc = {
         super_merchant_id: 0,
       };
     }
+
+    if (req.bodyString("status")) {
+      condition.status = req.bodyString("status") === 'Active' ? 0 : 1;
+    }
+    if (req.bodyString("ekyc_status")) {
+      // condition.status = req.bodyString("status");
+    }
+    if (req.bodyString("business_address")) {
+      if(req.bodyString("business_address")?.length > 10){
+        condition.registered_business_address = enc_dec.cjs_decrypt(req.bodyString("business_address"));
+      }
+    }
+    if (req.bodyString("type_of_business")) {
+      // condition.status = req.bodyString("status");
+    }
+    if (req.bodyString("industry_type")) {
+      // condition.status = req.bodyString("status");
+    }
+    if (req.bodyString("super_merchant")) {
+      condition.id = req.bodyString("super_merchant");
+    }
+
     let limit = {
       perpage: 0,
       page: 0,

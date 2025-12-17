@@ -899,17 +899,27 @@ var data_set = {
     }
   },
   dropdown_list: async (req, res) => {
-    let limit = {
-      perpage: 0,
-      page: 0,
-    };
-    if (req.bodyString("per_page") && req.bodyString("page")) {
-      perpage = parseInt(req.bodyString("per_page"));
-      start = parseInt(req.bodyString("page"));
+    console.log("🚀 ~ eq.body:", req.body)
+    let perpage = 10; // default
+    let page = 1;    // default
 
-      limit.perpage = perpage;
-      limit.start = (start - 1) * perpage;
+    const perPageStr = req.bodyString("per_page");
+    const pageStr = req.bodyString("page");
+
+    if (perPageStr && pageStr) {
+      perpage = parseInt(perPageStr, 10);
+      page = parseInt(pageStr, 10);
+
+      // validate
+      if (isNaN(perpage) || perpage <= 0) perpage = 10;
+      if (isNaN(page) || page <= 0) page = 1;
     }
+
+    const pagination = {
+      limit: perpage,
+      offset: (page - 1) * perpage
+    };
+
     const search_text = req.bodyString("search");
     const status = helpers.get_status(req.bodyString("status"));
     const country = await helpers.get_country_id_by_name(
@@ -971,7 +981,7 @@ var data_set = {
       filter.business_phone_number = search_text;
     }
 
-    MerchantModel.dropdownselect(search, filter, limit)
+    MerchantModel.dropdownselect(search, filter, pagination)
       .then(async (result) => {
         let send_res = [];
         for (let val of result) {
@@ -1008,6 +1018,7 @@ var data_set = {
       });
   },
   mid_dropdown_list: async (req, res) => {
+    // console.log("🚀 ~ req:", req.body);
     let limit = {
       perpage: 0,
       page: 0,
@@ -1053,6 +1064,13 @@ var data_set = {
       }
       search["s.id"] = submerchant_id;
     }
+    if (req.bodyString("live")) {
+      search["s.live"] = 1;
+    }
+    if (req.bodyString("onboarding_done")) {
+      search["s.onboarding_done"] = 1;
+    }
+
     if (req.bodyString("country")) {
       search.country = country;
     }

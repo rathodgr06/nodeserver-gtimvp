@@ -819,17 +819,18 @@ var dbModel = {
     }
     return response;
   },
-  dropdownselect: async (condition_obj, filter, limit) => {
-    console.log("🚀 ~ condition_obj:", condition_obj);
+  dropdownselect: async (condition_obj, filter, pagination) => {
+    console.log("🚀 ~ pagination:", pagination)
+    // console.log("🚀 ~ condition_obj:", condition_obj);
 
     // Build LIKE search condition
     let search_text = await helpers.get_conditional_or_like_string(filter);
     // Example: name LIKE '%PD 5%' OR email LIKE '%PD 5%'
-    console.log("🚀 ~ search_text:", search_text);
+    // console.log("🚀 ~ search_text:", search_text);
 
     // Build fixed join conditions
     let condition = await helpers.get_join_conditional_string(condition_obj);
-    console.log("🚀 ~ condition:", condition);
+    // console.log("🚀 ~ condition:", condition);
 
     let select = "s.super_merchant_id, s.id, m.company_name, m.merchant_id";
 
@@ -851,24 +852,22 @@ var dbModel = {
     // 3. Exclude empty company name
     where_clause += " AND m.company_name != '' ";
 
-    let page = Number(condition_obj.page) || 1;
-    limit = Number(limit) || 20;
-    let offset = (page - 1) * limit;
-
     let qb = await pool.get_connection();
     let response;
 
     try {
-      response = await qb.query(
-        `SELECT ${select}
+
+      let stringQuery = `SELECT ${select}
         FROM ${dbtable} s
         INNER JOIN ${merchant_details} m 
               ON s.id = m.merchant_id
         WHERE ${where_clause}
         ORDER BY s.id DESC
-        LIMIT ${offset}, ${limit}`
-      );
-      console.log("🚀 ~ query:", qb.last_query());
+        LIMIT ${pagination?.offset}, ${pagination?.limit}`;
+        console.log("🚀 ~ stringQuery:", stringQuery)
+        
+      response = await qb.query(stringQuery);
+      
     } catch (error) {
       console.log("🚀 ~ error:", error);
       logger.error(500, { message: error, stack: error.stack });
@@ -879,16 +878,16 @@ var dbModel = {
     return response;
   },
   middropdownselect: async (condition_obj, filter, limit) => {
-    console.log("🚀 ~ middropdownselect - condition_obj:", condition_obj);
+    // console.log("🚀 ~ middropdownselect - condition_obj:", condition_obj);
 
     // Build LIKE search condition
     let search_text = await helpers.get_conditional_or_like_string(filter);
     // Example: name LIKE '%PD 5%' OR email LIKE '%PD 5%'
-    console.log("🚀 ~ middropdownselect-search_text:", search_text);
+    // console.log("🚀 ~ middropdownselect-search_text:", search_text);
 
     // Build fixed join conditions
     let condition = await helpers.get_join_conditional_string(condition_obj);
-    console.log("🚀 ~ middropdownselect-condition:", condition);
+    // console.log("🚀 ~ middropdownselect-condition:", condition);
 
     let select = "s.super_merchant_id, s.id, m.company_name, m.merchant_id";
 
@@ -943,15 +942,15 @@ var dbModel = {
     return response;
   },
   dropdownselect_count: async (condition_obj, filter) => {
-    console.log("🚀 COUNT condition_obj:", condition_obj);
+    // console.log("🚀 COUNT condition_obj:", condition_obj);
 
     // Build LIKE filter
     let search_text = await helpers.get_conditional_or_like_string(filter);
-    console.log("🚀 COUNT search_text:", search_text);
+    // console.log("🚀 COUNT search_text:", search_text);
 
     // Build join condition
     let condition = await helpers.get_join_conditional_string(condition_obj);
-    console.log("🚀 COUNT condition:", condition);
+    // console.log("🚀 COUNT condition:", condition);
 
     // Build final WHERE clause
     let where_clause = "";
@@ -991,15 +990,15 @@ var dbModel = {
     return response?.[0]?.total || 0;
   },
   middropdownselect_count: async (condition_obj, filter) => {
-    console.log("🚀 ~ condition_obj:", condition_obj);
+    // console.log("🚀 ~ condition_obj:", condition_obj);
 
     // Build LIKE search condition
     let search_text = await helpers.get_conditional_or_like_string(filter);
-    console.log("🚀 ~ search_text:", search_text);
+    // console.log("🚀 ~ search_text:", search_text);
 
     // Build fixed join conditions
     let condition = await helpers.get_join_conditional_string(condition_obj);
-    console.log("🚀 ~ condition:", condition);
+    // console.log("🚀 ~ condition:", condition);
 
     // Build final WHERE clause
     let where_clause = "";

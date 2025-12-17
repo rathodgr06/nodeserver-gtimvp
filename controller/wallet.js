@@ -346,37 +346,46 @@ var wallet = {
   console.log("🚀 ~ req:", req.body);
   let receiver_id = req.bodyString("receiver_id");
   let sub_merchant_id = req.bodyString("sub_merchant_id");
+  let super_merchant_id = req.bodyString("super_merchant_id");
   let currency = req.bodyString("currency");
   let page = req.bodyString("page");
   let per_page = 50;
   
   try {
-    let condition = {
-      deleted: 0,
-    };
     let limit = {
       page: 1, // Default Values
       per_page: 20, // Default Values
     };
     
+    let condition = {};
+    
+    condition["pw.deleted"] = 0;
+
     // filters and pagination
-    if (sub_merchant_id) {
+    if (sub_merchant_id && sub_merchant_id != '0') {
       if (sub_merchant_id.length > 10) {
         sub_merchant_id = await encrypt_decrypt('decrypt', sub_merchant_id);
       }
-      condition.sub_merchant_id = sub_merchant_id;
+      condition["pw.sub_merchant_id"] = sub_merchant_id;
     }
     if (receiver_id) {
-      condition.beneficiary_id = parseInt(receiver_id);
+      condition["pw.beneficiary_id"] = parseInt(receiver_id);
     }
     if (currency) {
-      condition.currency = currency;
+      condition["pw.currency"] = currency;
     }
     if (page) {
       limit.page = page;
     }
     if (per_page) {
       limit.per_page = per_page;
+    }
+
+    if (super_merchant_id) {
+      if (super_merchant_id?.length > 10) {
+        super_merchant_id = await enc_dec.cjs_decrypt(super_merchant_id);
+      }
+      condition["mm.super_merchant_id"] = super_merchant_id;
     }
     
     const result = await WalletModel.list(condition, page, per_page);
@@ -424,6 +433,7 @@ var wallet = {
           wallet_id: balance_result?.wallet_id || wallet?.wallet_id,
           receiver_id: wallet?.beneficiary_id,
           sub_merchant_id: wallet?.sub_merchant_id,
+          merchant_name: wallet?.company_name,
           currency: wallet?.currency,
           total_balance: balance_result?.total_balance || 0,
           available_balance: balance_result?.balance || 0,
@@ -938,8 +948,14 @@ var wallet = {
     const condition = req.body;
     console.log("🚀 ~ condition:", condition)
 
+    if (condition?.sub_merchant_id) {
+      if (condition?.sub_merchant_id?.length > 10) {
+        condition.sub_merchant_id = enc_dec.cjs_decrypt(condition?.sub_merchant_id);
+      }
+    }
+
     charges_invoice_models.get_snapshot_balance(condition).then(async (result) => {
-        console.log("🚀 ~ .then ~ result:", result);
+        // console.log("🚀 ~ .then ~ result:", result);
         if (result?.status == 200) {
 
           let final_response_list = [];
