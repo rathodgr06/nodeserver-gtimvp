@@ -14,7 +14,7 @@ var dbModel = {
     try {
       response = await qb.returning("id").insert(dbtable, data);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -38,8 +38,9 @@ var dbModel = {
           .order_by("currency", "asc")
           .get(dbtable);
       }
+      console.log(qb.last_query());
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -51,18 +52,18 @@ var dbModel = {
     try {
       let ids_array = ids ? ids.split(",") : [];
       // if (ids_array.length > 0) {
-        await qb.select("*");
-          qb.where(condition)
-          if (ids_array.length > 0) {
-          qb.where_in("id", ids_array);
-          }
-          qb.order_by("id", "asc")
-        response =   qb.get(dbtable);
+      await qb.select("*");
+      qb.where(condition);
+      if (ids_array.length > 0) {
+        qb.where_in("id", ids_array);
+      }
+      qb.order_by("id", "asc");
+      response = qb.get(dbtable);
       // }
       console.log(`this is currency list`);
       console.log(qb.last_query());
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -74,7 +75,7 @@ var dbModel = {
     try {
       response = await qb.select(selection).where(condition).get(dbtable);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -90,7 +91,7 @@ var dbModel = {
         .order_by("currency", "asc")
         .get(dbtable);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -102,7 +103,7 @@ var dbModel = {
     try {
       response = await qb.select(selection).where(condition).get(dbtable);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -114,7 +115,7 @@ var dbModel = {
     try {
       response = await qb.set(data).where(condition).update(dbtable);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -129,11 +130,56 @@ var dbModel = {
         "select count('id') as count from " + dbtable + " where " + condition
       );
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
     return response?.[0].count;
+  },
+  selectBumpUpRate: async (currency) => {
+    let qb = await pool.get_connection();
+    let response;
+    try {
+      response = await qb.query(`SELECT
+    c.code,
+    COALESCE(b.rate, 1) AS bump_rate
+FROM pg_master_currency c
+LEFT JOIN pg_bump_up_rates b
+    ON b.currency = c.code
+   AND b.base_currency = '${currency}'
+WHERE c.status = 0
+  AND c.deleted = 0;`);
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+    } finally {
+      qb.release();
+    }
+    return response;
+  },
+  removeOldRate: async (currency) => {
+    console.log(`inside delete`);
+    let qb = await pool.get_connection();
+    let response;
+    try {
+      response = await qb.query(`DELETE FROM pg_bump_up_rates WHERE base_currency="${currency}"`);
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+    } finally {
+      qb.release();
+    }
+    return response;
+  },
+  addRate: async (data) => {
+    let qb = await pool.get_connection();
+    let response;
+    try {
+      response = await qb.insert(`pg_bump_up_rates`, data);
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+    } finally {
+      qb.release();
+    }
+    return response;
   },
 };
 module.exports = dbModel;

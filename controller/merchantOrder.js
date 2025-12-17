@@ -87,6 +87,7 @@ const fiserv_void = require("./fiserv/void.js");
 const SendTransactionMailAction = require("./SendTransactionMail.js");
 const https = require("https");
 const { send } = require("process");
+const DccService = require('../service/dccService.js');
 const ni_capture_func = async (req, res) => {
   let order_id = req.bodyString("p_order_id");
 
@@ -2736,6 +2737,9 @@ var MerchantOrder = {
       order_details.currency,
       mode
     );
+    
+   
+
 
     logs.push(
       `${moment().format(
@@ -2759,7 +2763,7 @@ var MerchantOrder = {
     logs.push(
       `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : accessToken ${token}`
     );
-
+   
     let ins_body = {
       merchant_id: req.credentials.merchant_id,
       mcc: req.credentials.mcc_id,
@@ -2798,8 +2802,8 @@ var MerchantOrder = {
       amount: order_details.amount,
       amount_left: order_details.amount,
       currency: order_details.currency,
-      // order_amount:order_details.amount,
-      // order_currency:order_details.currency,
+      order_amount:order_details.amount,
+      order_currency:order_details.currency,
       // return_url: order_details.return_url,
       description: order_details?.description,
       other_description: order_details?.description,
@@ -2842,6 +2846,24 @@ var MerchantOrder = {
     merchantOrderModel
       .add(ins_body, mode)
       .then(async (result) => {
+        // now order is created call DCC 
+        let proccessed_amount =  order_details.currency + " " + order_details.amount;
+         let dcc_enabled = await helpers.fetchDccStatus();
+         if (
+           mid_data?.[0]?.code != order_details.currency &&
+          dcc_enabled
+         ) {
+           let rate = await DccService.fetchRate(
+             mode,
+             order_id,
+             mid_data?.[0]?.code,
+             order_details.currency,
+             order_details.amount
+           );
+           console.log(rate);
+           proccessed_amount = rate.data.currency +" "+rate.data.amount
+          
+         }
         let p_request_id = await helpers.make_sequential_no("REQ");
         let order_req = {
           merchant_id: req.credentials.merchant_id,
@@ -2861,6 +2883,7 @@ var MerchantOrder = {
           p_request_id: p_request_id,
           order_creation_date: moment(created_at).format("DD/MM/YYYY HH:mm:ss"),
           amount: order_details.currency + " " + order_details.amount,
+          proccessed_amount:proccessed_amount,
           payment_link:
             process.env.PAYMENT_URL +
             "initiate/" +
@@ -3113,7 +3136,7 @@ var MerchantOrder = {
         };
 
         let selection =
-          "order_id,customer_name as name,customer_email as email,customer_mobile as mobile,customer_code as code,amount,currency,status,return_url,payment_token_id as payment_token,created_at";
+          "order_id,customer_name as name,customer_email as email,customer_mobile as mobile,customer_code as code,amount,currency,order_amount,order_currency,  status,return_url,payment_token_id as payment_token,created_at";
         merchantOrderModel
           .selectOne(
             selection,

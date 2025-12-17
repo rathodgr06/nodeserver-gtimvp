@@ -270,10 +270,19 @@ var Setting = {
       let avatar = "";
 
       if (req.user.type == "merchant") {
-      
+        let encriptedStoreID = enc_dec.cjs_encrypt(mer_details.id);
+        let isHaveAccessToSuperStore = await helpers.haveAccesstoSuperStore(encriptedStoreID,req.user.id);
         let isLiveMode = await helpers.checkMerchantLiveModeStatus(req.user);
+        let allowMid = user_details.allow_mid;
+        if(user_details.super_merchant_id>0){
+          allowMid = await helpers.checkAllowMidOnSuperMerchant(user_details.super_merchant_id)
+        }
+        console.log(`user details`);
+        console.log(user_details);
         data.user_detail = {
           is_user:supermerchant_live.user,
+          immediateSubmerchant:enc_dec.cjs_encrypt(mer_details.id),
+          isHaveAccessToSuperStore:isHaveAccessToSuperStore,
           name: user_details.name
             ? user_details.name
             : mer_details.company_name
@@ -289,7 +298,7 @@ var Setting = {
                 }),
           live: supermerchant_live.live,
           isLiveMode:isLiveMode,
-          allow_mid: user_details.allow_mid,
+          allow_mid:allowMid,
           allow_rules: user_details.allow_rules,
           supermerchant_id: enc_dec.cjs_encrypt(req?.user?.id),
           allow_payment_amount:
@@ -1177,6 +1186,49 @@ var Setting = {
       })
       .catch((error) => {
         console.log(error);
+       logger.error(500,{message: error,stack: error.stack}); 
+        res
+          .status(statusCode.internalError)
+          .send(response.errormsg(error.message));
+      });
+  },
+   dccDetails: async (req, res) => {
+    settingModel
+      .selectOneByTableAndCondition("*", { id: 1 }, "dcc_setup")
+      .then(async (result) => {
+        let res1 = {
+          data_id: enc_dec.cjs_encrypt(result.id),
+          dcc_enabled:result.dcc_enabled,
+          provider:result.provider,
+          apikey: result.apikey,
+          secret: result.secret,
+        };
+        res
+          .status(statusCode.ok)
+          .send(response.successdatamsg(res1, "Details fetched successfully."));
+      })
+      .catch((error) => {
+       logger.error(500,{message: error,stack: error.stack}); 
+        res
+          .status(statusCode.internalError)
+          .send(response.errormsg(error.message));
+      });
+  },
+   dccUpdate: async (req, res) => {
+    let updateData = {
+      dcc_enabled:req.bodyString('dcc_enabled'),
+      provider:req.bodyString('provider'),
+      apikey:req.bodyString('apikey'),
+      secret:req.bodyString('secret')
+    };
+    settingModel
+      .updateDynamic( { id: 1 },updateData, "dcc_setup")
+      .then(async (result) => {
+        res
+          .status(statusCode.ok)
+          .send(response.successmsg("DCC Details updated successfully."));
+      })
+      .catch((error) => {
        logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)

@@ -532,7 +532,7 @@ const MerchantOrderValidator = {
                     .status(StatusCode.badRequest)
                     .send(
                       ServerResponse.common_error_msg(
-                        result3.error.details[0].message,
+                        result3.error.message,
                         99
                       )
                     );
@@ -554,12 +554,13 @@ const MerchantOrderValidator = {
                       )
                     );
                 } else {
+                  console.log(`the error details are below`);
+                  console.log(result1.error.message);
                   res
                     .status(StatusCode.badRequest)
                     .send(
-                      ServerResponse.common_error_msg(
-                        result1.error.details[0].message,
-                        99
+                      ServerResponse.common_error_msg(result1.error.message,
+                       99
                       )
                     );
                 }
@@ -586,7 +587,7 @@ const MerchantOrderValidator = {
                     .status(StatusCode.badRequest)
                     .send(
                       ServerResponse.common_error_msg(
-                        result4.error.details[0].message,
+                        result4.error.message,
                         99
                       )
                     );
@@ -616,7 +617,7 @@ const MerchantOrderValidator = {
                     .status(StatusCode.badRequest)
                     .send(
                       ServerResponse.common_error_msg(
-                        result2.error.details[0].message,
+                        result2.error.message,
                         99
                       )
                     );
@@ -646,7 +647,7 @@ const MerchantOrderValidator = {
                     .status(StatusCode.badRequest)
                     .send(
                       ServerResponse.common_error_msg(
-                        result6.error.details[0].message,
+                        result6.error.message,
                         99
                       )
                     );

@@ -2385,6 +2385,8 @@ async function transformTransaction(val, params, table_name) {
       status_code: val?.status || "",
       currency: val?.currency || "",
       amount: val?.amount ? val.amount.toFixed(2) : "",
+      order_amount: val?.order_amount ? val.order_amount.toFixed(2) : "",
+      order_currency: val?.order_currency || "",
       psp: val?.psp || "",
       payment_method: val?.payment_mode || "",
       payment_method_id: val?.pan || "",

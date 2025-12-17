@@ -4999,6 +4999,31 @@ app.post('/update-alpay-status',function(req,res){
     console.log(`This is log when we got webhook from ALPAY`);
     console.log(req.body);
 })
+app.post(
+  "/currency/fetch-bump-up-rate",
+  CheckHeader,
+  CheckToken,
+  Validator.fetchBumpUpRate,
+  Currency.fetchBumpUpRate
+);
+app.post(
+  "/currency/store-bump-up-rate",
+  CheckHeader,
+  CheckToken,
+  Currency.storeRate
+);
+app.post(
+  "/dcc/details",
+  CheckHeader,
+  CheckToken,
+  Setting.dccDetails
+);
+app.post(
+  "/dcc/update",
+  CheckHeader,
+  CheckToken,
+  Setting.dccUpdate
+);
 // app.get('/roll-out-wallet',walletRollout);
 const { seedWallets } = require('../../../scripts/seed-wallets.js');
 app.post('/admin/seed-wallets', async (req, res) => {

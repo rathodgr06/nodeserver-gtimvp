@@ -129,7 +129,7 @@ let helpers = {
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -167,7 +167,7 @@ let helpers = {
         .get(config.table_prefix + "merchant_api_key");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -188,7 +188,7 @@ let helpers = {
         .get(config.table_prefix + "master_security_questions");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -209,7 +209,7 @@ let helpers = {
         .get(config.table_prefix + "country");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -230,7 +230,7 @@ let helpers = {
         .get(config.table_prefix + "country");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -251,7 +251,7 @@ let helpers = {
         .get(config.table_prefix + "country");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -273,7 +273,7 @@ let helpers = {
       console.log(qb.last_query());
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -299,7 +299,7 @@ let helpers = {
         .get(config.table_prefix + "city");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -324,7 +324,7 @@ let helpers = {
         .get(config.table_prefix + "states");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -351,7 +351,7 @@ let helpers = {
         .get(config.table_prefix + "city");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -388,7 +388,7 @@ let helpers = {
         .get(config.table_prefix + "country");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -414,7 +414,7 @@ let helpers = {
         .get(config.table_prefix + "country");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -443,7 +443,7 @@ let helpers = {
         .get(config.table_prefix + "states");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -467,7 +467,7 @@ let helpers = {
         .get(config.table_prefix + "country");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -488,7 +488,7 @@ let helpers = {
         .get(config.table_prefix + "nationality");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -509,7 +509,7 @@ let helpers = {
         .get(config.table_prefix + "states");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -531,7 +531,7 @@ let helpers = {
         .get(config.table_prefix + "city");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -552,7 +552,7 @@ let helpers = {
         .get(config.table_prefix + "master_currency");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -573,7 +573,7 @@ let helpers = {
         .get(config.table_prefix + "master_currency");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -594,7 +594,7 @@ let helpers = {
         .get(config.table_prefix + "master_super_merchant");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -621,7 +621,7 @@ let helpers = {
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -642,7 +642,7 @@ let helpers = {
         .get(config.table_prefix + "master_currency");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -663,7 +663,7 @@ let helpers = {
         .get(config.table_prefix + "country");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -683,7 +683,7 @@ let helpers = {
         .get(config.table_prefix + "states");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -703,7 +703,7 @@ let helpers = {
         .get(config.table_prefix + "city");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -724,7 +724,7 @@ let helpers = {
         .get(config.table_prefix + "master_designation");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -745,7 +745,7 @@ let helpers = {
         .get(config.table_prefix + "master_department");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -766,7 +766,7 @@ let helpers = {
         .get(config.table_prefix + "master_type_of_business");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -787,7 +787,7 @@ let helpers = {
         .get(config.table_prefix + "master_pricing_plan");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -829,7 +829,7 @@ let helpers = {
       // console.log("🚀 ~ getPSPByPricingPlanID: ~ response:", qb.last_query())
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1069,7 +1069,7 @@ let helpers = {
         .get(config.table_prefix + "master_designation");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1091,7 +1091,7 @@ let helpers = {
         .get(config.table_prefix + "subs_plans");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1113,7 +1113,7 @@ let helpers = {
         .get(config.table_prefix + "master_department");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1146,7 +1146,7 @@ let helpers = {
         .update(config.table_prefix + dbtable);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1162,7 +1162,7 @@ let helpers = {
         .get(config.table_prefix + "master_type_of_business");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1183,7 +1183,7 @@ let helpers = {
         .get(config.table_prefix + "master_entity_type");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1204,7 +1204,7 @@ let helpers = {
         .get(config.table_prefix + "psp");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1225,7 +1225,7 @@ let helpers = {
         .get(config.table_prefix + "master_features");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1246,7 +1246,7 @@ let helpers = {
         .get(config.table_prefix + "psp");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1266,7 +1266,7 @@ let helpers = {
         .get(config.table_prefix + "mid");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1286,7 +1286,7 @@ let helpers = {
         .get(config.table_prefix + "adm_user");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1307,7 +1307,7 @@ let helpers = {
         .get(config.table_prefix + "adm_user");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1328,7 +1328,7 @@ let helpers = {
         .get(config.table_prefix + "customers");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1349,7 +1349,7 @@ let helpers = {
         .get(config.table_prefix + "customers");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1370,7 +1370,7 @@ let helpers = {
         .get(config.table_prefix + "psp");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1391,7 +1391,7 @@ let helpers = {
         .get(config.table_prefix + "master_merchant");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1412,7 +1412,7 @@ let helpers = {
         .get(config.table_prefix + "master_merchant");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1433,7 +1433,7 @@ let helpers = {
         .get(config.table_prefix + "master_merchant_details");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1453,7 +1453,7 @@ let helpers = {
         .get(config.table_prefix + "master_merchant_details");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1475,7 +1475,7 @@ let helpers = {
       response = await qb.query(sql);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1495,7 +1495,7 @@ let helpers = {
       response = await qb.query(sql);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1517,7 +1517,7 @@ let helpers = {
       response = await qb.query(sql);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1538,7 +1538,7 @@ let helpers = {
         .get(config.table_prefix + "referrers");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1560,7 +1560,7 @@ let helpers = {
         .get(config.table_prefix + "referrers");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1580,7 +1580,7 @@ let helpers = {
         .get(config.table_prefix + "referral_bonus");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1605,7 +1605,7 @@ let helpers = {
         .get(config.table_prefix + "master_merchant");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1625,7 +1625,7 @@ let helpers = {
         .get(config.table_prefix + "master_merchant");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1645,7 +1645,7 @@ let helpers = {
         .get(config.table_prefix + "master_merchant");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1665,7 +1665,7 @@ let helpers = {
         .get(config.table_prefix + "master_super_merchant");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1685,7 +1685,7 @@ let helpers = {
         .get(config.table_prefix + "referrers");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1705,7 +1705,7 @@ let helpers = {
         .get(config.table_prefix + "referrers");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1727,7 +1727,7 @@ let helpers = {
         .get(config.table_prefix + "referral_bonus_monthly_invoice");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1749,7 +1749,7 @@ let helpers = {
         .get(config.table_prefix + "referrer_invoice_payout");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1769,7 +1769,7 @@ let helpers = {
         .get(config.table_prefix + "referrers");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1789,7 +1789,7 @@ let helpers = {
         .get(config.table_prefix + "master_super_merchant");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1810,7 +1810,7 @@ let helpers = {
         .get(config.table_prefix + "master_merchant");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1833,7 +1833,7 @@ let helpers = {
         .get(config.table_prefix + "master_super_merchant");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1855,7 +1855,7 @@ let helpers = {
         .get(config.table_prefix + "master_super_merchant");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1878,7 +1878,7 @@ let helpers = {
         .get(config.table_prefix + "master_merchant");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1901,7 +1901,7 @@ let helpers = {
         .get(config.table_prefix + "master_merchant");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1921,7 +1921,7 @@ let helpers = {
         .get(config.table_prefix + "master_merchant_details");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1942,7 +1942,7 @@ let helpers = {
         .get(config.table_prefix + "master_features");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1963,7 +1963,7 @@ let helpers = {
         .get(config.table_prefix + "master_merchant_details");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -1984,7 +1984,7 @@ let helpers = {
         .get(config.table_prefix + "inv_customer");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2005,7 +2005,7 @@ let helpers = {
         .get(config.table_prefix + "master_merchant_details");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2028,7 +2028,7 @@ let helpers = {
         .get(config.table_prefix1 + "request_list");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2065,7 +2065,7 @@ let helpers = {
         .get(config.table_prefix + "response_code");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2081,7 +2081,7 @@ let helpers = {
       response = await qb.query(sql);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2097,7 +2097,7 @@ let helpers = {
         .get(config.table_prefix + "master_merchant_details");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2114,7 +2114,7 @@ let helpers = {
       response = await qb.select("title").get(config.table_prefix + "title");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2134,7 +2134,7 @@ let helpers = {
         .get(config.table_prefix + "master_partners");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2155,7 +2155,7 @@ let helpers = {
         .insert(config.table_prefix + dbtable, data);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2170,10 +2170,10 @@ let helpers = {
         .select(selection)
         .where(condition)
         .get(config.table_prefix + dbtable);
-        console.log(qb.last_query());
+      console.log(qb.last_query());
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2191,7 +2191,7 @@ let helpers = {
         .get(config.table_prefix + dbtable);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2208,7 +2208,7 @@ let helpers = {
         .get(config.table_prefix + dbtable);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2224,7 +2224,7 @@ let helpers = {
         .get(config.table_prefix + "master_merchant");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2247,7 +2247,7 @@ let helpers = {
         .get(config.table_prefix + "password_token_check");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2265,7 +2265,7 @@ let helpers = {
         .get(config.table_prefix + "email_otp_sent");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2283,7 +2283,7 @@ let helpers = {
         .get(config.table_prefix + "mobile_otp");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2299,7 +2299,7 @@ let helpers = {
         .get(config.table_prefix + "master_mcc_category");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2320,7 +2320,7 @@ let helpers = {
         .get(config.table_prefix + "master_mcc_category");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2342,7 +2342,7 @@ let helpers = {
         .get(config.table_prefix + "mcc_codes");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2363,7 +2363,7 @@ let helpers = {
         .get(config.table_prefix + "master_mcc_category");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2384,7 +2384,7 @@ let helpers = {
         .get(config.table_prefix + "master_entity_document");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2405,7 +2405,7 @@ let helpers = {
         .get(config.table_prefix + "master_document_type");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2425,7 +2425,7 @@ let helpers = {
         .get(config.table_prefix + "master_document_type");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2445,7 +2445,7 @@ let helpers = {
         .get(config.table_prefix + "master_document_type");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2475,7 +2475,7 @@ let helpers = {
         .get(config.table_prefix + "master_merchant");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2503,7 +2503,7 @@ let helpers = {
         .update(config.table_prefix + "master_merchant");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2581,8 +2581,7 @@ let helpers = {
         let res = await axios(config);
         return res.data;
       } catch (error) {
-
-        logger.error(500,{message: error,stack: error?.stack});
+        logger.error(500, { message: error, stack: error?.stack });
       }
     }
     makeRequest(fields, url, apiKey);
@@ -2637,7 +2636,7 @@ let helpers = {
 
         return res.data;
       } catch (error) {
-        logger.error(500,{message: error,stack: error?.stack});
+        logger.error(500, { message: error, stack: error?.stack });
       }
     }
     makeRequest(fields, url, apiKey);
@@ -2654,7 +2653,7 @@ let helpers = {
         .get(config.table_prefix + "tc");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2681,7 +2680,7 @@ let helpers = {
         .get(config.table_prefix + "inv_customer");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2708,7 +2707,7 @@ let helpers = {
         .get(config.table_prefix + "inv_customer");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2732,7 +2731,7 @@ let helpers = {
         .get(config.table_prefix + "master_items");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2752,7 +2751,7 @@ let helpers = {
         .get(config.table_prefix + "master_merchant");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2776,7 +2775,7 @@ let helpers = {
         .get(config.table_prefix + "master_items");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2800,7 +2799,7 @@ let helpers = {
           });
       } catch (error) {
         console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+        logger.error(500, { message: error, stack: error?.stack });
       } finally {
         qb.release();
       }
@@ -2818,7 +2817,7 @@ let helpers = {
         .get(config.table_prefix + "order_txn");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2845,7 +2844,7 @@ let helpers = {
         .get(config.table_prefix + txn_table);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2870,7 +2869,7 @@ let helpers = {
         .get(config.table_prefix + "order_txn");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2891,7 +2890,7 @@ let helpers = {
         .get(config.table_prefix + txn_table);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2917,7 +2916,7 @@ let helpers = {
         .get(config.table_prefix + txn_table);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2939,7 +2938,7 @@ let helpers = {
         .get(config.table_prefix + "order_txn");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -2961,7 +2960,7 @@ let helpers = {
         .get(config.table_prefix + "order_txn");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3051,8 +3050,7 @@ let helpers = {
           break;
       } */
     } catch (error) {
-
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
     }
     return num;
@@ -3068,7 +3066,7 @@ let helpers = {
         .get(config.table_prefix + "customers_cards");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3087,7 +3085,7 @@ let helpers = {
         .get(config.table_prefix + "orders");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3106,7 +3104,7 @@ let helpers = {
         .get(config.table_prefix + table);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3123,7 +3121,7 @@ let helpers = {
         .get(config.table_prefix + table);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3141,7 +3139,7 @@ let helpers = {
         .get(config.table_prefix + "tc");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3157,7 +3155,7 @@ let helpers = {
         .get(config.table_prefix + "customers");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3183,7 +3181,7 @@ let helpers = {
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3209,7 +3207,7 @@ let helpers = {
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3241,7 +3239,7 @@ let helpers = {
         .get(config.table_prefix + "subs_plans");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3261,7 +3259,7 @@ let helpers = {
         .get(config.table_prefix + "subs_plans");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3279,7 +3277,7 @@ let helpers = {
       response = await qb.select_max("id").get(config.table_prefix + "mid");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3301,19 +3299,25 @@ let helpers = {
     const class_ = ["ecom"];
     let response;
     try {
-      response = await qb
-        .select("*,m.id as midId")
-        .from(config.table_prefix + "mid m")
-        .join(
-          config.table_prefix + "master_currency c",
-          "m.currency_id=c.id",
-          "inner"
-        )
-        .where(condition)
-        .get();
+      let dcc_enabled = await dccStatusFetch();
+      if (dcc_enabled) {
+        let queryStr = `SELECT *, m.id as midId FROM pg_mid m INNER JOIN pg_master_currency c ON m.currency_id = c.id WHERE m.submerchant_id = ${merchant_id} AND m.deleted = 0 AND m.env = '${mode}' AND (c.code = '${currency}' OR FIND_IN_SET('${currency}', m.supported_currency) > 0)`;
+        response = await qb.query(queryStr);
+      } else {
+        response = await qb
+          .select("*,m.id as midId")
+          .from(config.table_prefix + "mid m")
+          .join(
+            config.table_prefix + "master_currency c",
+            "m.currency_id=c.id",
+            "inner"
+          )
+          .where(condition)
+          .get();
+      }
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3330,21 +3334,27 @@ let helpers = {
     const class_ = ["ecom"];
     let response;
     try {
-      response = await qb
-        .select("*,m.id as midId")
-        .from(config.table_prefix + "mid m")
-        .join(
-          config.table_prefix + "master_currency c",
-          "m.currency_id=c.id",
-          "inner"
-        )
-        .like("m.class", "ecom")
-        // .where_in("m.class",class_)
-        .where(condition)
-        .get();
+      let dcc_enabled = await dccStatusFetch();
+      if (dcc_enabled) {
+        let queryStr = `SELECT *, m.id as midId FROM pg_mid m INNER JOIN pg_master_currency c ON m.currency_id = c.id WHERE m.class LIKE '%ecom%' AND m.submerchant_id = ${merchant_id} AND m.deleted = 0 AND m.env = '${mode}' AND (c.code = '${currency}' OR FIND_IN_SET('${currency}',m.supported_currency)>0)`;
+        response = await qb.query(queryStr);
+      } else {
+        response = await qb
+          .select("*,m.id as midId")
+          .from(config.table_prefix + "mid m")
+          .join(
+            config.table_prefix + "master_currency c",
+            "m.currency_id=c.id",
+            "inner"
+          )
+          .like("m.class", "ecom")
+          // .where_in("m.class",class_)
+          .where(condition)
+          .get();
+      }
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3374,7 +3384,7 @@ let helpers = {
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3408,7 +3418,7 @@ let helpers = {
         .get(config.table_prefix + "secret_key");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3436,7 +3446,7 @@ let helpers = {
         .get(config.table_prefix + "customers_cards");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3482,7 +3492,7 @@ let helpers = {
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3499,7 +3509,7 @@ let helpers = {
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3517,7 +3527,7 @@ let helpers = {
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3538,7 +3548,7 @@ let helpers = {
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3557,7 +3567,7 @@ let helpers = {
         .get(config.table_prefix + "response_code");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3590,7 +3600,7 @@ let helpers = {
         .insert(config.table_prefix + table, data);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3609,7 +3619,7 @@ let helpers = {
         .get(config.table_prefix + table);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3626,7 +3636,7 @@ let helpers = {
         .get(config.table_prefix + "country");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3643,7 +3653,7 @@ let helpers = {
         .get(config.table_prefix + "master_currency");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3659,7 +3669,7 @@ let helpers = {
         .get(config.table_prefix + "invoice_sharing_logs");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3681,7 +3691,7 @@ let helpers = {
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3823,7 +3833,7 @@ let helpers = {
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3845,7 +3855,7 @@ let helpers = {
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3864,7 +3874,7 @@ let helpers = {
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3882,7 +3892,7 @@ let helpers = {
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3904,7 +3914,7 @@ let helpers = {
       );
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3928,7 +3938,7 @@ let helpers = {
       );
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3949,7 +3959,7 @@ let helpers = {
       );
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3974,7 +3984,7 @@ let helpers = {
       );
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -3997,7 +4007,7 @@ let helpers = {
       );
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4019,7 +4029,7 @@ let helpers = {
       );
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4042,7 +4052,7 @@ let helpers = {
       );
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4058,7 +4068,7 @@ let helpers = {
         .get(config.table_prefix + "country");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4082,7 +4092,7 @@ let helpers = {
         .get(config.table_prefix + "subscription");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4105,7 +4115,7 @@ let helpers = {
         .get(config.table_prefix + "subscription");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4126,7 +4136,7 @@ let helpers = {
         .get(config.table_prefix + "country");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4146,7 +4156,7 @@ let helpers = {
         .get(config.table_prefix + "country");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4167,7 +4177,7 @@ let helpers = {
         .get(config.table_prefix + "country");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4187,7 +4197,7 @@ let helpers = {
         .get(config.table_prefix + "payment_mode");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4221,7 +4231,7 @@ let helpers = {
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4263,7 +4273,7 @@ let helpers = {
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4320,7 +4330,7 @@ let helpers = {
       console.log(qb.last_query());
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4350,7 +4360,7 @@ let helpers = {
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4398,7 +4408,7 @@ let helpers = {
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4434,7 +4444,7 @@ let helpers = {
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4470,7 +4480,7 @@ let helpers = {
       }
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4502,7 +4512,7 @@ let helpers = {
       }
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4534,7 +4544,7 @@ let helpers = {
       }
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4632,7 +4642,7 @@ let helpers = {
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4649,7 +4659,7 @@ let helpers = {
         .get(config.table_prefix + table);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4674,7 +4684,7 @@ let helpers = {
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4698,7 +4708,7 @@ let helpers = {
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4722,7 +4732,7 @@ let helpers = {
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4743,7 +4753,7 @@ let helpers = {
         .get(config.table_prefix + table);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4779,7 +4789,7 @@ let helpers = {
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4797,7 +4807,7 @@ let helpers = {
         .get(config.table_prefix + "orders");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4825,7 +4835,7 @@ let helpers = {
         .get(config.table_prefix + "inv_invoice_master");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4846,7 +4856,7 @@ let helpers = {
         .get(config.table_prefix + "merchant_qr_codes");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4867,7 +4877,7 @@ let helpers = {
         .get(config.table_prefix + "merchant_qr_codes");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4888,7 +4898,7 @@ let helpers = {
         .get(config.table_prefix + "qr_payment");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4908,7 +4918,7 @@ let helpers = {
         .get(config.table_prefix + "inv_invoice_master");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4928,7 +4938,7 @@ let helpers = {
         .get(config.table_prefix + "subs_payment");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4948,7 +4958,7 @@ let helpers = {
         .get(config.table_prefix + "order_txn");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4968,7 +4978,7 @@ let helpers = {
         .get(config.table_prefix + "order_txn");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -4989,7 +4999,7 @@ let helpers = {
         .get(config.table_prefix + "merchant_qr_codes");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5010,7 +5020,7 @@ let helpers = {
         .get(config.table_prefix + "bus_reg_country_master");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5021,7 +5031,7 @@ let helpers = {
       return "";
     }
   },
-   get_business_address_code: async (id) => {
+  get_business_address_code: async (id) => {
     let qb = await pool.get_connection();
     let response;
     try {
@@ -5031,7 +5041,7 @@ let helpers = {
         .get(config.table_prefix + "bus_reg_country_master");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5052,7 +5062,7 @@ let helpers = {
         .get(config.table_prefix + "bus_reg_country_master");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5097,7 +5107,7 @@ let helpers = {
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5125,7 +5135,7 @@ let helpers = {
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5151,7 +5161,7 @@ let helpers = {
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5179,7 +5189,7 @@ let helpers = {
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5197,7 +5207,7 @@ let helpers = {
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5220,7 +5230,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5238,7 +5248,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5255,7 +5265,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get(config.table_prefix + "response_code");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5279,7 +5289,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get(config.table_prefix + "subs_plans");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5300,7 +5310,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get(config.table_prefix + "card_scheme");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5351,7 +5361,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       response = await qb.query(sql);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5384,7 +5394,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       response = await qb.query(sql);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5416,7 +5426,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       response = await qb.query(sql);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5458,7 +5468,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       response = await qb.query(sql);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5483,7 +5493,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       response = await qb.query(sql);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5512,7 +5522,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       response = await qb.query(sql);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5546,7 +5556,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       response = await qb.query(sql);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5582,7 +5592,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       response = await qb.query(sql);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5612,7 +5622,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       response = await qb.query(sql);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5728,7 +5738,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       response = await qb.query(sql);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5758,7 +5768,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       );
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5802,7 +5812,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       response = await qb.query(sql);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5822,7 +5832,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get(config.table_prefix + "invoice_sharing_logs");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5849,7 +5859,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get(config.table_prefix + table);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5883,7 +5893,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       response = await qb.query(sql);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5921,7 +5931,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5938,7 +5948,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       response = await qb.query(query);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5957,7 +5967,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5979,7 +5989,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -5998,7 +6008,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6031,7 +6041,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6048,7 +6058,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
             .get();
         } catch (error) {
           console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+          logger.error(500, { message: error, stack: error?.stack });
         } finally {
           qb.release();
         }
@@ -6069,7 +6079,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
             .get();
         } catch (error) {
           console.error("Database query failed:", error);
-          logger.error(500,{message: error,stack: error?.stack});
+          logger.error(500, { message: error, stack: error?.stack });
         } finally {
           qb.release();
         }
@@ -6090,7 +6100,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6123,7 +6133,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6146,7 +6156,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6165,7 +6175,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6184,7 +6194,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6206,23 +6216,24 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       response = await qb.query(sql);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
     return response?.[0];
   },
-   midDetailsDefault: async (terminal_id) => {
+  midDetailsDefault: async (terminal_id) => {
     let sql =
-      `SELECT m.label,m.terminal_id from pg_mid m where m.terminal_id='` + 
-      terminal_id + `' `;
+      `SELECT m.label,m.terminal_id from pg_mid m where m.terminal_id='` +
+      terminal_id +
+      `' `;
     let qb = await pool.get_connection();
     let response;
     try {
       response = await qb.query(sql);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6242,7 +6253,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6261,7 +6272,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
           .get();
       } catch (error) {
         console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+        logger.error(500, { message: error, stack: error?.stack });
       } finally {
         qb.release();
       }
@@ -6294,7 +6305,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6317,7 +6328,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6346,7 +6357,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get();
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6381,7 +6392,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .update(db_table);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6437,7 +6448,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get(config.table_prefix + "nutrionoapi");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6463,7 +6474,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       response = await qb.select(selection).where(condition).get(table);
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6510,7 +6521,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get(config.table_prefix + "country");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6537,7 +6548,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       console.log(qb.last_query());
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6557,7 +6568,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get(config.table_prefix + "psp");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6577,7 +6588,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get(config.table_prefix + "card_scheme");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6597,7 +6608,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get(config.table_prefix + "country");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6617,7 +6628,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .get(config.table_prefix + "master_merchant");
     } catch (error) {
       console.error("Database query failed:", error);
-      logger.error(500,{message: error,stack: error?.stack});
+      logger.error(500, { message: error, stack: error?.stack });
     } finally {
       qb.release();
     }
@@ -6682,218 +6693,218 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
           status_code: "00",
         },
       },
-      "ALPAY": {
-        "1": {
+      ALPAY: {
+        1: {
           status: "FAILED",
           order_status: "FAILED",
           txn_status: "FAILED",
           remark: "Database Error",
           status_code: "01",
         },
-        "2": {
+        2: {
           status: "FAILED",
           order_status: "FAILED",
           txn_status: "FAILED",
           remark: "Insufficient Funds MTO",
           status_code: "02",
         },
-        "3": {
+        3: {
           status: "FAILED",
           order_status: "FAILED",
           txn_status: "FAILED",
           remark: "General Error",
           status_code: "03",
         },
-        "200": {
+        200: {
           status: "SUCCESS",
           order_status: "CAPTURED",
           txn_status: "CAPTURED",
           remark: "Transaction Successful",
           status_code: "00",
         },
-        "202": {
+        202: {
           status: "PENDING",
           order_status: "PENDING",
           txn_status: "PENDING",
           remark: "Request is being processed",
           status_code: "02",
         },
-        "300": {
+        300: {
           status: "FAILED",
           order_status: "REJECTED",
           txn_status: "REJECTED",
           remark: "Request rejected",
           status_code: "03",
         },
-        "303": {
+        303: {
           status: "PENDING",
           order_status: "PENDING",
           txn_status: "PENDING",
           remark: "Other error (treated as pending)",
           status_code: "03",
         },
-        "401": {
+        401: {
           status: "FAILED",
           order_status: "UNAUTHORIZED",
           txn_status: "UNAUTHORIZED",
           remark: "Unauthorized",
           status_code: "01",
         },
-        "402": {
+        402: {
           status: "FAILED",
           order_status: "FAILED",
           txn_status: "FAILED",
           remark: "Request institution is not found",
           status_code: "02",
         },
-        "403": {
+        403: {
           status: "FAILED",
           order_status: "FAILED",
           txn_status: "FAILED",
           remark: "Request transaction type not found",
           status_code: "03",
         },
-        "404": {
+        404: {
           status: "FAILED",
           order_status: "FAILED",
           txn_status: "FAILED",
           remark: "No Record found/Account not found",
           status_code: "04",
         },
-        "405": {
+        405: {
           status: "PENDING",
           order_status: "PENDING",
           txn_status: "PENDING",
           remark: "Request institution is unavailable (treated as pending)",
           status_code: "05",
         },
-        "406": {
+        406: {
           status: "FAILED",
           order_status: "FAILED",
           txn_status: "FAILED",
           remark: "Request not accepted for one or more reasons",
           status_code: "06",
         },
-        "407": {
+        407: {
           status: "FAILED",
           order_status: "UNAUTHORIZED",
           txn_status: "UNAUTHORIZED",
           remark: "Unauthorized",
           status_code: "07",
         },
-        "408": {
+        408: {
           status: "FAILED",
           order_status: "FAILED",
           txn_status: "FAILED",
           remark: "Invalid PIN",
           status_code: "08",
         },
-        "409": {
+        409: {
           status: "FAILED",
           order_status: "FAILED",
           txn_status: "FAILED",
           remark: "Request Expired",
           status_code: "09",
         },
-        "410": {
+        410: {
           status: "FAILED",
           order_status: "FAILED",
           txn_status: "FAILED",
           remark: "Insufficient Funds",
           status_code: "10",
         },
-        "411": {
+        411: {
           status: "FAILED",
           order_status: "FAILED",
           txn_status: "FAILED",
           remark: "Request Failed",
           status_code: "11",
         },
-        "412": {
+        412: {
           status: "FAILED",
           order_status: "FAILED",
           txn_status: "FAILED",
           remark: "Request Declined",
           status_code: "12",
         },
-        "413": {
+        413: {
           status: "FAILED",
           order_status: "FAILED",
           txn_status: "FAILED",
           remark: "Request Failed",
           status_code: "13",
         },
-        "414": {
+        414: {
           status: "FAILED",
           order_status: "FAILED",
           txn_status: "FAILED",
           remark: "Request channel is not found",
           status_code: "14",
         },
-        "415": {
+        415: {
           status: "FAILED",
           order_status: "FAILED",
           txn_status: "FAILED",
           remark: "Recipient transaction not permitted",
           status_code: "15",
         },
-        "416": {
+        416: {
           status: "PENDING",
           order_status: "PENDING",
           txn_status: "PENDING",
           remark: "System Defect (treated as pending)",
           status_code: "16",
         },
-        "417": {
+        417: {
           status: "PENDING",
           order_status: "PENDING",
           txn_status: "PENDING",
           remark: "Custom Pending Code 417",
           status_code: "17",
         },
-        "418": {
+        418: {
           status: "PENDING",
           order_status: "PENDING",
           txn_status: "PENDING",
           remark: "Custom Pending Code 418",
           status_code: "18",
         },
-        "419": {
+        419: {
           status: "PENDING",
           order_status: "PENDING",
           txn_status: "PENDING",
           remark: "Request is pending completion",
           status_code: "19",
         },
-        "420": {
+        420: {
           status: "FAILED",
           order_status: "FAILED",
           txn_status: "FAILED",
           remark: "Wrong account number",
           status_code: "20",
         },
-        "424": {
+        424: {
           status: "FAILED",
           order_status: "FAILED",
           txn_status: "FAILED",
           remark: "Request failed",
           status_code: "24",
         },
-        "422": {
+        422: {
           status: "FAILED",
           order_status: "FAILED",
           txn_status: "FAILED",
           remark: "Not processable Entity",
           status_code: "22",
         },
-        "491": {
+        491: {
           status: "PENDING",
           order_status: "PENDING",
           txn_status: "PENDING",
           remark: "Custom Pending Code 491",
           status_code: "91",
         },
-        "500": {
+        500: {
           status: "FAILED",
           order_status: "SYSTEM_ERROR",
           txn_status: "SYSTEM_ERROR",
@@ -6902,13 +6913,15 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         },
       },
     };
-    return data[psp][status] || {
-          status: "FAILED",
-          order_status: "FAILED",
-          txn_status: "FAILED",
-          remark: "Transaction FAILED",
-          status_code: "01",
-        };
+    return (
+      data[psp][status] || {
+        status: "FAILED",
+        order_status: "FAILED",
+        txn_status: "FAILED",
+        remark: "Transaction FAILED",
+        status_code: "01",
+      }
+    );
   },
 
   // Function to get code by name (case-insensitive search)
@@ -6928,6 +6941,88 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
     );
     return mnoItem ? mnoItem.code : null;
   },
+  normalizeId: (value) => {
+    return value == null || value === "" || isNaN(value) ? 0 : value;
+  },
+  fetchDccStatus: async() => {
+     let qb = await pool.get_connection();
+    let response;
+    try {
+      response = await qb
+        .select("dcc_enabled")
+        .where({ id: 1})
+        .get("pg_dcc_setup");
+    } catch (error) {
+      console.error("Database query failed:", error);
+      logger.error(500, { message: error, stack: error?.stack });
+    } finally {
+      qb.release();
+    }
+    if (response?.[0]) {
+      return response?.[0]?.dcc_enabled==1?true:false ;
+    } else {
+      return false;
+    }
+  },
+  haveAccesstoSuperStore:async(store_id,super_merchant_id)=>{
+      let qb = await pool.get_connection();
+    let response;
+    try {
+      response = await qb.query(`SELECT id FROM pg_master_super_merchant WHERE id=${super_merchant_id} AND FIND_IN_SET('${store_id}', stores) > 0`);
+      console.log(`SELECT id FROM pg_master_super_merchant WHERE id=${super_merchant_id} AND FIND_IN_SET('${store_id}', stores) > 0`);
+       
+    } catch (error) {
+      console.error("Database query failed:", error);
+      logger.error(500, { message: error, stack: error?.stack });
+    } finally {
+      qb.release();
+    }
+    if (response?.[0]) {
+      return response?.[0]?.id?true:false ;
+    } else {
+      return false;
+    }
+  },
+  checkAllowMidOnSuperMerchant:async(super_merchant_id)=>{
+      let qb = await pool.get_connection();
+    let response;
+    try {
+      response = await qb.query(`SELECT allow_mid FROM pg_master_super_merchant WHERE id=${super_merchant_id}`);
+       
+    } catch (error) {
+      console.error("Database query failed:", error);
+      logger.error(500, { message: error, stack: error?.stack });
+    } finally {
+      qb.release();
+    }
+    if (response?.[0]) {
+      return response?.[0]?.allow_mid ;
+    } else {
+      return 0;
+    }
+  }
+
 };
 
 module.exports = helpers;
+
+ async function dccStatusFetch(){
+     let qb = await pool.get_connection();
+    let response;
+    try {
+      response = await qb
+        .select("dcc_enabled")
+        .where({ id: 1})
+        .get("pg_dcc_setup");
+    } catch (error) {
+      console.error("Database query failed:", error);
+      logger.error(500, { message: error, stack: error?.stack });
+    } finally {
+      qb.release();
+    }
+    if (response?.[0]) {
+      return response?.[0]?.dcc_enabled==1?true:false ;
+    } else {
+      return false;
+    }
+  };

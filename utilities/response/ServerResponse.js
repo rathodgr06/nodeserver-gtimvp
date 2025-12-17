@@ -93,7 +93,7 @@ var ServerResponse = {
     return response;
   },
 
-  common_error_msg: (msg, code) => {
+  common_error_msg: (msg='', code) => {
     msg = msg.toString();
     var response = {
       message: msg,
