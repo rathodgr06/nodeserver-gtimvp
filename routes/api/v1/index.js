@@ -4840,7 +4840,6 @@ app.post(
   submerchant.open_add_mid
 );
 app.post(
-
   "/payment/custom-form",
   custom_form_data_validator.validate,
   custom_form_controller.get
@@ -4946,7 +4945,7 @@ app.post(
 app.post("/wallet-list", apiRateLimiter, WalletValidator.wallet_list, wallet.list);
 app.post("/manage-wallet", CheckHeader, WalletValidator.manage, wallet.manage);
 app.get("/get-wallet-by-id/:id", WalletValidator.get_wallet_by_id, wallet.get_wallet_details_by_id);
-// app.post('/roll-out-wallet', walletRollout);
+app.post('/roll-out-wallet', wallet.rollout_wallets);
 
 // schedule.scheduleJob('0 2 * * *', async function () {
 //   console.log("🕑 Starting Wallet Snapshot Job at 2:00 AM");
@@ -5001,6 +5000,7 @@ app.post('/update-alpay-status',function(req,res){
 })
 // app.get('/roll-out-wallet',walletRollout);
 const { seedWallets } = require('../../../scripts/seed-wallets.js');
+const ValidateMerchant = require("../../../utilities/tokenmanager/ValidateMerchant.js");
 app.post('/admin/seed-wallets', async (req, res) => {
   try {
     const result = await seedWallets();
@@ -5016,4 +5016,12 @@ app.post('/admin/seed-wallets', async (req, res) => {
     });
   }
 });
+app.get(
+  "/submerchant-details/:sub_merchant_id",
+  ValidateMerchant,
+  // Validator.validate_submerchant_details,
+  MerchantEkyc.sub_merchant_details
+);
+app.post("/merchant-droupdown-list", CheckHeader, CheckToken, merchant.dropdown_list);
+app.post("/mid-merchant-droupdown-list", CheckHeader, CheckToken, merchant.mid_dropdown_list);
 module.exports = app;

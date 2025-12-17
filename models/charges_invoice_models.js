@@ -2516,10 +2516,13 @@ LEFT JOIN super_merchant sm ON mm.super_merchant_id = sm.id`;
         end_date = condition.to_date;
       }
 
+      // if (condition.from_date && condition.to_date) {
+      //   query =
+      //     query +
+      //     `${whereString}${andString} ws.created_at BETWEEN '${start_date}' AND '${end_date}'`;
+      // }
       if (condition.from_date && condition.to_date) {
-        query =
-          query +
-          `${whereString}${andString} ws.created_at BETWEEN '${start_date}' AND '${end_date}'`;
+        query += `${whereString}${andString} ws.created_at >= '${start_date} 00:00:00' AND ws.created_at < DATE_ADD('${end_date}', INTERVAL 1 DAY)`;
       }
 
       query = query + ` ORDER BY ws.created_at DESC`;

@@ -1012,6 +1012,10 @@ const WalletValidator = {
           .optional()
           .allow("", null)
           .label("Sub merchant id"),
+        super_merchant_id: Joi.string()
+          .optional()
+          .allow("", null)
+          .label("Super merchant id"),
         receiver_id: Joi.string()
           .optional()
           .allow("", null)

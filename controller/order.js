@@ -10,181 +10,175 @@ const moment = require("moment");
 const logger = require('../config/logger');
 
 var res_data = {
-    add: async (req, res) => {
-        let added_date = moment().format('YYYY-MM-DD HH:mm:ss');
-        let amount = req.bodyString("amount");
-        let currency = req.bodyString("currency");
-        let payment_method = req.bodyString("payment_method");
-        let artha_order_no = await helpers.make_order_number("ORD");
-        let ip = await helpers.get_ip(req);
-        let ins_body = {
-            merchant_id: req.user.id,
-            super_merchant: req.user.super_merchant,
-            partner_id: req.user.partner_id,
-            artha_order_no: artha_order_no,
-            payment_method: payment_method,
-            amount: amount,
-            order_status: "Created",
-            order_currency: currency,
-            transaction_date: added_date,
-            ip: ip,
-        };
+  add: async (req, res) => {
+    let added_date = moment().format("YYYY-MM-DD HH:mm:ss");
+    let amount = req.bodyString("amount");
+    let currency = req.bodyString("currency");
+    let payment_method = req.bodyString("payment_method");
+    let artha_order_no = await helpers.make_order_number("ORD");
+    let ip = await helpers.get_ip(req);
+    let ins_body = {
+      merchant_id: req.user.id,
+      super_merchant: req.user.super_merchant,
+      partner_id: req.user.partner_id,
+      artha_order_no: artha_order_no,
+      payment_method: payment_method,
+      amount: amount,
+      order_status: "Created",
+      order_currency: currency,
+      transaction_date: added_date,
+      ip: ip,
+    };
 
-        if (req.bodyString("description")) {
-            ins_body.description = req.bodyString("description");
-        }
-        if (req.bodyString("customer_name")) {
-            ins_body.customer_name = req.bodyString("customer_name");
-        }
-        if (req.bodyString("customer_mobile")) {
-            ins_body.customer_mobile = req.bodyString("customer_mobile");
-        }
-        if (req.bodyString("customer_email")) {
-            ins_body.customer_email = req.bodyString("customer_email");
-        }
+    if (req.bodyString("description")) {
+      ins_body.description = req.bodyString("description");
+    }
+    if (req.bodyString("customer_name")) {
+      ins_body.customer_name = req.bodyString("customer_name");
+    }
+    if (req.bodyString("customer_mobile")) {
+      ins_body.customer_mobile = req.bodyString("customer_mobile");
+    }
+    if (req.bodyString("customer_email")) {
+      ins_body.customer_email = req.bodyString("customer_email");
+    }
 
-        let data = {
-            artha_order_no: artha_order_no,
-            amount: amount,
-        };
+    let data = {
+      artha_order_no: artha_order_no,
+      amount: amount,
+    };
 
-        TransactionsModel.add(ins_body)
-            .then((result) => {
-                res.status(statusCode.ok).send(
-                    response.successdatamsg(data, "Order Created successfully.")
-                );
-            })
-            .catch((error) => {
-               logger.error(500,{message: error,stack: error.stack}); 
-                res.status(statusCode.internalError).send(
-                    response.errormsg(error.message)
-                );
-            });
-    },
-    list: async (req,res) => {
-         try {
-    const params = extractParams(req); // ✅ One place to get all params
-    const table_name = chooseTableName(req.user, params.mode);
-    const filters = await buildFilters(req.user, params); // ✅ Build all filter objects
+    TransactionsModel.add(ins_body)
+      .then((result) => {
+        res
+          .status(statusCode.ok)
+          .send(response.successdatamsg(data, "Order Created successfully."));
+      })
+      .catch((error) => {
+        logger.error(500, { message: error, stack: error.stack });
+        res
+          .status(statusCode.internalError)
+          .send(response.errormsg(error.message));
+      });
+  },
+  list: async (req, res) => {
+    try {
+      const params = extractParams(req); // ✅ One place to get all params
+      const table_name = chooseTableName(req.user, params.mode);
+      const filters = await buildFilters(req.user, params); // ✅ Build all filter objects
 
-    // ✅ Single query returning both data & total_count using COUNT(*) OVER()
-    const result = await TransactionsModel.select_trans_with_count(
-      filters.and_filter_obj,
-      filters.date_condition,
-      filters.limit,
-      table_name,
-      filters.in_condition,
-      filters.amount_condition,
-      filters.like_condition,
-      filters.trans_date,
-      filters.search_terms,
-      filters.subscription_order
-    );
+      // ✅ Single query returning both data & total_count using COUNT(*) OVER()
+      const result = await TransactionsModel.select_trans_with_count(
+        filters.and_filter_obj,
+        filters.date_condition,
+        filters.limit,
+        table_name,
+        filters.in_condition,
+        filters.amount_condition,
+        filters.like_condition,
+        filters.trans_date,
+        filters.search_terms,
+        filters.subscription_order
+      );
 
-    // ✅ Transform DB rows into final response in parallel
-    const send_res = await Promise.all(
-      result.rows.map(row => transformTransaction(row, params, table_name))
-    );
+      // ✅ Transform DB rows into final response in parallel
+      const send_res = await Promise.all(
+        result.rows.map((row) => transformTransaction(row, params, table_name))
+      );
 
-    res.status(statusCode.ok).send(
-      response.successdatamsg(
-        send_res,
-        "List fetched successfully.",
-        result.total_count // comes from the same query
-      )
-    );
+      res.status(statusCode.ok).send(
+        response.successdatamsg(
+          send_res,
+          "List fetched successfully.",
+          result.total_count // comes from the same query
+        )
+      );
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+      res
+        .status(statusCode.internalError)
+        .send(response.errormsg(error.message));
+    }
+  },
+  export_list: async (req, res) => {
+    try {
+      const params = extractParams(req); // ✅ One place to get all params
+      const table_name = chooseTableName(req.user, params.mode);
+      const filters = await buildFilters(req.user, params); // ✅ Build all filter objects
 
-  } catch (error) {
-   logger.error(500,{message: error,stack: error.stack}); 
-    res.status(statusCode.internalError).send(
-      response.errormsg(error.message)
-    );
-  }
+      // ✅ Single query returning both data & total_count using COUNT(*) OVER()
+      const result = await TransactionsModel.export_transactions(
+        filters.and_filter_obj,
+        filters.date_condition,
+        filters.limit,
+        table_name,
+        filters.in_condition,
+        filters.amount_condition,
+        filters.like_condition,
+        filters.trans_date,
+        filters.search_terms,
+        filters.subscription_order
+      );
 
-    },
-    export_list: async (req,res) => {
-         try {
-    const params = extractParams(req); // ✅ One place to get all params
-    const table_name = chooseTableName(req.user, params.mode);
-    const filters = await buildFilters(req.user, params); // ✅ Build all filter objects
+      // ✅ Transform DB rows into final response in parallel
+      const send_res = await Promise.all(
+        result.rows.map((row) => transformTransaction(row, params, table_name))
+      );
 
-    // ✅ Single query returning both data & total_count using COUNT(*) OVER()
-    const result = await TransactionsModel.export_transactions(
-      filters.and_filter_obj,
-      filters.date_condition,
-      filters.limit,
-      table_name,
-      filters.in_condition,
-      filters.amount_condition,
-      filters.like_condition,
-      filters.trans_date,
-      filters.search_terms,
-      filters.subscription_order
-    );
+      res.status(statusCode.ok).send(
+        response.successdatamsg(
+          send_res,
+          "List fetched successfully.",
+          result.total_count // comes from the same query
+        )
+      );
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+      res
+        .status(statusCode.internalError)
+        .send(response.errormsg(error.message));
+    }
+  },
+  charges_list: async (req, res) => {
+    try {
+      const params = extractParams(req); // ✅ One place to get all params
+      const table_name = chooseTableName(req.user, params.mode);
+      const filters = await buildFilters(req.user, params); // ✅ Build all filter objects
 
-    // ✅ Transform DB rows into final response in parallel
-    const send_res = await Promise.all(
-      result.rows.map(row => transformTransaction(row, params, table_name))
-    );
+      // ✅ Single query returning both data & total_count using COUNT(*) OVER()
+      const result = await TransactionsModel.select_trans_with_count(
+        filters.and_filter_obj,
+        filters.date_condition,
+        filters.limit,
+        table_name,
+        filters.in_condition,
+        filters.amount_condition,
+        filters.like_condition,
+        filters.trans_date,
+        filters.search_terms,
+        filters.subscription_order
+      );
 
-    res.status(statusCode.ok).send(
-      response.successdatamsg(
-        send_res,
-        "List fetched successfully.",
-        result.total_count // comes from the same query
-      )
-    );
+      // ✅ Transform DB rows into final response in parallel
+      const send_res = await Promise.all(
+        result.rows.map((row) => transformTransaction(row, params, table_name))
+      );
 
-  } catch (error) {
-   logger.error(500,{message: error,stack: error.stack}); 
-    res.status(statusCode.internalError).send(
-      response.errormsg(error.message)
-    );
-  }
-
-    },
-    charges_list: async (req,res) => {
-         try {
-    const params = extractParams(req); // ✅ One place to get all params
-    const table_name = chooseTableName(req.user, params.mode);
-    const filters = await buildFilters(req.user, params); // ✅ Build all filter objects
-
-    // ✅ Single query returning both data & total_count using COUNT(*) OVER()
-    const result = await TransactionsModel.select_trans_with_count(
-      filters.and_filter_obj,
-      filters.date_condition,
-      filters.limit,
-      table_name,
-      filters.in_condition,
-      filters.amount_condition,
-      filters.like_condition,
-      filters.trans_date,
-      filters.search_terms,
-      filters.subscription_order
-    );
-
-    // ✅ Transform DB rows into final response in parallel
-    const send_res = await Promise.all(
-      result.rows.map(row => transformTransaction(row, params, table_name))
-    );
-
-    res.status(statusCode.ok).send(
-      response.successdatamsg(
-        send_res,
-        "List fetched successfully.",
-        result.total_count // comes from the same query
-      )
-    );
-
-  } catch (error) {
-   logger.error(500,{message: error,stack: error.stack}); 
-    res.status(statusCode.internalError).send(
-      response.errormsg(error.message)
-    );
-  }
-
-    },
-    /*  list: async (req, res) => {
+      res.status(statusCode.ok).send(
+        response.successdatamsg(
+          send_res,
+          "List fetched successfully.",
+          result.total_count // comes from the same query
+        )
+      );
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+      res
+        .status(statusCode.internalError)
+        .send(response.errormsg(error.message));
+    }
+  },
+  /*  list: async (req, res) => {
         let mode = req.bodyString("mode");
         let limit = {
             perpage: 0,
@@ -671,263 +665,293 @@ var res_data = {
             });
     }, */
 
-    open_list: async (req, res) => {
+  open_list: async (req, res) => {
+    let limit = {
+      perpage: 0,
+      page: 0,
+    };
 
-        let limit = {
-            perpage: 0,
-            page: 0,
-        };
+    if (req.bodyString("perpage") && req.bodyString("page")) {
+      perpage = parseInt(req.bodyString("perpage"));
+      start = parseInt(req.bodyString("page"));
+      limit.perpage = perpage;
+      limit.start = (start - 1) * perpage;
+    }
 
-        if (req.bodyString("perpage") && req.bodyString("page")) {
-            perpage = parseInt(req.bodyString("perpage"));
-            start = parseInt(req.bodyString("page"));
-            limit.perpage = perpage;
-            limit.start = (start - 1) * perpage;
+    let and_filter_obj = {};
+    let date_condition = {};
+
+    // if (req.user.type == "merchant") {
+    //     and_filter_obj.super_merchant = req.user.id;
+    //     if (req.bodyString("selected_merchant") != 0) {
+    //         and_filter_obj.merchant_id = encrypt_decrypt(
+    //             "decrypt",
+    //             req.bodyString("selected_merchant")
+    //         );
+    //     }
+    // }
+
+    let table_name = "";
+    if (req.bodyString("mode") == "test") {
+      table_name = "test_orders";
+    } else {
+      table_name = "orders";
+    }
+
+    if (req?.user?.merchant_id) {
+      and_filter_obj.merchant_id = req.user.merchant_id;
+    }
+    if (req?.user?.sub_merchant_id) {
+      and_filter_obj.super_merchant = req.user.sub_merchant_id;
+    }
+
+    if (req.bodyString("from_date")) {
+      date_condition.from_date = req.bodyString("from_date");
+    }
+
+    if (req.bodyString("to_date")) {
+      date_condition.to_date = req.bodyString("to_date");
+    }
+
+    TransactionsModel.open_select(
+      and_filter_obj,
+      date_condition,
+      limit,
+      table_name
+    )
+      .then(async (result) => {
+        let send_res = [];
+        for (let val of result) {
+          let today = moment().format("YYYY-MM-DD");
+          let order_date = moment(val.created_at).format("YYYY-MM-DD");
+          let res = {
+            // transactions_id: await enc_dec.cjs_encrypt(val.id),
+            // merchant_id: await enc_dec.cjs_encrypt(val.merchant_id),
+            order_id: val?.order_id ? val?.order_id : "",
+            payment_id: val?.payment_id ? val?.payment_id : "",
+            merchant_name: val?.merchant_id
+              ? await helpers.get_merchantdetails_name_by_id(val?.merchant_id)
+              : "",
+            merchant_order_id: val?.merchant_order_id
+              ? val?.merchant_order_id
+              : "",
+            order_amount: val?.amount ? val.amount.toFixed(2) : "",
+            order_currency: val?.currency ? val?.currency : "",
+            customer_name: val?.customer_name ? val?.customer_name : "",
+            customer_email: val?.customer_email ? val?.customer_email : "",
+            customer_mobile: val?.customer_mobile ? val?.customer_mobile : "",
+            channel: val?.origin ? val?.origin : "",
+            status: val?.status ? val?.status : "",
+            high_risk_country: val.high_risk_country
+              ? val.high_risk_country
+              : 0,
+            high_risk_transaction: val.high_risk_transaction
+              ? val.high_risk_transaction
+              : 0,
+            block_for_suspicious_ip: val.block_for_suspicious_ip
+              ? val.block_for_suspicious_ip
+              : 0,
+            block_for_suspicious_email: val.block_for_suspicious_email
+              ? val.block_for_suspicious_email
+              : 0,
+            block_for_transaction_limit: val.block_for_transaction_limit
+              ? val.block_for_transaction_limit
+              : 0,
+            can_be_voided: moment(order_date).isSame(today) ? "1" : "0",
+            transaction_date: moment(val.created_at).format(
+              "DD-MM-YYYY H:mm:ss"
+            ),
+          };
+          send_res.push(res);
+        }
+        total_count = await TransactionsModel.open_get_count(
+          and_filter_obj,
+          date_condition,
+          table_name
+        );
+
+        res
+          .status(statusCode.ok)
+          .send(
+            response.successdatamsg(
+              send_res,
+              "List fetched successfully.",
+              total_count
+            )
+          );
+      })
+      .catch((error) => {
+        logger.error(500, { message: error, stack: error.stack });
+        res
+          .status(statusCode.internalError)
+          .send(response.errormsg(error.message));
+      });
+  },
+
+  details: async (req, res) => {
+    let id = enc_dec.cjs_decrypt(req.bodyString("id"));
+    let table = "orders";
+    let dump_table = "txn_response_dump";
+    let txn_table = "order_txn";
+    if (req.bodyString("mode") === "test") {
+      table = "test_orders";
+      dump_table = "test_txn_response_dump";
+      txn_table = "test_order_txn";
+    }
+
+    TransactionsModel.selectOne("*", { id: id }, table)
+      .then(async (result) => {
+        let txn_order_dump = "";
+        let failed_remark = "";
+
+        // console.log("txn_table", txn_table);
+        if (result.status == "FAILED") {
+          let txn_details = await TransactionsModel.selectOne(
+            "remark",
+            {
+              order_id: result.order_id,
+              type: ["AUTH", "SALE"],
+              status: "FAILED",
+            },
+            txn_table
+          );
+          failed_remark = txn_details?.remark;
         }
 
-        let and_filter_obj = {};
-        let date_condition = {};
+        let order_txn = await TransactionsModel.selectSpecificDynamic(
+          "order_id, txn, type,payment_id, status, res_dump, amount, currency, created_at,is_voided,remark,psp_code,txn_ref_id,is_voided,paydart_category",
+          { order_id: result.order_id },
+          txn_table
+        );
+        let terminal_details = await TransactionsModel.selectOne(
+          "allowVoid,allowRefunds",
+          { terminal_id: result.terminal_id },
+          "mid"
+        );
+        let send_res = [];
+        let update_order_txn = [];
 
-        // if (req.user.type == "merchant") {
-        //     and_filter_obj.super_merchant = req.user.id;
-        //     if (req.bodyString("selected_merchant") != 0) {
-        //         and_filter_obj.merchant_id = encrypt_decrypt(
-        //             "decrypt",
-        //             req.bodyString("selected_merchant")
-        //         );
-        //     }
-        // }
+        let val = result;
 
-        let table_name = "";
-        if (req.bodyString("mode") == "test") {
-            table_name = "test_orders";
-        } else {
-            table_name = "orders";
-        }
+        let trans_history = [];
 
-        if (req?.user?.merchant_id) {
-            and_filter_obj.merchant_id = req.user.merchant_id;
-        }
-        if (req?.user?.sub_merchant_id) {
-            and_filter_obj.super_merchant = req.user.sub_merchant_id;
-        }
+        // let amount_capture = 0;
+        let amount_refunded = 0;
+        let total_amount_capture_by_txn = 0;
+        const psp_code = "";
+        // console.log(`PSP NAME`);
+        // Switch For Transaction History Status and Button
+        let can_be_capture = false;
+        let can_be_void = false;
+        let can_be_refund = false;
+        let capture_amount = 0;
 
-        if (req.bodyString("from_date")) {
-            date_condition.from_date = req.bodyString("from_date");
-        }
+        switch (val.psp) {
+          case "TELR":
+            capture_amount = 0;
+            for (let val of order_txn) {
+              let check_created_at = moment(
+                val.created_at,
+                "DD-MM-YYYY"
+              ).format("DD-MM-YYYY");
+              let mid_details = await helpers.midDetails(
+                result.order_id,
+                val?.txn,
+                req.bodyString("mode")
+              );
 
-        if (req.bodyString("to_date")) {
-            date_condition.to_date = req.bodyString("to_date");
-        }
+              let temp = {
+                order_id: val?.order_id ? val?.order_id : "",
+                txn: val?.txn ? val?.txn : "",
+                payment_id: val?.payment_id ? val.payment_id : "",
+                type: val?.type ? val?.type : "",
+                status: val?.status ? val?.status : "",
+                currency: val?.currency ? val?.currency : "",
+                amount: val?.amount
+                  ? Number(val?.amount - capture_amount).toFixed(2)
+                  : "",
+                created_at: val?.created_at
+                  ? moment(val?.created_at).format("DD-MM-YYYY hh:mm")
+                  : "",
+                remark: val.remark,
+                can_be_capture: false,
+                can_be_void: false,
+                can_be_refund: false,
+                is_voided: val.is_voided,
+                code_psp: val?.psp_code,
+                code_category: val?.paydart_category,
+                mid: mid_details?.label,
+                psp: mid_details?.psp,
+                terminal: mid_details?.terminal_id,
+              };
 
-        TransactionsModel.open_select(
-            and_filter_obj,
-            date_condition,
-            limit,
-            table_name
-        )
-            .then(async (result) => {
-                let send_res = [];
-                for (let val of result) {
-                    let today = moment().format("YYYY-MM-DD");
-                    let order_date = moment(val.created_at).format(
-                        "YYYY-MM-DD"
-                    );
-                    let res = {
-                        // transactions_id: await enc_dec.cjs_encrypt(val.id),
-                        // merchant_id: await enc_dec.cjs_encrypt(val.merchant_id),
-                        order_id: val?.order_id ? val?.order_id : "",
-                        payment_id: val?.payment_id ? val?.payment_id : "",
-                        merchant_name: val?.merchant_id
-                            ? await helpers.get_merchantdetails_name_by_id(
-                                val?.merchant_id
-                            )
-                            : "",
-                        merchant_order_id: val?.merchant_order_id
-                            ? val?.merchant_order_id
-                            : "",
-                        order_amount: val?.amount ? val.amount.toFixed(2) : "",
-                        order_currency: val?.currency ? val?.currency : "",
-                        customer_name: val?.customer_name
-                            ? val?.customer_name
-                            : "",
-                        customer_email: val?.customer_email
-                            ? val?.customer_email
-                            : "",
-                        customer_mobile: val?.customer_mobile
-                            ? val?.customer_mobile
-                            : "",
-                        channel: val?.origin ? val?.origin : "",
-                        status: val?.status ? val?.status : "",
-                        high_risk_country: val.high_risk_country
-                            ? val.high_risk_country
-                            : 0,
-                        high_risk_transaction: val.high_risk_transaction
-                            ? val.high_risk_transaction
-                            : 0,
-                        block_for_suspicious_ip: val.block_for_suspicious_ip
-                            ? val.block_for_suspicious_ip
-                            : 0,
-                        block_for_suspicious_email:
-                            val.block_for_suspicious_email
-                                ? val.block_for_suspicious_email
-                                : 0,
-                        block_for_transaction_limit:
-                            val.block_for_transaction_limit
-                                ? val.block_for_transaction_limit
-                                : 0,
-                        can_be_voided: moment(order_date).isSame(today)
-                            ? "1"
-                            : "0",
-                        transaction_date: moment(val.created_at).format(
-                            "DD-MM-YYYY H:mm:ss"
-                        ),
-                    };
-                    send_res.push(res);
-                }
-                total_count = await TransactionsModel.open_get_count(
-                    and_filter_obj,
-                    date_condition,
-                    table_name
+              //console.log(temp);
+              // temp.can_be_refund = false;
+              // temp.can_be_void = false;
+
+              if (
+                val.type == "AUTH" &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                temp.can_be_void = true;
+              }
+              if (
+                val.type == "PARTIALLY_CAPTURE" &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                capture_amount = capture_amount + val.amount;
+              }
+              if (
+                (val.type == "CAPTURE" ||
+                  val.type == "PARTIALLY_CAPTURE" ||
+                  val.type == "SALE") &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                amount_refunded = await helpers.get_refunded_amount_by_txn(
+                  val.txn,
+                  req.bodyString("mode")
                 );
 
-                res.status(statusCode.ok).send(
-                    response.successdatamsg(
-                        send_res,
-                        "List fetched successfully.",
-                        total_count
-                    )
-                );
-            })
-            .catch((error) => {
-               logger.error(500,{message: error,stack: error.stack}); 
-                res.status(statusCode.internalError).send(
-                    response.errormsg(error.message)
-                );
-            });
-    },
-
-    details: async (req, res) => {
-        let id = enc_dec.cjs_decrypt(req.bodyString("id"));
-        let table = "orders";
-        let dump_table = "txn_response_dump";
-        let txn_table = "order_txn";
-        if (req.bodyString("mode") === "test") {
-            table = "test_orders";
-            dump_table = "test_txn_response_dump";
-            txn_table = "test_order_txn";
-        }
-
-        TransactionsModel.selectOne("*", { id: id }, table)
-            .then(async (result) => {
-                let txn_order_dump = "";
-                let failed_remark = '';
-
-                // console.log("txn_table", txn_table);
-                if (result.status == 'FAILED') {
-                    let txn_details = await TransactionsModel.selectOne('remark', { order_id: result.order_id, type: ['AUTH', 'SALE'], status: 'FAILED' }, txn_table);
-                    failed_remark = txn_details?.remark;
-                }
-
-                let order_txn = await TransactionsModel.selectSpecificDynamic(
-                    "order_id, txn, type,payment_id, status, res_dump, amount, currency, created_at,is_voided,remark,psp_code,txn_ref_id,is_voided,paydart_category",
-                    { order_id: result.order_id },
+                temp.can_be_void = true;
+                temp.can_be_refund =
+                  amount_refunded == val.amount ? false : true;
+              }
+              if (
+                (val.type == "REFUND" || val.type == "PARTIALLY_REFUND") &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                temp.can_be_void = true;
+              }
+              if (val.type == "VOID" && val.status == "AUTHORISED") {
+                let voided_txn_type =
+                  await TransactionsModel.selectSpecificDynamic(
+                    "type",
+                    { txn: val.txn_ref_id },
                     txn_table
-                );
-                let terminal_details = await TransactionsModel.selectOne('allowVoid,allowRefunds', { terminal_id: result.terminal_id }, 'mid');
-                let send_res = [];
-                let update_order_txn = [];
-
-                let val = result;
-
-                let trans_history = [];
-
-                // let amount_capture = 0;
-                let amount_refunded = 0;
-                let total_amount_capture_by_txn = 0;
-                const psp_code = '';
-                // console.log(`PSP NAME`);
-                // Switch For Transaction History Status and Button
-                let can_be_capture = false;
-                let can_be_void = false;
-                let can_be_refund = false;
-                let capture_amount = 0;
-               
-
-                switch (val.psp) {
-
-                    case 'TELR':
-                        capture_amount = 0;
-                        for (let val of order_txn) {
-                            let check_created_at = moment(val.created_at, 'DD-MM-YYYY').format('DD-MM-YYYY');
-                            let mid_details = await helpers.midDetails(result.order_id, val?.txn, req.bodyString("mode"));
-
-                            let temp = {
-                                order_id: val?.order_id ? val?.order_id : "",
-                                txn: val?.txn ? val?.txn : "",
-                                payment_id: val?.payment_id ? val.payment_id : '',
-                                type: val?.type ? val?.type : "",
-                                status: val?.status ? val?.status : "",
-                                currency: val?.currency ? val?.currency : "",
-                                amount: val?.amount ? Number(val?.amount - capture_amount).toFixed(2) : "",
-                                created_at: val?.created_at ? moment(val?.created_at).format('DD-MM-YYYY hh:mm') : "",
-                                remark: val.remark,
-                                can_be_capture: false,
-                                can_be_void: false,
-                                can_be_refund: false,
-                                is_voided: val.is_voided,
-                                code_psp: val?.psp_code,
-                                code_category: val?.paydart_category,
-                                mid: mid_details?.label,
-                                psp: mid_details?.psp,
-                                terminal: mid_details?.terminal_id,
-                            };
-
-                            //console.log(temp);
-                            // temp.can_be_refund = false;
-                            // temp.can_be_void = false;
-
-                            if (val.type == 'AUTH' && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                temp.can_be_void = true;
-                            }
-                            if (val.type == 'PARTIALLY_CAPTURE' && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                capture_amount = capture_amount + val.amount
-                            }
-                            if ((val.type == 'CAPTURE' || val.type == 'PARTIALLY_CAPTURE' || val.type == 'SALE') && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                amount_refunded = await helpers.get_refunded_amount_by_txn(val.txn, req.bodyString("mode"));
-
-
-                                temp.can_be_void = true;
-                                temp.can_be_refund = amount_refunded == val.amount ? false : true;
-                            }
-                            if ((val.type == 'REFUND' || val.type == 'PARTIALLY_REFUND') && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                temp.can_be_void = true;
-                            }
-                            if (val.type == 'VOID' && val.status == 'AUTHORISED') {
-                                let voided_txn_type = await TransactionsModel.selectSpecificDynamic(
-                                    "type",
-                                    { txn: val.txn_ref_id },
-                                    txn_table
-                                );
-                                let msg = '';
-                                // console.log(voided_txn_type[0]);
-                                // console.log(`${voided_txn_type[0].type} voided txn type`)
-                                switch (voided_txn_type[0]?.type) {
-                                    case 'AUTH':
-                                        msg = 'Auth Reversal';
-                                        break;
-                                    case 'CAPTURE':
-                                    case 'PARTIALLY_CAPTURE':
-                                        msg = 'Capture Reversal';
-                                        break;
-                                    case 'REFUND':
-                                    case 'PARTIALLY_REFUND':
-                                        msg = 'Refund Reversal';
-                                        break;
-                                }
-                                temp.remark = msg;
-                            }
-                            /*   if (val.status != 'AUTHORISED') {
+                  );
+                let msg = "";
+                // console.log(voided_txn_type[0]);
+                // console.log(`${voided_txn_type[0].type} voided txn type`)
+                switch (voided_txn_type[0]?.type) {
+                  case "AUTH":
+                    msg = "Auth Reversal";
+                    break;
+                  case "CAPTURE":
+                  case "PARTIALLY_CAPTURE":
+                    msg = "Capture Reversal";
+                    break;
+                  case "REFUND":
+                  case "PARTIALLY_REFUND":
+                    msg = "Refund Reversal";
+                    break;
+                }
+                temp.remark = msg;
+              }
+              /*   if (val.status != 'AUTHORISED') {
                                    temp.can_be_refund = false;
                                    temp.can_be_void = false;
            
@@ -981,416 +1005,595 @@ var res_data = {
                                if (val.type == 'AUTH' && result.status != 'AUTHORISED') {
                                    temp.can_be_void = false;
                                } */
-                            //console.log(temp);
-                            trans_history.push(temp);
-                        }
+              //console.log(temp);
+              trans_history.push(temp);
+            }
 
-                        break;
-                    case 'NI':
-                        for (let val of order_txn) {
-                            let check_created_at = moment(val.created_at, 'DD-MM-YYYY').format('DD-MM-YYYY');
-                            let mid_details = await helpers.midDetails(result.order_id, val?.txn, req.bodyString("mode"));
-                            //console.log("mid_details1", mid_details);
-                            let temp = {
-                                order_id: val?.order_id ? val?.order_id : "",
-                                txn: val?.txn ? val?.txn : "",
-                                payment_id: val?.payment_id ? val.payment_id : '',
-                                type: val?.type ? val?.type : "",
-                                status: val?.status ? val?.status : "",
-                                currency: val?.currency ? val?.currency : "",
-                                amount: val?.amount ? val?.amount.toFixed(2) : "",
-                                created_at: val?.created_at ? moment(val?.created_at).format('DD-MM-YYYY hh:mm') : "",
-                                remark: val.remark,
-                                can_be_capture: false,
-                                can_be_void: false,
-                                can_be_refund: false,
-                                is_voided: val?.is_voided,
-                                code_psp: val?.psp_code,
-                                code_category: val?.paydart_category,
-                                psp: mid_details?.psp,
-                                terminal: mid_details?.terminal_id,
-                                mid: mid_details?.label,
-                            };
-                            // temp.can_be_refund = false;
-                            // temp.can_be_void = false;
+            break;
+          case "NI":
+            for (let val of order_txn) {
+              let check_created_at = moment(
+                val.created_at,
+                "DD-MM-YYYY"
+              ).format("DD-MM-YYYY");
+              let mid_details = await helpers.midDetails(
+                result.order_id,
+                val?.txn,
+                req.bodyString("mode")
+              );
+              //console.log("mid_details1", mid_details);
+              let temp = {
+                order_id: val?.order_id ? val?.order_id : "",
+                txn: val?.txn ? val?.txn : "",
+                payment_id: val?.payment_id ? val.payment_id : "",
+                type: val?.type ? val?.type : "",
+                status: val?.status ? val?.status : "",
+                currency: val?.currency ? val?.currency : "",
+                amount: val?.amount ? val?.amount.toFixed(2) : "",
+                created_at: val?.created_at
+                  ? moment(val?.created_at).format("DD-MM-YYYY hh:mm")
+                  : "",
+                remark: val.remark,
+                can_be_capture: false,
+                can_be_void: false,
+                can_be_refund: false,
+                is_voided: val?.is_voided,
+                code_psp: val?.psp_code,
+                code_category: val?.paydart_category,
+                psp: mid_details?.psp,
+                terminal: mid_details?.terminal_id,
+                mid: mid_details?.label,
+              };
+              // temp.can_be_refund = false;
+              // temp.can_be_void = false;
 
-                            if (val.type == 'AUTH' && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                temp.can_be_void = true;
-                            }
-                            if (val.type == 'AUTH' && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                temp.can_be_capture = false;
-                            }
-                            if ((val.type == 'CAPTURE' || val.type == 'PARTIALLY_CAPTURE' || val.type == 'SALE') && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                amount_refunded = await helpers.get_refunded_amount_by_txn(val.txn, req.bodyString("mode"));
+              if (
+                val.type == "AUTH" &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                temp.can_be_void = true;
+              }
+              if (
+                val.type == "AUTH" &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                temp.can_be_capture = false;
+              }
+              if (
+                (val.type == "CAPTURE" ||
+                  val.type == "PARTIALLY_CAPTURE" ||
+                  val.type == "SALE") &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                amount_refunded = await helpers.get_refunded_amount_by_txn(
+                  val.txn,
+                  req.bodyString("mode")
+                );
 
+                temp.can_be_void = true;
+                temp.can_be_refund =
+                  amount_refunded == val.amount ? false : true;
+              }
 
-                                temp.can_be_void = true;
-                                temp.can_be_refund = amount_refunded == val.amount ? false : true;
-                            }
-
-                            // console.log((val.type=='REFUND' || val.type=='PARTIALLY_REFUND') && val.status=='AUTHORISED' && val.is_voided==0);
-                            if ((val.type == 'REFUND' || val.type == 'PARTIALLY_REFUND') && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                temp.can_be_void = true;
-                            }
-                            if (val.type == 'VOID' && val.status == 'AUTHORISED') {
-                                let voided_txn_type = await TransactionsModel.selectSpecificDynamic(
-                                    "type",
-                                    { txn: val.txn_ref_id },
-                                    txn_table
-                                );
-                                let msg = '';
-                                // console.log(voided_txn_type[0]);
-                                // console.log(`${voided_txn_type[0].type} voided txn type`)
-                                switch (voided_txn_type[0]?.type) {
-                                    case 'AUTH':
-                                    case 'SALE':
-                                        msg = 'Auth Reversal';
-                                        break;
-                                    case 'CAPTURE':
-                                    case 'PARTIALLY_CAPTURE':
-                                        msg = 'Capture Reversal';
-                                        break;
-                                    case 'REFUND':
-                                    case 'PARTIALLY_REFUND':
-                                        msg = 'Refund Reversal';
-                                        break;
-                                }
-                                temp.remark = msg;
-
-                            }
-                            let today = moment().format('DD-MM-YYYY');
-                            if (check_created_at == today && val.is_voided == 0 && val.type != 'VOID' && val.status == 'AUTHORISED') {
-                                temp.can_be_void = true;
-                                temp.can_be_refund = false;
-                            } else {
-                                temp.can_be_void = false;
-                            }
-                            trans_history.push(temp);
-                        }
-                        break;
-                    case 'PAYTABS':
-                        for (let val of order_txn) {
-                            let check_created_at = moment(val.created_at, 'DD-MM-YYYY').format('DD-MM-YYYY');
-                            let mid_details = await helpers.midDetails(result.order_id, val?.txn, req.bodyString("mode"));
-                            let temp = {
-                                order_id: val?.order_id ? val?.order_id : "",
-                                txn: val?.txn ? val?.txn : "",
-                                payment_id: val?.payment_id ? val.payment_id : '',
-                                type: val?.type ? val?.type : "",
-                                status: val?.status ? val?.status : "",
-                                currency: val?.currency ? val?.currency : "",
-                                amount: val?.amount ? val?.amount.toFixed(2) : "",
-                                created_at: val?.created_at ? moment(val?.created_at).format('DD-MM-YYYY hh:mm') : "",
-                                remark: val.remark,
-                                can_be_capture: false,
-                                can_be_void: false,
-                                can_be_refund: false,
-                                is_voided: val?.is_voided,
-                                psp: mid_details?.psp,
-                                terminal: mid_details?.terminal_id,
-                                mid: mid_details?.label,
-                                code_psp: val?.psp_code,
-                                code_category: val?.paydart_category,
-                            };
-                            // temp.can_be_refund = false;
-                            // temp.can_be_void = false;
-
-                            if (val.type == 'AUTH' && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                temp.can_be_void = true;
-                            }
-                            if (val.type == 'AUTH' && val.status == 'AUTHORISED' && val.is_voided == 1) {
-                                temp.can_be_capture = false;
-                            }
-                            if ((val.type == 'CAPTURE' || val.type == 'PARTIALLY_CAPTURE') && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                amount_refunded = await helpers.get_refunded_amount_by_txn(val.txn, req.bodyString("mode"));
-
-                                temp.can_be_void = false;
-                                temp.can_be_refund = amount_refunded == val.amount ? false : true;
-                            }
-                            if ((val.type == 'SALE') && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                amount_refunded = await helpers.get_refunded_amount_by_txn(val.txn, req.bodyString("mode"));
-
-                                temp.can_be_void = false;
-                                temp.can_be_refund = amount_refunded == val.amount ? false : true;
-                            }
-                            // console.log((val.type=='REFUND' || val.type=='PARTIALLY_REFUND') && val.status=='AUTHORISED' && val.is_voided==0);
-                            if ((val.type == 'REFUND' || val.type == 'PARTIALLY_REFUND') && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                temp.can_be_void = false;
-                            }
-                            if (val.type == 'VOID' && val.status == 'AUTHORISED') {
-                                let voided_txn_type = await TransactionsModel.selectSpecificDynamic(
-                                    "type",
-                                    { txn: val.txn_ref_id },
-                                    txn_table
-                                );
-                                let msg = '';
-                                // console.log(voided_txn_type[0]);
-                                // console.log(`${voided_txn_type[0].type} voided txn type`)
-                                switch (voided_txn_type[0]?.type) {
-                                    case 'AUTH':
-                                        msg = 'Auth Reversal';
-                                        break;
-                                    case 'CAPTURE':
-                                    case 'PARTIALLY_CAPTURE':
-                                        msg = 'Capture Reversal';
-                                        break;
-                                    case 'REFUND':
-                                    case 'PARTIALLY_REFUND':
-                                        msg = 'Refund Reversal';
-                                        break;
-                                }
-                                temp.remark = msg;
-
-                            }
-                            trans_history.push(temp);
-                        }
-                        break;
-                    case "MPGS-ADIB":
-                    case "MPGS-MEPSPAY":
-                    case "MPGS-PAYSHIFT":
-                    case "MPGS-GTI":            
-                        for (let val of order_txn) {
-                            let check_created_at = moment(val.created_at, 'DD-MM-YYYY').format('DD-MM-YYYY');
-                            let mid_details = await helpers.midDetails(result.order_id, val?.txn, req.bodyString("mode"));
-                            console.log(`mid details`)
-                            console.log(mid_details);
-                            let temp = {
-                                order_id: val?.order_id ? val?.order_id : "",
-                                txn: val?.txn ? val?.txn : "",
-                                payment_id: val?.payment_id ? val.payment_id : '',
-                                type: val?.type ? val?.type : "",
-                                status: val?.status ? val?.status : "",
-                                currency: val?.currency ? val?.currency : "",
-                                amount: val?.amount ? val?.amount.toFixed(2) : "",
-                                created_at: val?.created_at ? moment(val?.created_at).format('DD-MM-YYYY hh:mm') : "",
-                                remark: val.remark,
-                                can_be_capture: false,
-                                can_be_void: false,
-                                can_be_refund: false,
-                                is_voided: val?.is_voided,
-                                code_psp: val?.psp_code,
-                                code_category: val?.paydart_category,
-                                psp: mid_details?.psp,
-                                terminal: mid_details?.terminal_id,
-                                mid: mid_details?.label,
-                            };
-
-                            if (val.type == 'AUTH' && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                temp.can_be_void = true;
-                            }
-                            if (val.type == 'AUTH' && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                temp.can_be_capture = false;
-                            }
-                            if ((val.type == 'CAPTURE' || val.type == 'PARTIALLY_CAPTURE' || val.type == "SALE") && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                amount_refunded = await helpers.get_refunded_amount_by_txn(val.txn, req.bodyString("mode"));
-                                console.log(amount_refunded, typeof amount_refunded);
-                                console.log(amount_refunded == val.amount);
-                                temp.can_be_void = true;
-                                if (amount_refunded) {
-                                    temp.can_be_refund = amount_refunded == val.amount ? false : true;
-                                } else {
-                                    temp.can_be_refund = true;
-                                }
-
-                            }
-                            if ( val.type == "SALE" && val.status == 'AUTHORISED' && val.is_voided == 1) {
-                                amount_capture = val.amount;
-
-                            }
-
-                            if ((val.type == 'REFUND' || val.type == 'PARTIALLY_REFUND') && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                temp.can_be_void = true;
-                            }
-                            if (val.type == 'VOID' && val.status == 'AUTHORISED') {
-                                let voided_txn_type = await TransactionsModel.selectSpecificDynamic(
-                                    "type",
-                                    { txn: val.txn_ref_id },
-                                    txn_table
-                                );
-                                let msg = '';
-                                switch (voided_txn_type[0]?.type) {
-                                    case 'AUTH':
-                                    case 'SALE':
-                                        msg = 'Capture Reversal';
-                                        break;
-                                    case 'CAPTURE':
-                                    case 'PARTIALLY_CAPTURE':
-                                        msg = 'Capture Reversal';
-                                        break;
-                                    case 'REFUND':
-                                    case 'PARTIALLY_REFUND':
-                                        msg = 'Refund Reversal';
-                                        break;
-                                }
-                                temp.remark = msg;
-
-                            }
-                            let today = moment().format('DD-MM-YYYY');
-                            if (check_created_at == today && val.is_voided == 0 && val.type != 'VOID' && val.status == 'AUTHORISED') {
-                                temp.can_be_void = true;
-                                //  temp.can_be_refund = false;
-                            } else {
-                                temp.can_be_void = false;
-                            }
-                            trans_history.push(temp);
-                        }
-                        break;
-                    case "My Fatoorah":
-                        for (let val of order_txn) {
-                            let check_created_at = moment(val.created_at, 'DD-MM-YYYY').format('DD-MM-YYYY');
-                            let mid_details = await helpers.midDetails(result.order_id, val?.txn, req.bodyString("mode"));
-                            let temp = {
-                                order_id: val?.order_id ? val?.order_id : "",
-                                txn: val?.txn ? val?.txn : "",
-                                payment_id: val?.payment_id ? val.payment_id : '',
-                                type: val?.type ? val?.type : "",
-                                status: val?.status ? val?.status : "",
-                                currency: val?.currency ? val?.currency : "",
-                                amount: val?.amount ? val?.amount.toFixed(2) : "",
-                                created_at: val?.created_at ? moment(val?.created_at).format('DD-MM-YYYY hh:mm') : "",
-                                remark: val.remark,
-                                can_be_capture: false,
-                                can_be_void: false,
-                                can_be_refund: false,
-                                is_voided: val?.is_voided,
-                                code_psp: val?.psp_code,
-                                code_category: val?.paydart_category,
-                                psp: mid_details?.psp,
-                                terminal: mid_details?.terminal_id,
-                                mid: mid_details?.label,
-                            };
-                            console.log(`temp is here`);
-                            console.log(temp);
-
-                            if (val.type == 'AUTH' && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                temp.can_be_void = true;
-                            }
-                            if (val.type == 'AUTH' && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                temp.can_be_capture = false;
-                            }
-                            if ((val.type == 'CAPTURE' || val.type == 'PARTIALLY_CAPTURE' || val.type == "SALE") && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                amount_refunded = await helpers.get_refunded_amount_by_txn(val.txn, req.bodyString("mode"));
-                                console.log(amount_refunded, typeof amount_refunded);
-                                console.log(amount_refunded == val.amount);
-                                temp.can_be_void = true;
-                                if (amount_refunded) {
-                                    temp.can_be_refund = amount_refunded == val.amount ? false : true;
-                                } else {
-                                    temp.can_be_refund = true;
-                                }
-
-                            }
-
-                            if ((val.type == 'REFUND' || val.type == 'PARTIALLY_REFUND') && val.status == 'AUTHORISED' && val.is_voided == 0) {
-                                temp.can_be_void = true;
-                            }
-                            if (val.type == 'VOID' && val.status == 'AUTHORISED') {
-                                let voided_txn_type = await TransactionsModel.selectSpecificDynamic(
-                                    "type",
-                                    { txn: val.txn_ref_id },
-                                    txn_table
-                                );
-                                let msg = '';
-                                switch (voided_txn_type[0]?.type) {
-                                    case 'AUTH':
-                                    case 'SALE':
-                                        msg = 'Auth Reversal';
-                                        break;
-                                    case 'CAPTURE':
-                                    case 'PARTIALLY_CAPTURE':
-                                        msg = 'Capture Reversal';
-                                        break;
-                                    case 'REFUND':
-                                    case 'PARTIALLY_REFUND':
-                                        msg = 'Refund Reversal';
-                                        break;
-                                }
-                                temp.remark = msg;
-
-                            }
-                            let today = moment().format('DD-MM-YYYY');
-                            if (check_created_at == today && val.is_voided == 0 && val.type != 'VOID' && val.status == 'AUTHORISED') {
-                                temp.can_be_void = true;
-                                //  temp.can_be_refund = false;
-                            } else {
-                                temp.can_be_void = false;
-                            }
-                            trans_history.push(temp);
-                        }
-                        break;
-                    case "fiserv":
-                        console.log(`result in fiserv`);
-                        console.log(result);
-                        for (let val of order_txn) {
-                            let mid_details = await helpers.midDetails(result.order_id, val?.txn, req.bodyString("mode"));
-                            console.log(`mid details`);
-                            console.log(mid_details);
-                            let check_created_at = moment(val.created_at, 'DD-MM-YYYY').format('DD-MM-YYYY');
-                            let temp = {
-                                order_id: val?.order_id ? val?.order_id : "",
-                                txn: val?.txn ? val?.txn : "",
-                                payment_id: val?.payment_id ? val.payment_id : '',
-                                type: val?.type ? val?.type : "",
-                                status: val?.status ? val?.status : "",
-                                currency: val?.currency ? val?.currency : "",
-                                amount: val?.amount ? val?.amount.toFixed(2) : "",
-                                created_at: val?.created_at ? moment(val?.created_at).format('DD-MM-YYYY hh:mm') : "",
-                                remark: val.remark,
-                                can_be_capture: false,
-                                can_be_void:  ((val?.type=="AUTH" || val?.type=="CAPTURE" || val?.type=="REFUND" || val?.type=="SALE") && val.is_voided==0)?true:false,
-                                can_be_refund: val?.type=="CAPTURE" && val.is_voided==0?true:false ,
-                                is_voided: val?.is_voided,
-                                psp: result.psp,
-                                code_psp: val?.psp_code,
-                                code_category: val?.paydart_category,
-                                terminal: result.terminal_id,
-                                mid:mid_details?.label
-                            };
-                            // temp.can_be_refund = false;
-                            // temp.can_be_void = false;
-                            trans_history.push(temp);
-                        }
-                        break;
-                    default:
-                        for (let val of order_txn) {
-                            let check_created_at = moment(val.created_at, 'DD-MM-YYYY').format('DD-MM-YYYY');
-                            let mid_details_default = await helpers.midDetailsDefault(result.terminal_id);
-                            let temp = {
-                                order_id: val?.order_id ? val?.order_id : "",
-                                txn: val?.txn ? val?.txn : "",
-                                payment_id: val?.payment_id ? val.payment_id : '',
-                                type: val?.type ? val?.type : "",
-                                status: val?.status ? val?.status : "",
-                                currency: val?.currency ? val?.currency : "",
-                                amount: val?.amount ? val?.amount.toFixed(2) : "",
-                                created_at: val?.created_at ? moment(val?.created_at).format('DD-MM-YYYY hh:mm') : "",
-                                remark: val.remark,
-                                can_be_capture: false,
-                                can_be_void:  ((val?.type=="AUTH" || val?.type=="CAPTURE" || val?.type=="REFUND" || val?.type=="SALE") && val.is_voided==0)?true:false,
-                                can_be_refund: val?.type=="CAPTURE" && val.is_voided==0?true:false ,
-                                is_voided: val?.is_voided,
-                                psp: result?.psp,
-                                terminal: result?.terminal_id,
-                                mid: mid_details_default?.label,
-                                code_psp: val?.psp_code,
-                                code_category: val?.paydart_category,
-                            };
-                            // temp.can_be_refund = false;
-                            // temp.can_be_void = false;
-                            trans_history.push(temp);
-                        }
+              // console.log((val.type=='REFUND' || val.type=='PARTIALLY_REFUND') && val.status=='AUTHORISED' && val.is_voided==0);
+              if (
+                (val.type == "REFUND" || val.type == "PARTIALLY_REFUND") &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                temp.can_be_void = true;
+              }
+              if (val.type == "VOID" && val.status == "AUTHORISED") {
+                let voided_txn_type =
+                  await TransactionsModel.selectSpecificDynamic(
+                    "type",
+                    { txn: val.txn_ref_id },
+                    txn_table
+                  );
+                let msg = "";
+                // console.log(voided_txn_type[0]);
+                // console.log(`${voided_txn_type[0].type} voided txn type`)
+                switch (voided_txn_type[0]?.type) {
+                  case "AUTH":
+                  case "SALE":
+                    msg = "Auth Reversal";
                     break;
-
+                  case "CAPTURE":
+                  case "PARTIALLY_CAPTURE":
+                    msg = "Capture Reversal";
+                    break;
+                  case "REFUND":
+                  case "PARTIALLY_REFUND":
+                    msg = "Refund Reversal";
+                    break;
                 }
-                let retryCascadeMidList = await helpers.getRetryAndCascade(val?.order_id);
-                // console.log(`Retry and Cascade details`)
-                // console.log(retryCascadeMidList);
-                let sumRetryAndCascade = retryCascadeMidList.retry + retryCascadeMidList.cascade;
-                let r = retryCascadeMidList.retry;
-                let c = retryCascadeMidList.cascade;
-                trans_history = trans_history.reverse();
-                let i = 0;
-                /* for(let transaction of trans_history){
+                temp.remark = msg;
+              }
+              let today = moment().format("DD-MM-YYYY");
+              if (
+                check_created_at == today &&
+                val.is_voided == 0 &&
+                val.type != "VOID" &&
+                val.status == "AUTHORISED"
+              ) {
+                temp.can_be_void = true;
+                temp.can_be_refund = false;
+              } else {
+                temp.can_be_void = false;
+              }
+              trans_history.push(temp);
+            }
+            break;
+          case "PAYTABS":
+            for (let val of order_txn) {
+              let check_created_at = moment(
+                val.created_at,
+                "DD-MM-YYYY"
+              ).format("DD-MM-YYYY");
+              let mid_details = await helpers.midDetails(
+                result.order_id,
+                val?.txn,
+                req.bodyString("mode")
+              );
+              let temp = {
+                order_id: val?.order_id ? val?.order_id : "",
+                txn: val?.txn ? val?.txn : "",
+                payment_id: val?.payment_id ? val.payment_id : "",
+                type: val?.type ? val?.type : "",
+                status: val?.status ? val?.status : "",
+                currency: val?.currency ? val?.currency : "",
+                amount: val?.amount ? val?.amount.toFixed(2) : "",
+                created_at: val?.created_at
+                  ? moment(val?.created_at).format("DD-MM-YYYY hh:mm")
+                  : "",
+                remark: val.remark,
+                can_be_capture: false,
+                can_be_void: false,
+                can_be_refund: false,
+                is_voided: val?.is_voided,
+                psp: mid_details?.psp,
+                terminal: mid_details?.terminal_id,
+                mid: mid_details?.label,
+                code_psp: val?.psp_code,
+                code_category: val?.paydart_category,
+              };
+              // temp.can_be_refund = false;
+              // temp.can_be_void = false;
+
+              if (
+                val.type == "AUTH" &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                temp.can_be_void = true;
+              }
+              if (
+                val.type == "AUTH" &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 1
+              ) {
+                temp.can_be_capture = false;
+              }
+              if (
+                (val.type == "CAPTURE" || val.type == "PARTIALLY_CAPTURE") &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                amount_refunded = await helpers.get_refunded_amount_by_txn(
+                  val.txn,
+                  req.bodyString("mode")
+                );
+
+                temp.can_be_void = false;
+                temp.can_be_refund =
+                  amount_refunded == val.amount ? false : true;
+              }
+              if (
+                val.type == "SALE" &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                amount_refunded = await helpers.get_refunded_amount_by_txn(
+                  val.txn,
+                  req.bodyString("mode")
+                );
+
+                temp.can_be_void = false;
+                temp.can_be_refund =
+                  amount_refunded == val.amount ? false : true;
+              }
+              // console.log((val.type=='REFUND' || val.type=='PARTIALLY_REFUND') && val.status=='AUTHORISED' && val.is_voided==0);
+              if (
+                (val.type == "REFUND" || val.type == "PARTIALLY_REFUND") &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                temp.can_be_void = false;
+              }
+              if (val.type == "VOID" && val.status == "AUTHORISED") {
+                let voided_txn_type =
+                  await TransactionsModel.selectSpecificDynamic(
+                    "type",
+                    { txn: val.txn_ref_id },
+                    txn_table
+                  );
+                let msg = "";
+                // console.log(voided_txn_type[0]);
+                // console.log(`${voided_txn_type[0].type} voided txn type`)
+                switch (voided_txn_type[0]?.type) {
+                  case "AUTH":
+                    msg = "Auth Reversal";
+                    break;
+                  case "CAPTURE":
+                  case "PARTIALLY_CAPTURE":
+                    msg = "Capture Reversal";
+                    break;
+                  case "REFUND":
+                  case "PARTIALLY_REFUND":
+                    msg = "Refund Reversal";
+                    break;
+                }
+                temp.remark = msg;
+              }
+              trans_history.push(temp);
+            }
+            break;
+          case "MPGS-ADIB":
+          case "MPGS-MEPSPAY":
+          case "MPGS-PAYSHIFT":
+          case "MPGS-GTI":
+            for (let val of order_txn) {
+              let check_created_at = moment(
+                val.created_at,
+                "DD-MM-YYYY"
+              ).format("DD-MM-YYYY");
+              let mid_details = await helpers.midDetails(
+                result.order_id,
+                val?.txn,
+                req.bodyString("mode")
+              );
+              console.log(`mid details`);
+              console.log(mid_details);
+              let temp = {
+                order_id: val?.order_id ? val?.order_id : "",
+                txn: val?.txn ? val?.txn : "",
+                payment_id: val?.payment_id ? val.payment_id : "",
+                type: val?.type ? val?.type : "",
+                status: val?.status ? val?.status : "",
+                currency: val?.currency ? val?.currency : "",
+                amount: val?.amount ? val?.amount.toFixed(2) : "",
+                created_at: val?.created_at
+                  ? moment(val?.created_at).format("DD-MM-YYYY hh:mm")
+                  : "",
+                remark: val.remark,
+                can_be_capture: false,
+                can_be_void: false,
+                can_be_refund: false,
+                is_voided: val?.is_voided,
+                code_psp: val?.psp_code,
+                code_category: val?.paydart_category,
+                psp: mid_details?.psp,
+                terminal: mid_details?.terminal_id,
+                mid: mid_details?.label,
+              };
+
+              if (
+                val.type == "AUTH" &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                temp.can_be_void = true;
+              }
+              if (
+                val.type == "AUTH" &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                temp.can_be_capture = false;
+              }
+              if (
+                (val.type == "CAPTURE" ||
+                  val.type == "PARTIALLY_CAPTURE" ||
+                  val.type == "SALE") &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                amount_refunded = await helpers.get_refunded_amount_by_txn(
+                  val.txn,
+                  req.bodyString("mode")
+                );
+                console.log(amount_refunded, typeof amount_refunded);
+                console.log(amount_refunded == val.amount);
+                temp.can_be_void = true;
+                if (amount_refunded) {
+                  temp.can_be_refund =
+                    amount_refunded == val.amount ? false : true;
+                } else {
+                  temp.can_be_refund = true;
+                }
+              }
+              if (
+                val.type == "SALE" &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 1
+              ) {
+                amount_capture = val.amount;
+              }
+
+              if (
+                (val.type == "REFUND" || val.type == "PARTIALLY_REFUND") &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                temp.can_be_void = true;
+              }
+              if (val.type == "VOID" && val.status == "AUTHORISED") {
+                let voided_txn_type =
+                  await TransactionsModel.selectSpecificDynamic(
+                    "type",
+                    { txn: val.txn_ref_id },
+                    txn_table
+                  );
+                let msg = "";
+                switch (voided_txn_type[0]?.type) {
+                  case "AUTH":
+                  case "SALE":
+                    msg = "Capture Reversal";
+                    break;
+                  case "CAPTURE":
+                  case "PARTIALLY_CAPTURE":
+                    msg = "Capture Reversal";
+                    break;
+                  case "REFUND":
+                  case "PARTIALLY_REFUND":
+                    msg = "Refund Reversal";
+                    break;
+                }
+                temp.remark = msg;
+              }
+              let today = moment().format("DD-MM-YYYY");
+              if (
+                check_created_at == today &&
+                val.is_voided == 0 &&
+                val.type != "VOID" &&
+                val.status == "AUTHORISED"
+              ) {
+                temp.can_be_void = true;
+                //  temp.can_be_refund = false;
+              } else {
+                temp.can_be_void = false;
+              }
+              trans_history.push(temp);
+            }
+            break;
+          case "My Fatoorah":
+            for (let val of order_txn) {
+              let check_created_at = moment(
+                val.created_at,
+                "DD-MM-YYYY"
+              ).format("DD-MM-YYYY");
+              let mid_details = await helpers.midDetails(
+                result.order_id,
+                val?.txn,
+                req.bodyString("mode")
+              );
+              let temp = {
+                order_id: val?.order_id ? val?.order_id : "",
+                txn: val?.txn ? val?.txn : "",
+                payment_id: val?.payment_id ? val.payment_id : "",
+                type: val?.type ? val?.type : "",
+                status: val?.status ? val?.status : "",
+                currency: val?.currency ? val?.currency : "",
+                amount: val?.amount ? val?.amount.toFixed(2) : "",
+                created_at: val?.created_at
+                  ? moment(val?.created_at).format("DD-MM-YYYY hh:mm")
+                  : "",
+                remark: val.remark,
+                can_be_capture: false,
+                can_be_void: false,
+                can_be_refund: false,
+                is_voided: val?.is_voided,
+                code_psp: val?.psp_code,
+                code_category: val?.paydart_category,
+                psp: mid_details?.psp,
+                terminal: mid_details?.terminal_id,
+                mid: mid_details?.label,
+              };
+              console.log(`temp is here`);
+              console.log(temp);
+
+              if (
+                val.type == "AUTH" &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                temp.can_be_void = true;
+              }
+              if (
+                val.type == "AUTH" &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                temp.can_be_capture = false;
+              }
+              if (
+                (val.type == "CAPTURE" ||
+                  val.type == "PARTIALLY_CAPTURE" ||
+                  val.type == "SALE") &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                amount_refunded = await helpers.get_refunded_amount_by_txn(
+                  val.txn,
+                  req.bodyString("mode")
+                );
+                console.log(amount_refunded, typeof amount_refunded);
+                console.log(amount_refunded == val.amount);
+                temp.can_be_void = true;
+                if (amount_refunded) {
+                  temp.can_be_refund =
+                    amount_refunded == val.amount ? false : true;
+                } else {
+                  temp.can_be_refund = true;
+                }
+              }
+
+              if (
+                (val.type == "REFUND" || val.type == "PARTIALLY_REFUND") &&
+                val.status == "AUTHORISED" &&
+                val.is_voided == 0
+              ) {
+                temp.can_be_void = true;
+              }
+              if (val.type == "VOID" && val.status == "AUTHORISED") {
+                let voided_txn_type =
+                  await TransactionsModel.selectSpecificDynamic(
+                    "type",
+                    { txn: val.txn_ref_id },
+                    txn_table
+                  );
+                let msg = "";
+                switch (voided_txn_type[0]?.type) {
+                  case "AUTH":
+                  case "SALE":
+                    msg = "Auth Reversal";
+                    break;
+                  case "CAPTURE":
+                  case "PARTIALLY_CAPTURE":
+                    msg = "Capture Reversal";
+                    break;
+                  case "REFUND":
+                  case "PARTIALLY_REFUND":
+                    msg = "Refund Reversal";
+                    break;
+                }
+                temp.remark = msg;
+              }
+              let today = moment().format("DD-MM-YYYY");
+              if (
+                check_created_at == today &&
+                val.is_voided == 0 &&
+                val.type != "VOID" &&
+                val.status == "AUTHORISED"
+              ) {
+                temp.can_be_void = true;
+                //  temp.can_be_refund = false;
+              } else {
+                temp.can_be_void = false;
+              }
+              trans_history.push(temp);
+            }
+            break;
+          case "fiserv":
+            console.log(`result in fiserv`);
+            console.log(result);
+            for (let val of order_txn) {
+              let mid_details = await helpers.midDetails(
+                result.order_id,
+                val?.txn,
+                req.bodyString("mode")
+              );
+              console.log(`mid details`);
+              console.log(mid_details);
+              let check_created_at = moment(
+                val.created_at,
+                "DD-MM-YYYY"
+              ).format("DD-MM-YYYY");
+              let temp = {
+                order_id: val?.order_id ? val?.order_id : "",
+                txn: val?.txn ? val?.txn : "",
+                payment_id: val?.payment_id ? val.payment_id : "",
+                type: val?.type ? val?.type : "",
+                status: val?.status ? val?.status : "",
+                currency: val?.currency ? val?.currency : "",
+                amount: val?.amount ? val?.amount.toFixed(2) : "",
+                created_at: val?.created_at
+                  ? moment(val?.created_at).format("DD-MM-YYYY hh:mm")
+                  : "",
+                remark: val.remark,
+                can_be_capture: false,
+                can_be_void:
+                  (val?.type == "AUTH" ||
+                    val?.type == "CAPTURE" ||
+                    val?.type == "REFUND" ||
+                    val?.type == "SALE") &&
+                  val.is_voided == 0
+                    ? true
+                    : false,
+                can_be_refund:
+                  val?.type == "CAPTURE" && val.is_voided == 0 ? true : false,
+                is_voided: val?.is_voided,
+                psp: result.psp,
+                code_psp: val?.psp_code,
+                code_category: val?.paydart_category,
+                terminal: result.terminal_id,
+                mid: mid_details?.label,
+              };
+              // temp.can_be_refund = false;
+              // temp.can_be_void = false;
+              trans_history.push(temp);
+            }
+            break;
+          default:
+            for (let val of order_txn) {
+              let check_created_at = moment(
+                val.created_at,
+                "DD-MM-YYYY"
+              ).format("DD-MM-YYYY");
+              let mid_details_default = await helpers.midDetailsDefault(
+                result.terminal_id
+              );
+              let temp = {
+                order_id: val?.order_id ? val?.order_id : "",
+                txn: val?.txn ? val?.txn : "",
+                payment_id: val?.payment_id ? val.payment_id : "",
+                type: val?.type ? val?.type : "",
+                status: val?.status ? val?.status : "",
+                currency: val?.currency ? val?.currency : "",
+                amount: val?.amount ? val?.amount.toFixed(2) : "",
+                created_at: val?.created_at
+                  ? moment(val?.created_at).format("DD-MM-YYYY hh:mm")
+                  : "",
+                remark: val.remark,
+                can_be_capture: false,
+                can_be_void:
+                  (val?.type == "AUTH" ||
+                    val?.type == "CAPTURE" ||
+                    val?.type == "REFUND" ||
+                    val?.type == "SALE") &&
+                  val.is_voided == 0
+                    ? true
+                    : false,
+                can_be_refund:
+                  val?.type == "CAPTURE" && val.is_voided == 0 ? true : false,
+                is_voided: val?.is_voided,
+                psp: result?.psp,
+                terminal: result?.terminal_id,
+                mid: mid_details_default?.label,
+                code_psp: val?.psp_code,
+                code_category: val?.paydart_category,
+              };
+              // temp.can_be_refund = false;
+              // temp.can_be_void = false;
+              trans_history.push(temp);
+            }
+            break;
+        }
+        let retryCascadeMidList = await helpers.getRetryAndCascade(
+          val?.order_id
+        );
+        // console.log(`Retry and Cascade details`)
+        // console.log(retryCascadeMidList);
+        let sumRetryAndCascade =
+          retryCascadeMidList.retry + retryCascadeMidList.cascade;
+        let r = retryCascadeMidList.retry;
+        let c = retryCascadeMidList.cascade;
+        trans_history = trans_history.reverse();
+        let i = 0;
+        /* for(let transaction of trans_history){
                     if(transaction.status=='FAILED' && (transaction.type=='AUTH' || transaction.type=='SALE')){
                         let failed_logs = await helpers.fetchPSPBYTXN({txn:transaction.txn});
                        
@@ -1412,765 +1615,763 @@ var res_data = {
                     }
                     i++;
                 } */
-                for (let transaction of trans_history) {
-                    console.log(`txnksdandkasdnkadnakdnka`)
-                    console.log(transaction)
-                    var txn_mid, txn_psp, txn_terminal = ""
-                    // if ((transaction.type == 'AUTH' || transaction.type == 'SALE' || transaction.type=="CAPTURE") && transaction.status == 'AUTHORISED') {
-                    //     txn_mid = transaction.mid
-                    //     txn_psp = transaction.psp
-                    //     txn_terminal = transaction.terminal
-                    //     // console.log("txn_mid1", txn_mid);
-                    // }
+        for (let transaction of trans_history) {
+          console.log(`txnksdandkasdnkadnakdnka`);
+          console.log(transaction);
+          var txn_mid,
+            txn_psp,
+            txn_terminal = "";
+          // if ((transaction.type == 'AUTH' || transaction.type == 'SALE' || transaction.type=="CAPTURE") && transaction.status == 'AUTHORISED') {
+          //     txn_mid = transaction.mid
+          //     txn_psp = transaction.psp
+          //     txn_terminal = transaction.terminal
+          //     // console.log("txn_mid1", txn_mid);
+          // }
 
-                    // if (transaction.type == 'REFUND' || transaction.type == 'PARTIALLY_REFUND' || transaction.type == 'PARTIALLY_CAPTURE' || transaction.type == 'VOID' || transaction.type == 'CAPTURE' || transaction.type == '') {
-                    //     console.log("txn_mid2", txn_mid);
-                    //     transaction.mid = txn_mid
-                    //     transaction.psp = txn_psp
-                    //     transaction.terminal = txn_terminal
-                    // }
+          // if (transaction.type == 'REFUND' || transaction.type == 'PARTIALLY_REFUND' || transaction.type == 'PARTIALLY_CAPTURE' || transaction.type == 'VOID' || transaction.type == 'CAPTURE' || transaction.type == '') {
+          //     console.log("txn_mid2", txn_mid);
+          //     transaction.mid = txn_mid
+          //     transaction.psp = txn_psp
+          //     transaction.terminal = txn_terminal
+          // }
 
-                    transaction.retry = false;
-                    transaction.cascade = false;
-                    let retry = await helpers.lastCardUsed({ order_id: val.order_id, txn: transaction.txn, mode: req.bodyString("mode") })
-                    // console.log(retry);
-                    transaction.retry = retry?.retry_txn == 1 ? true : false
-                    transaction.cascade = retry?.cascade_txn == 1 ? true : false
-                }
-                trans_history = trans_history.reverse();
-                console.log(`transaction isdkasdnaksdfk`)
-                console.log(trans_history);
-                let data_created = {
-                    order_id: val?.order_id ? val?.order_id : "",
-                    txn: "-",
-                    status: "INITIATED",
-                    type: "CREATED",
-                    payment_id: '-',
-                    currency: val?.currency ? val?.currency : "",
-                    amount: val?.amount ? val?.amount.toFixed(2) : "",
-                    created_at: moment(result.created_at).format(
-                        "DD-MM-YYYY hh:mm"
-                    ),
-                    can_be_refund: false,
-                    can_be_void: false
-                };
-                trans_history.push(data_created);
-                // const filteredData = trans_history
-
-                let trans_data = await helpers.get_trans_data(
-                    result?.order_id,
-                    req.bodyString("mode")
-                );
-
-                if (req.bodyString('txn_id')) {
-                    let refunded_amount_as_per_txn = await helpers.get_refunded_amount_by_txn(req.bodyString('txn_id'), req.bodyString("mode"));
-                    let amount_capture_by_txn = await helpers.get_capture_amount_by_txn(req.bodyString('txn_id'), req.bodyString("mode"));
-                    amount_refunded = amount_capture_by_txn - refunded_amount_as_per_txn;
-                    console.log(`refunded amount as per txn`);
-                    console.log(refunded_amount_as_per_txn);
-                }
-                amount_capture = await helpers.get_capture_amount_by_order_id(val?.order_id, req.bodyString("mode"));
-                let is_retry = await TransactionsModel.get_transactions_retry(val?.order_id, req.bodyString("mode"));
-                let is_cascade = await TransactionsModel.get_transactions_cascade(val?.order_id, req.bodyString("mode"));
-                let user_card_token_Details = await helpers.fetchLastTryData({ order_id: val?.order_id });
-                let new_res = {
-                    action: val.action,
-                    allow_void: terminal_details?.allowVoid == 1 ? 'Yes' : 'No',
-                    allow_refund: terminal_details?.allowRefunds == 1 ? 'Yes' : 'No',
-                    data_id: enc_dec.cjs_encrypt(result?.id),
-                    m_order_id: result?.merchant_order_id
-                        ? result?.merchant_order_id
-                        : "",
-                    p_order_id: result?.order_id ? result?.order_id : "",
-                    p_request_id: trans_data[0]?.last_request_id
-                        ? trans_data[0]?.last_request_id
-                        : "",
-                    psp_ref_id: trans_data[0]?.last_psp_ref_id
-                        ? trans_data[0]?.last_psp_ref_id
-                        : "",
-                    transaction_id: trans_data[0]?.last_txn_id
-                        ? trans_data[0]?.last_txn_id
-                        : "",
-                    psp_txn_id: trans_data[0]?.last_psp_txn_id
-                        ? trans_data[0]?.last_psp_txn_id
-                        : "",
-                    transaction_date:
-                        result && result.updated_at
-                            ? moment(result.updated_at).format(
-                                "DD-MM-YYYY hh:mm:ss"
-                            )
-                            : "",
-                    transaction_status: result?.status ? result?.status : "",
-                    status_code: result?.status ? result?.status : "",
-                    status: "",
-                    currency: result?.currency ? result?.currency : "",
-                    amount: result?.amount ? result?.amount.toFixed(2) : "",
-                    psp: result?.psp ? result?.psp : "",
-                    payment_method: result?.payment_mode
-                        ? result?.payment_mode
-                        : "",
-                    payment_method_id: "", // missing field
-                    is_oneclick: result.is_one_click == 1 ? 1 : 0,
-                    is_retry: is_retry > 0 ? 1 : 0,
-                    is_cascade: is_cascade > 0 ? 1 : 0,
-                    m_customer_id: result?.merchant_customer_id
-                        ? result?.merchant_customer_id
-                        : "",
-                    customer_email: result?.customer_email
-                        ? result?.customer_email
-                        : "",
-                    customer_mobile_code: result?.customer_code
-                        ? result?.customer_code
-                        : "",
-                    customer_mobile: result?.customer_mobile
-                        ? result?.customer_mobile
-                        : "",
-                    customer_country: result?.billing_country
-                        ? result?.billing_country
-                        : "",
-                    m_payment_token: result?.card_id ? result?.card_id : "",
-                    payment_method_data: {
-                        scheme: result?.scheme ? result?.scheme : "",
-                        card_country: result?.card_country
-                            ? result?.card_country
-                            : "",
-                        card_type: result?.cardType ? result?.cardType : "",
-                        masked_pan: result?.pan ? result?.pan : "",
-                    },
-                    apm_name: "",
-                    apm_identifier: "",
-                    sub_merchant_identifier: result?.merchant_id
-                        ? await enc_dec.cjs_encrypt(result?.merchant_id)
-                        : "",
-                    transaction_history: trans_history,
-                    amount_remaining_for_capture: result?.amount - amount_capture,
-                    amount_tobe_refunded: amount_refunded,
-                    remark: failed_remark ? failed_remark : '-',
-                    card_bin: result.card_bin != "" ? result.card_bin : result?.pan.substring(0, 5),
-                    issuer: result.issuer ? result.issuer : '-',
-                    issuer_website: result.issuer_website ? result.issuer_website : "-",
-                    issuer_phone_number: result.issuer_phone_number ? result.issuer_phone_number : '-',
-                    threeds_version: result['3ds'],
-                    threeds_status: result['3ds_status']
-
-                };
-
-                var psp_result = ""
-                const last_txn_result = await helpers.get_last_transaction(result.order_id);
-
-                if (last_txn_result) {
-                    psp_result = await helpers.get_response_code(result?.psp, last_txn_result?.psp_code);
-                }
-
-                let psp_card_token = '-';
-                switch (val.psp) {
-                    case 'TELR':
-                        if (val.saved_card_for_recurring != '')
-                            psp_card_token = val.saved_card_for_recurring;
-                        break;
-                    case 'NI':
-                        if (val.saved_card_for_recurring != '') {
-                            let saved_card_for_recurirng = JSON.parse((val.saved_card_for_recurring));
-                            psp_card_token = saved_card_for_recurirng?.cardToken;
-                        }
-                        break;
-                    case 'PAYTABS':
-                        if (val.saved_card_for_recurring != '')
-                            psp_card_token = val.saved_card_for_recurring;
-                        break;
-                }
-
-                let fraud_details = await helpers.get_fraud_data(val.order_id, req.bodyString("mode"));
-
-
-                let sale_success = await helpers.get_date_by_order_id(
-                    {
-                        order_id: val.order_id,
-                        status: "AUTHORISED",
-                        type: "SALE",
-                    },
-                    txn_table
-                )
-                console.log("sale_success", sale_success);
-
-                let capture_date = "-"
-                if (val.action == "SALE" && sale_success != "") {
-                    capture_date = sale_success
-                } else {
-                    capture_date = await helpers.get_capture_date_by_order_id(val.order_id, txn_table)
-                }
-
-                let partial_refund = await helpers.get_partial_refund_date_by_order_id(val.order_id, txn_table)
-
-                let res1 = {
-                    transactions_id: await enc_dec.cjs_encrypt(val.id),
-                    merchant_id: await enc_dec.cjs_encrypt(val.merchant_id),
-                    order_id: val?.order_id ? val?.order_id : "",
-                    payment_id: val?.payment_id ? val?.payment_id : "",
-                    payment_mode: val?.payment_mode ? val?.payment_mode : "",
-                    merchant_name: await helpers.get_merchantdetails_name_by_id(
-                        val.merchant_id
-                    ),
-                    customer_name: val?.customer_name ? val.customer_name : "",
-                    customer_email: val?.customer_email
-                        ? val.customer_email
-                        : "",
-                    customer_mobile: val?.customer_mobile
-                        ? val.customer_mobile
-                        : "",
-                    customer_code: val?.customer_code ? val.customer_code : "",
-                    order_amount: val?.amount.toFixed(2)
-                        ? val.amount.toFixed(2)
-                        : "",
-                    order_currency: val?.currency ? val.currency : "",
-                    status: val?.status ? val.status : "",
-                    billing_address_1: val?.billing_address_line_1
-                        ? val?.billing_address_line_1
-                        : "",
-                    billing_address_2: val?.billing_address_line_2
-                        ? val?.billing_address_line_2
-                        : "",
-                    billing_city: val?.billing_city ? val?.billing_city : "",
-                    billing_pincode: val?.billing_pincode
-                        ? val?.billing_pincode
-                        : "",
-                    billing_province: val?.billing_province
-                        ? val?.billing_province
-                        : "",
-                    billing_country: val?.billing_country
-                        ? val?.billing_country
-                        : "",
-                    shipping_address_1: val?.shipping_address_line_1
-                        ? val?.shipping_address_line_1
-                        : "",
-                    shipping_address_2: val?.shipping_address_line_2
-                        ? val?.shipping_address_line_2
-                        : "",
-                    shipping_city: val?.shipping_city ? val?.shipping_city : "",
-                    shipping_province: val?.shipping_province
-                        ? val?.shipping_province
-                        : "",
-                    shipping_country: val?.shipping_country
-                        ? val?.shipping_country
-                        : "",
-                    shipping_pincode: val?.shipping_pincode
-                        ? val?.shipping_pincode
-                        : "",
-                    order_description: val?.other_description ? val?.other_description : val?.description || "-",
-                    card_no: val?.card_no ? val?.card_no : "",
-                    card_token: val?.card_id ? val?.card_id : "",
-                    u_card_token: user_card_token_Details?.card_proxy ? user_card_token_Details?.card_proxy : "-",
-                    psp_card_token: psp_card_token,
-                    browser_fingerprint: val?.browser_fingerprint
-                        ? val?.browser_fingerprint
-                        : "",
-                    block_for_suspicious_ip: val?.block_for_suspicious_ip
-                        ? val?.block_for_suspicious_ip
-                        : "",
-                    block_for_suspicious_email: val?.block_for_suspicious_email
-                        ? val?.block_for_suspicious_email
-                        : "",
-                    high_risk_country: val?.high_risk_country
-                        ? val?.high_risk_country
-                        : "",
-                    block_for_transaction_limit:
-                        val?.block_for_transaction_limit
-                            ? val?.block_for_transaction_limit
-                            : "",
-                    high_risk_transaction: val?.high_risk_transaction
-                        ? val?.high_risk_transaction
-                        : "",
-                    risk_rating:
-                        val.high_risk_transaction +
-                        val.block_for_suspicious_ip +
-                        val.block_for_suspicious_email +
-                        val.block_for_transaction_limit +
-                        val.high_risk_country,
-                    remark: failed_remark ? failed_remark : "-",
-                    transaction_date: moment(val.created_at).format(
-                        "DD-MM-YYYY H:mm:ss"
-                    ),
-                    url: val?.return_url ? val?.return_url : "",
-                    browser: val?.browser ? val?.browser : "",
-                    browser_version: val?.browser_version
-                        ? val?.browser_version
-                        : "",
-                    os: val?.os ? val?.os : "",
-                    ip: val?.ip ? val?.ip : "",
-                    ip_country: val?.ip_country ? val?.ip_country : "",
-                    device_type: val?.device_type ? val?.device_type : "",
-                    origin: val?.origin ? val?.origin : "",
-                    psp: val?.psp ? val?.psp : "",
-                    expiry: val?.expiry ? val?.expiry : "",
-                    cardholderName: result?.cardholderName
-                        ? result?.cardholderName
-                        : "",
-                    scheme: val?.scheme ? val?.scheme : "",
-                    cardType: val?.cardType ? val?.cardType : "",
-                    cardCategory: val?.cardCategory ? val?.cardCategory : "",
-                    pan: val?.pan ? val?.pan : "",
-                    updated_at: moment(val.updated_at).format(
-                        "DD-MM-YYYY H:mm:ss"
-                    ),
-                    order_txn: update_order_txn,
-                    acquirer_response: txn_order_dump?.dump
-                        ? txn_order_dump?.dump
-                        : "",
-                    void_date: await helpers.get_date_by_order_id(
-                        {
-                            order_id: val.order_id,
-                            status: "AUTHORISED",
-                            type: "VOID",
-                        },
-                        txn_table
-                    ),
-                    auth_date: await helpers.get_date_by_order_id(
-                        {
-                            order_id: val.order_id,
-                            status: "AUTHORISED",
-                            type: "AUTH",
-                        },
-                        txn_table
-                    ),
-                    failed_date: await helpers.get_date_by_order_id(
-                        {
-                            order_id: val.order_id,
-                            status: "FAILED",
-                            type: "CAPTURE",
-                        },
-                        txn_table
-                    ),
-                    partial_refund: partial_refund,
-                    refund_date: await helpers.get_refund_date_by_order_id(val.order_id, txn_table),
-                    cancel_date: await helpers.get_date_by_order_id(
-                        {
-                            order_id: val.order_id,
-                            status: "CANCELLED",
-                            type: "PAYMENT",
-                        },
-                        txn_table
-                    ),
-                    capture_date: capture_date,
-                    psp_payment_id:
-                        await helpers.get_txn_details_by_order_status(
-                            {
-                                order_id: val.order_id,
-                                status: "AUTHORISED",
-                                type: "CAPTURE",
-                            },
-                            "CAPTURE",
-                            txn_table
-                        ),
-                    refund_amount:
-                        await helpers.get_txn_details_by_order_status(
-                            {
-                                order_id: val.order_id,
-                                status: "AUTHORISED",
-                                type: "REFUND",
-                            },
-                            "REFUND",
-                            txn_table
-                        ),
-                    new_res,
-                    psp_category: psp_result,
-                    bt_name: val?.scheme ? val?.scheme : "",
-                    bt_user: val?.bt_name ? val?.bt_name : "",
-                    bt_id: val?.bt_id ? val?.bt_id : "",
-                    bt_iban: val?.bt_iban ? val?.bt_iban : "",
-                    bt_type: val?.bt_type ? val?.bt_type : "",
-                    bt_number: val?.bt_number ? val?.bt_number : "",
-                    routed_by: await helpers.getRoutingRuleDetails(val?.order_id, req.bodyString("mode")),
-                    fraud_details: fraud_details,
-                    status_3ds: user_card_token_Details?.['3ds_version'] != undefined ? user_card_token_Details?.['3ds_version'] : "NA"
-                };
-
-                // send_res = new_res;
-                send_res = res1;
-
-                res.status(statusCode.ok).send(
-                    response.successdatamsg(
-                        send_res,
-                        "Transaction details fetched successfully."
-                    )
-                );
-            })
-            .catch((error) => {
-                console.log(error);
-               logger.error(500,{message: error,stack: error.stack}); 
-                res.status(statusCode.internalError).send(
-                    response.errormsg(error.message)
-                );
-            });
-    },
-
-    requests: async (req, res) => {
-        try {
-            let request_id = req.bodyString("request_id");
-            let mode = req.bodyString("mode");
-            let request_data = await helpers.get_data_list(
-                "*",
-                mode === "test"
-                    ? "test_generate_request_id"
-                    : "generate_request_id",
-                { request_id: request_id }
-            );
-
-            // let request_data = await helpers.get_data_list(
-            //     "*",
-            //     mode === "test" ? "test_generate_request_id" : "generate_request_id",
-            //     { order_id: order_id[0].order_id }
-            // );
-
-
-            let rest_data = [];
-            for (let val of request_data) {
-                let temp = {
-                    id: val?.id ? enc_dec.cjs_encrypt(val?.id) : "",
-                    merchant_id: val?.merchant_id
-                        ? enc_dec.cjs_encrypt(val?.merchant_id)
-                        : "",
-                    order_id: val?.order_id ? val?.order_id : "",
-                    request_id: val?.request_id ? val?.request_id : "",
-                    request: val?.request ? val?.request : "",
-                };
-                rest_data.push(temp);
-            }
-
-            res.status(statusCode.ok).send(
-                response.successdatamsg(rest_data, "List fetched successfully.")
-            );
-        } catch (error) {
-           logger.error(500,{message: error,stack: error.stack}); 
-            res.status(statusCode.internalError).send(
-                response.errormsg(error.message)
-            );
+          transaction.retry = false;
+          transaction.cascade = false;
+          let retry = await helpers.lastCardUsed({
+            order_id: val.order_id,
+            txn: transaction.txn,
+            mode: req.bodyString("mode"),
+          });
+          // console.log(retry);
+          transaction.retry = retry?.retry_txn == 1 ? true : false;
+          transaction.cascade = retry?.cascade_txn == 1 ? true : false;
         }
-    },
+        trans_history = trans_history.reverse();
+        console.log(`transaction isdkasdnaksdfk`);
+        console.log(trans_history);
+        let data_created = {
+          order_id: val?.order_id ? val?.order_id : "",
+          txn: "-",
+          status: "INITIATED",
+          type: "CREATED",
+          payment_id: "-",
+          currency: val?.currency ? val?.currency : "",
+          amount: val?.amount ? val?.amount.toFixed(2) : "",
+          created_at: moment(result.created_at).format("DD-MM-YYYY hh:mm"),
+          can_be_refund: false,
+          can_be_void: false,
+        };
+        trans_history.push(data_created);
+        // const filteredData = trans_history
 
-    payment_id: async (req, res) => {
-        try {
-            let payment_ref_id = req.bodyString("payment_ref_id");
-            let mode = req.bodyString("mode");
-            let table =
-                mode === "test"
-                    ? "test_txn_response_dump"
-                    : "txn_response_dump";
-            // let order_id = await helpers.get_data_list(
-            //     "order_id",
-            //     "order_txn",
-            //     { payment_id: payment_ref_id }
-            // );
-
-            // let dump_data = await helpers.get_data_list(
-            //     "*",
-            //     "txn_response_dump",
-            //     { order_id: order_id[0]?.order_id }
-            // );
-
-            let data = await helpers.get_dump_by_payment_ref(
-                payment_ref_id,
-                table
-            );
-
-
-            const filteredData = data.filter(
-                (item) => item.status !== "AWAIT_3DS"
-            );
-
-            // let rest_data=[]
-            // for(let val of request_data){
-            //     let temp = {
-            //         id: val?.id ? enc_dec.cjs_encrypt(val?.id) : "",
-            //         merchant_id: val?.merchant_id
-            //             ? enc_dec.cjs_encrypt(val?.merchant_id)
-            //             : "",
-            //         order_id: val?.order_id ? val?.order_id : "",
-            //         request_id: val?.request_id ? val?.request_id : "",
-            //         request: val?.request ? JSON.parse(val?.request) : "",
-            //     };
-            //     rest_data.push(temp)
-            // }
-
-            res.status(statusCode.ok).send(
-                response.successdatamsg(
-                    filteredData,
-                    "List fetched successfully."
-                )
-            );
-        } catch (error) {
-           logger.error(500,{message: error,stack: error.stack}); 
-            res.status(statusCode.internalError).send(
-                response.errormsg(error.message)
-            );
-        }
-    },
-    update: async (req, res) => {
-        try {
-            let department_id = await enc_dec.cjs_decrypt(
-                req.bodyString("department_id")
-            );
-            let department = req.bodyString("department");
-
-            var insdata = {
-                department: department,
-            };
-            $ins_id = await TransactionsModel.updateDetails(
-                { id: department_id },
-                insdata
-            );
-            res.status(statusCode.ok).send(
-                response.successmsg("Record updated successfully")
-            );
-        } catch (error) {
-           logger.error(500,{message: error,stack: error.stack}); 
-            res.status(statusCode.internalError).send(
-                response.errormsg(error.message)
-            );
-        }
-    },
-    payment_status: async (req, res) => {
-        let payment_status = await helpers.get_data_list(
-            "*",
-            "payment_status",
-            { deleted: 0 }
+        let trans_data = await helpers.get_trans_data(
+          result?.order_id,
+          req.bodyString("mode")
         );
-        let payment_modes = await helpers.get_data_list("*", "payment_mode", {
-            deleted: 0,
-        });
 
-        let send_res = { payment_status: [], payment_mode: [] };
-        payment_status.forEach(function (val, key) {
-            let res = {
-                id: enc_dec.cjs_encrypt(val.id),
-                payment_status: val.status,
-            };
-            send_res.payment_status.push(res);
-        });
-        payment_modes.forEach(function (val, key) {
-            let res1 = {
-                id: enc_dec.cjs_encrypt(val.id),
-                payment_mode: val.payment_mode,
-            };
-            send_res.payment_mode.push(res1);
-        });
-
-        res.status(statusCode.ok).send(
-            response.successdatamsg(send_res, "List fetched successfully.")
+        if (req.bodyString("txn_id")) {
+          let refunded_amount_as_per_txn =
+            await helpers.get_refunded_amount_by_txn(
+              req.bodyString("txn_id"),
+              req.bodyString("mode")
+            );
+          let amount_capture_by_txn = await helpers.get_capture_amount_by_txn(
+            req.bodyString("txn_id"),
+            req.bodyString("mode")
+          );
+          amount_refunded = amount_capture_by_txn - refunded_amount_as_per_txn;
+          console.log(`refunded amount as per txn`);
+          console.log(refunded_amount_as_per_txn);
+        }
+        amount_capture = await helpers.get_capture_amount_by_order_id(
+          val?.order_id,
+          req.bodyString("mode")
         );
-    },
-
-    highrisk_list: async (req, res) => {
-        let limit = {
-            perpage: 10,
-            start: 0,
-            page: 1,
+        let is_retry = await TransactionsModel.get_transactions_retry(
+          val?.order_id,
+          req.bodyString("mode")
+        );
+        let is_cascade = await TransactionsModel.get_transactions_cascade(
+          val?.order_id,
+          req.bodyString("mode")
+        );
+        let user_card_token_Details = await helpers.fetchLastTryData({
+          order_id: val?.order_id,
+        });
+        let new_res = {
+          action: val.action,
+          allow_void: terminal_details?.allowVoid == 1 ? "Yes" : "No",
+          allow_refund: terminal_details?.allowRefunds == 1 ? "Yes" : "No",
+          data_id: enc_dec.cjs_encrypt(result?.id),
+          m_order_id: result?.merchant_order_id
+            ? result?.merchant_order_id
+            : "",
+          p_order_id: result?.order_id ? result?.order_id : "",
+          p_request_id: trans_data[0]?.last_request_id
+            ? trans_data[0]?.last_request_id
+            : "",
+          psp_ref_id: trans_data[0]?.last_psp_ref_id
+            ? trans_data[0]?.last_psp_ref_id
+            : "",
+          transaction_id: trans_data[0]?.last_txn_id
+            ? trans_data[0]?.last_txn_id
+            : "",
+          psp_txn_id: trans_data[0]?.last_psp_txn_id
+            ? trans_data[0]?.last_psp_txn_id
+            : "",
+          transaction_date:
+            result && result.updated_at
+              ? moment(result.updated_at).format("DD-MM-YYYY hh:mm:ss")
+              : "",
+          transaction_status: result?.status ? result?.status : "",
+          status_code: result?.status ? result?.status : "",
+          status: "",
+          currency: result?.currency ? result?.currency : "",
+          amount: result?.amount ? result?.amount.toFixed(2) : "",
+          psp: result?.psp ? result?.psp : "",
+          payment_method: result?.payment_mode ? result?.payment_mode : "",
+          payment_method_id: "", // missing field
+          is_oneclick: result.is_one_click == 1 ? 1 : 0,
+          is_retry: is_retry > 0 ? 1 : 0,
+          is_cascade: is_cascade > 0 ? 1 : 0,
+          m_customer_id: result?.merchant_customer_id
+            ? result?.merchant_customer_id
+            : "",
+          customer_email: result?.customer_email ? result?.customer_email : "",
+          customer_mobile_code: result?.customer_code
+            ? result?.customer_code
+            : "",
+          customer_mobile: result?.customer_mobile
+            ? result?.customer_mobile
+            : "",
+          customer_country: result?.billing_country
+            ? result?.billing_country
+            : "",
+          m_payment_token: result?.card_id ? result?.card_id : "",
+          payment_method_data: {
+            scheme: result?.scheme ? result?.scheme : "",
+            card_country: result?.card_country ? result?.card_country : "",
+            card_type: result?.cardType ? result?.cardType : "",
+            masked_pan: result?.pan ? result?.pan : "",
+          },
+          apm_name: "",
+          apm_identifier: "",
+          sub_merchant_identifier: result?.merchant_id
+            ? await enc_dec.cjs_encrypt(result?.merchant_id)
+            : "",
+          transaction_history: trans_history,
+          amount_remaining_for_capture: result?.amount - amount_capture,
+          amount_tobe_refunded: amount_refunded,
+          remark: failed_remark ? failed_remark : "-",
+          card_bin:
+            result.card_bin != ""
+              ? result.card_bin
+              : result?.pan.substring(0, 5),
+          issuer: result.issuer ? result.issuer : "-",
+          issuer_website: result.issuer_website ? result.issuer_website : "-",
+          issuer_phone_number: result.issuer_phone_number
+            ? result.issuer_phone_number
+            : "-",
+          threeds_version: result["3ds"],
+          threeds_status: result["3ds_status"],
         };
 
-        if (req.bodyString("perpage") && req.bodyString("page")) {
-            perpage = parseInt(req.bodyString("perpage"));
-            start = parseInt(req.bodyString("page"));
+        var psp_result = "";
+        const last_txn_result = await helpers.get_last_transaction(
+          result.order_id
+        );
 
-            limit.perpage = perpage;
-            limit.start = (start - 1) * perpage;
-        }
-        let and_filter_obj = {};
-        let date_condition = {};
-        let or_filter_obj = {};
-        // if (req.user.type == "merchant") {
-        //     and_filter_obj.super_merchant = req.user.id;
-        // }
-        let table_name = "";
-        if (req.bodyString("mode") == "test") {
-            table_name = "test_orders";
-        } else {
-            table_name = "orders";
+        if (last_txn_result) {
+          psp_result = await helpers.get_response_code(
+            result?.psp,
+            last_txn_result?.psp_code
+          );
         }
 
-        if (req.bodyString("merchant_id")) {
-            and_filter_obj.merchant_id = encrypt_decrypt(
-                "decrypt",
-                req.bodyString("merchant_id")
-            );
-        }
-
-        let get_risk = 0;
-        if (req.bodyString("type")) {
-            get_risk = await helpers.get_high_risk(req.bodyString("type"));
-
-        }
-
-        // if (req.bodyString("super_merchant")) {
-        //     and_filter_obj.super_merchant = encrypt_decrypt(
-        //         "decrypt",
-        //         req.bodyString("super_merchant")
-        //     );
-        // }
-
-        if (req.bodyString("status")) {
-            and_filter_obj.status = req.bodyString("status");
-        }
-        if (req.bodyString("currency")) {
-            and_filter_obj.currency = req.bodyString("currency");
-        }
-        if (req.bodyString("order_id")) {
-            and_filter_obj.order_id = req.bodyString("order_id");
-        }
-        if (req.bodyString("customer_name")) {
-            and_filter_obj.customer_name = req.bodyString("customer_name");
-        }
-
-        if (req.bodyString("email")) {
-            and_filter_obj.customer_email = req.bodyString("email");
-        }
-
-        if (req.bodyString("mobile")) {
-            and_filter_obj.customer_mobile = req.bodyString("mobile");
-        }
-
-        if (req.bodyString("from_date")) {
-            date_condition.from_date = req.bodyString("from_date");
-        }
-
-        if (req.bodyString("to_date")) {
-            date_condition.to_date = req.bodyString("to_date");
-        }
-
-
-
-        TransactionsModel.select_highrisk(
-            and_filter_obj,
-            date_condition,
-            get_risk,
-            limit,
-            table_name
-        )
-            .then(async (result) => {
-                let send_res = [];
-                for (let val of result) {
-
-                    let refunded_amt = await helpers.get_refunded_amount(
-                        val.order_id
-                    );
-                    let res = {
-                        transactions_id: await enc_dec.cjs_encrypt(val.id),
-                        merchant_id: await enc_dec.cjs_encrypt(val.merchant_id),
-                        order_id: val.order_id,
-                        payment_id: val.payment_id,
-                        merchant_name:
-                            await helpers.get_merchantdetails_name_by_id(
-                                val.merchant_id
-                            ),
-                        order_amount: val.amount.toFixed(2),
-                        order_currency: val.currency,
-                        customer_name: val.customer_name,
-                        customer_email: val.customer_email,
-                        customer_mobile: val.customer_mobile,
-                        class: val.class,
-                        mode: "",
-                        type: await helpers.get_latest_type_of_txn(
-                            val.order_id
-                        ),
-                        status: val.status,
-                        can_be_void: val.status == "APPROVED" ? true : false,
-                        refunded_amount: refunded_amt ? refunded_amt : 0.0,
-                        // reason: get_risk.val,
-                        reason:
-                            val.high_risk_transaction == 1
-                                ? "block for transaction"
-                                : val.block_for_suspicious_ip == 1
-                                    ? "block for suspicious ip"
-                                    : val.block_for_suspicious_email == 1
-                                        ? "block for suspicious email"
-                                        : val.block_for_transaction_limit == 1
-                                            ? "block for transaction limit"
-                                            : val.high_risk_country == 1
-                                                ? "block for high risk country"
-                                                : "",
-                        risk_rating:
-                            val.high_risk_transaction +
-                            val.block_for_suspicious_ip +
-                            val.block_for_suspicious_email +
-                            val.block_for_transaction_limit +
-                            val.high_risk_country,
-                        high_risk_country: val.high_risk_country
-                            ? val.high_risk_country
-                            : 0,
-                        high_risk_transaction: val.high_risk_transaction
-                            ? val.high_risk_transaction
-                            : 0,
-                        block_for_suspicious_ip: val.block_for_suspicious_ip
-                            ? val.block_for_suspicious_ip
-                            : 0,
-                        block_for_suspicious_email:
-                            val.block_for_suspicious_email
-                                ? val.block_for_suspicious_email
-                                : 0,
-                        block_for_transaction_limit:
-                            val.block_for_transaction_limit
-                                ? val.block_for_transaction_limit
-                                : 0,
-                        transaction_date: moment(val.created_at).format(
-                            "DD-MM-YYYY H:mm:ss"
-                        ),
-                    };
-                    send_res.push(res);
-                }
-                total_count = await TransactionsModel.get_count_risk(
-                    and_filter_obj,
-                    date_condition,
-                    get_risk,
-                    table_name
-                );
-
-                res.status(statusCode.ok).send(
-                    response.successdatamsg(
-                        send_res,
-                        "List fetched successfully.",
-                        total_count
-                    )
-                );
-            })
-            .catch((error) => {
-               logger.error(500,{message: error,stack: error.stack}); 
-                res.status(statusCode.internalError).send(
-                    response.errormsg(error.message)
-                );
-            });
-    },
-
-    header_update: async (req, res) => {
-        try {
-            let order_id = req.bodyString("order_id");
-            let order_data = {
-                browser: req.headers.browser,
-                browser_version: req.headers.browser_version,
-                os: req.headers.os,
-                ip: req.headers['ip'],
-                ip_country: req.headers.ipcountry,
-                device_type: req.headers.mobilebrand != "" ? req.headers.mobilebrand : "Desktop",
-            };
-            //console.log(req.headers);
-            let table_name = "";
-            if (req.bodyString("mode") == "test") {
-                table_name = "test_orders"
-            } else {
-                table_name = "orders"
+        let psp_card_token = "-";
+        switch (val.psp) {
+          case "TELR":
+            if (val.saved_card_for_recurring != "")
+              psp_card_token = val.saved_card_for_recurring;
+            break;
+          case "NI":
+            if (val.saved_card_for_recurring != "") {
+              let saved_card_for_recurirng = JSON.parse(
+                val.saved_card_for_recurring
+              );
+              psp_card_token = saved_card_for_recurirng?.cardToken;
             }
-
-            $ins_id = await TransactionsModel.orderDetailsUpdate(
-                { order_id: order_id },
-                order_data, table_name
-            );
-            res.status(statusCode.ok).send(
-                response.successmsg("Record updated successfully")
-            );
-        } catch (error) {
-           logger.error(500,{message: error,stack: error.stack}); 
-            res.status(statusCode.internalError).send(
-                response.errormsg(error.message)
-            );
+            break;
+          case "PAYTABS":
+            if (val.saved_card_for_recurring != "")
+              psp_card_token = val.saved_card_for_recurring;
+            break;
         }
-    },
+
+        let fraud_details = await helpers.get_fraud_data(
+          val.order_id,
+          req.bodyString("mode")
+        );
+
+        let sale_success = await helpers.get_date_by_order_id(
+          {
+            order_id: val.order_id,
+            status: "AUTHORISED",
+            type: "SALE",
+          },
+          txn_table
+        );
+        console.log("sale_success", sale_success);
+
+        let capture_date = "-";
+        if (val.action == "SALE" && sale_success != "") {
+          capture_date = sale_success;
+        } else {
+          capture_date = await helpers.get_capture_date_by_order_id(
+            val.order_id,
+            txn_table
+          );
+        }
+
+        let partial_refund = await helpers.get_partial_refund_date_by_order_id(
+          val.order_id,
+          txn_table
+        );
+
+        let res1 = {
+          transactions_id: await enc_dec.cjs_encrypt(val.id),
+          merchant_id: await enc_dec.cjs_encrypt(val.merchant_id),
+          order_id: val?.order_id ? val?.order_id : "",
+          payment_id: val?.payment_id ? val?.payment_id : "",
+          payment_mode: val?.payment_mode ? val?.payment_mode : "",
+          merchant_name: await helpers.get_merchantdetails_name_by_id(
+            val.merchant_id
+          ),
+          customer_name: val?.customer_name ? val.customer_name : "",
+          customer_email: val?.customer_email ? val.customer_email : "",
+          customer_mobile: val?.customer_mobile ? val.customer_mobile : "",
+          customer_code: val?.customer_code ? val.customer_code : "",
+          order_amount: val?.amount.toFixed(2) ? val.amount.toFixed(2) : "",
+          order_currency: val?.currency ? val.currency : "",
+          status: val?.status ? val.status : "",
+          billing_address_1: val?.billing_address_line_1
+            ? val?.billing_address_line_1
+            : "",
+          billing_address_2: val?.billing_address_line_2
+            ? val?.billing_address_line_2
+            : "",
+          billing_city: val?.billing_city ? val?.billing_city : "",
+          billing_pincode: val?.billing_pincode ? val?.billing_pincode : "",
+          billing_province: val?.billing_province ? val?.billing_province : "",
+          billing_country: val?.billing_country ? val?.billing_country : "",
+          shipping_address_1: val?.shipping_address_line_1
+            ? val?.shipping_address_line_1
+            : "",
+          shipping_address_2: val?.shipping_address_line_2
+            ? val?.shipping_address_line_2
+            : "",
+          shipping_city: val?.shipping_city ? val?.shipping_city : "",
+          shipping_province: val?.shipping_province
+            ? val?.shipping_province
+            : "",
+          shipping_country: val?.shipping_country ? val?.shipping_country : "",
+          shipping_pincode: val?.shipping_pincode ? val?.shipping_pincode : "",
+          order_description: val?.other_description
+            ? val?.other_description
+            : val?.description || "-",
+          card_no: val?.card_no ? val?.card_no : "",
+          card_token: val?.card_id ? val?.card_id : "",
+          u_card_token: user_card_token_Details?.card_proxy
+            ? user_card_token_Details?.card_proxy
+            : "-",
+          psp_card_token: psp_card_token,
+          browser_fingerprint: val?.browser_fingerprint
+            ? val?.browser_fingerprint
+            : "",
+          block_for_suspicious_ip: val?.block_for_suspicious_ip
+            ? val?.block_for_suspicious_ip
+            : "",
+          block_for_suspicious_email: val?.block_for_suspicious_email
+            ? val?.block_for_suspicious_email
+            : "",
+          high_risk_country: val?.high_risk_country
+            ? val?.high_risk_country
+            : "",
+          block_for_transaction_limit: val?.block_for_transaction_limit
+            ? val?.block_for_transaction_limit
+            : "",
+          high_risk_transaction: val?.high_risk_transaction
+            ? val?.high_risk_transaction
+            : "",
+          risk_rating:
+            val.high_risk_transaction +
+            val.block_for_suspicious_ip +
+            val.block_for_suspicious_email +
+            val.block_for_transaction_limit +
+            val.high_risk_country,
+          remark: failed_remark ? failed_remark : "-",
+          transaction_date: moment(val.created_at).format("DD-MM-YYYY H:mm:ss"),
+          url: val?.return_url ? val?.return_url : "",
+          browser: val?.browser ? val?.browser : "",
+          browser_version: val?.browser_version ? val?.browser_version : "",
+          os: val?.os ? val?.os : "",
+          ip: val?.ip ? val?.ip : "",
+          ip_country: val?.ip_country ? val?.ip_country : "",
+          device_type: val?.device_type ? val?.device_type : "",
+          origin: val?.origin ? val?.origin : "",
+          psp: val?.psp ? val?.psp : "",
+          expiry: val?.expiry ? val?.expiry : "",
+          cardholderName: result?.cardholderName ? result?.cardholderName : "",
+          scheme: val?.scheme ? val?.scheme : "",
+          cardType: val?.cardType ? val?.cardType : "",
+          cardCategory: val?.cardCategory ? val?.cardCategory : "",
+          pan: val?.pan ? val?.pan : "",
+          updated_at: moment(val.updated_at).format("DD-MM-YYYY H:mm:ss"),
+          order_txn: update_order_txn,
+          acquirer_response: txn_order_dump?.dump ? txn_order_dump?.dump : "",
+          void_date: await helpers.get_date_by_order_id(
+            {
+              order_id: val.order_id,
+              status: "AUTHORISED",
+              type: "VOID",
+            },
+            txn_table
+          ),
+          auth_date: await helpers.get_date_by_order_id(
+            {
+              order_id: val.order_id,
+              status: "AUTHORISED",
+              type: "AUTH",
+            },
+            txn_table
+          ),
+          failed_date: await helpers.get_date_by_order_id(
+            {
+              order_id: val.order_id,
+              status: "FAILED",
+              type: "CAPTURE",
+            },
+            txn_table
+          ),
+          partial_refund: partial_refund,
+          refund_date: await helpers.get_refund_date_by_order_id(
+            val.order_id,
+            txn_table
+          ),
+          cancel_date: await helpers.get_date_by_order_id(
+            {
+              order_id: val.order_id,
+              status: "CANCELLED",
+              type: "PAYMENT",
+            },
+            txn_table
+          ),
+          capture_date: capture_date,
+          psp_payment_id: await helpers.get_txn_details_by_order_status(
+            {
+              order_id: val.order_id,
+              status: "AUTHORISED",
+              type: "CAPTURE",
+            },
+            "CAPTURE",
+            txn_table
+          ),
+          refund_amount: await helpers.get_txn_details_by_order_status(
+            {
+              order_id: val.order_id,
+              status: "AUTHORISED",
+              type: "REFUND",
+            },
+            "REFUND",
+            txn_table
+          ),
+          new_res,
+          psp_category: psp_result,
+          bt_name: val?.scheme ? val?.scheme : "",
+          bt_user: val?.bt_name ? val?.bt_name : "",
+          bt_id: val?.bt_id ? val?.bt_id : "",
+          bt_iban: val?.bt_iban ? val?.bt_iban : "",
+          bt_type: val?.bt_type ? val?.bt_type : "",
+          bt_number: val?.bt_number ? val?.bt_number : "",
+          routed_by: await helpers.getRoutingRuleDetails(
+            val?.order_id,
+            req.bodyString("mode")
+          ),
+          fraud_details: fraud_details,
+          status_3ds:
+            user_card_token_Details?.["3ds_version"] != undefined
+              ? user_card_token_Details?.["3ds_version"]
+              : "NA",
+        };
+
+        // send_res = new_res;
+        send_res = res1;
+
+        res
+          .status(statusCode.ok)
+          .send(
+            response.successdatamsg(
+              send_res,
+              "Transaction details fetched successfully."
+            )
+          );
+      })
+      .catch((error) => {
+        console.log(error);
+        logger.error(500, { message: error, stack: error.stack });
+        res
+          .status(statusCode.internalError)
+          .send(response.errormsg(error.message));
+      });
+  },
+
+  requests: async (req, res) => {
+    try {
+      let request_id = req.bodyString("request_id");
+      let mode = req.bodyString("mode");
+      let request_data = await helpers.get_data_list(
+        "*",
+        mode === "test" ? "test_generate_request_id" : "generate_request_id",
+        { request_id: request_id }
+      );
+
+      // let request_data = await helpers.get_data_list(
+      //     "*",
+      //     mode === "test" ? "test_generate_request_id" : "generate_request_id",
+      //     { order_id: order_id[0].order_id }
+      // );
+
+      let rest_data = [];
+      for (let val of request_data) {
+        let temp = {
+          id: val?.id ? enc_dec.cjs_encrypt(val?.id) : "",
+          merchant_id: val?.merchant_id
+            ? enc_dec.cjs_encrypt(val?.merchant_id)
+            : "",
+          order_id: val?.order_id ? val?.order_id : "",
+          request_id: val?.request_id ? val?.request_id : "",
+          request: val?.request ? val?.request : "",
+        };
+        rest_data.push(temp);
+      }
+
+      res
+        .status(statusCode.ok)
+        .send(response.successdatamsg(rest_data, "List fetched successfully."));
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+      res
+        .status(statusCode.internalError)
+        .send(response.errormsg(error.message));
+    }
+  },
+
+  payment_id: async (req, res) => {
+    try {
+      let payment_ref_id = req.bodyString("payment_ref_id");
+      let mode = req.bodyString("mode");
+      let table =
+        mode === "test" ? "test_txn_response_dump" : "txn_response_dump";
+      // let order_id = await helpers.get_data_list(
+      //     "order_id",
+      //     "order_txn",
+      //     { payment_id: payment_ref_id }
+      // );
+
+      // let dump_data = await helpers.get_data_list(
+      //     "*",
+      //     "txn_response_dump",
+      //     { order_id: order_id[0]?.order_id }
+      // );
+
+      let data = await helpers.get_dump_by_payment_ref(payment_ref_id, table);
+
+      const filteredData = data.filter((item) => item.status !== "AWAIT_3DS");
+
+      // let rest_data=[]
+      // for(let val of request_data){
+      //     let temp = {
+      //         id: val?.id ? enc_dec.cjs_encrypt(val?.id) : "",
+      //         merchant_id: val?.merchant_id
+      //             ? enc_dec.cjs_encrypt(val?.merchant_id)
+      //             : "",
+      //         order_id: val?.order_id ? val?.order_id : "",
+      //         request_id: val?.request_id ? val?.request_id : "",
+      //         request: val?.request ? JSON.parse(val?.request) : "",
+      //     };
+      //     rest_data.push(temp)
+      // }
+
+      res
+        .status(statusCode.ok)
+        .send(
+          response.successdatamsg(filteredData, "List fetched successfully.")
+        );
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+      res
+        .status(statusCode.internalError)
+        .send(response.errormsg(error.message));
+    }
+  },
+  update: async (req, res) => {
+    try {
+      let department_id = await enc_dec.cjs_decrypt(
+        req.bodyString("department_id")
+      );
+      let department = req.bodyString("department");
+
+      var insdata = {
+        department: department,
+      };
+      $ins_id = await TransactionsModel.updateDetails(
+        { id: department_id },
+        insdata
+      );
+      res
+        .status(statusCode.ok)
+        .send(response.successmsg("Record updated successfully"));
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+      res
+        .status(statusCode.internalError)
+        .send(response.errormsg(error.message));
+    }
+  },
+  payment_status: async (req, res) => {
+    let payment_status = await helpers.get_data_list("*", "payment_status", {
+      deleted: 0,
+    });
+    let payment_modes = await helpers.get_data_list("*", "payment_mode", {
+      deleted: 0,
+    });
+
+    let send_res = { payment_status: [], payment_mode: [] };
+    payment_status.forEach(function (val, key) {
+      let res = {
+        id: enc_dec.cjs_encrypt(val.id),
+        payment_status: val.status,
+      };
+      send_res.payment_status.push(res);
+    });
+    payment_modes.forEach(function (val, key) {
+      let res1 = {
+        id: enc_dec.cjs_encrypt(val.id),
+        payment_mode: val.payment_mode,
+      };
+      send_res.payment_mode.push(res1);
+    });
+
+    res
+      .status(statusCode.ok)
+      .send(response.successdatamsg(send_res, "List fetched successfully."));
+  },
+
+  highrisk_list: async (req, res) => {
+    let limit = {
+      perpage: 10,
+      start: 0,
+      page: 1,
+    };
+
+    if (req.bodyString("perpage") && req.bodyString("page")) {
+      perpage = parseInt(req.bodyString("perpage"));
+      start = parseInt(req.bodyString("page"));
+
+      limit.perpage = perpage;
+      limit.start = (start - 1) * perpage;
+    }
+    let and_filter_obj = {};
+    let date_condition = {};
+    let or_filter_obj = {};
+    // if (req.user.type == "merchant") {
+    //     and_filter_obj.super_merchant = req.user.id;
+    // }
+    let table_name = "";
+    if (req.bodyString("mode") == "test") {
+      table_name = "test_orders";
+    } else {
+      table_name = "orders";
+    }
+
+    if (req.bodyString("merchant_id")) {
+      and_filter_obj.merchant_id = encrypt_decrypt(
+        "decrypt",
+        req.bodyString("merchant_id")
+      );
+    }
+
+    let get_risk = 0;
+    if (req.bodyString("type")) {
+      get_risk = await helpers.get_high_risk(req.bodyString("type"));
+    }
+
+    // if (req.bodyString("super_merchant")) {
+    //     and_filter_obj.super_merchant = encrypt_decrypt(
+    //         "decrypt",
+    //         req.bodyString("super_merchant")
+    //     );
+    // }
+
+    if (req.bodyString("status")) {
+      and_filter_obj.status = req.bodyString("status");
+    }
+    if (req.bodyString("currency")) {
+      and_filter_obj.currency = req.bodyString("currency");
+    }
+    if (req.bodyString("order_id")) {
+      and_filter_obj.order_id = req.bodyString("order_id");
+    }
+    if (req.bodyString("customer_name")) {
+      and_filter_obj.customer_name = req.bodyString("customer_name");
+    }
+
+    if (req.bodyString("email")) {
+      and_filter_obj.customer_email = req.bodyString("email");
+    }
+
+    if (req.bodyString("mobile")) {
+      and_filter_obj.customer_mobile = req.bodyString("mobile");
+    }
+
+    if (req.bodyString("from_date")) {
+      date_condition.from_date = req.bodyString("from_date");
+    }
+
+    if (req.bodyString("to_date")) {
+      date_condition.to_date = req.bodyString("to_date");
+    }
+
+    TransactionsModel.select_highrisk(
+      and_filter_obj,
+      date_condition,
+      get_risk,
+      limit,
+      table_name
+    )
+      .then(async (result) => {
+        let send_res = [];
+        for (let val of result) {
+          let refunded_amt = await helpers.get_refunded_amount(val.order_id);
+          let res = {
+            transactions_id: await enc_dec.cjs_encrypt(val.id),
+            merchant_id: await enc_dec.cjs_encrypt(val.merchant_id),
+            order_id: val.order_id,
+            payment_id: val.payment_id,
+            merchant_name: await helpers.get_merchantdetails_name_by_id(
+              val.merchant_id
+            ),
+            order_amount: val.amount.toFixed(2),
+            order_currency: val.currency,
+            customer_name: val.customer_name,
+            customer_email: val.customer_email,
+            customer_mobile: val.customer_mobile,
+            class: val.class,
+            mode: "",
+            type: await helpers.get_latest_type_of_txn(val.order_id),
+            status: val.status,
+            can_be_void: val.status == "APPROVED" ? true : false,
+            refunded_amount: refunded_amt ? refunded_amt : 0.0,
+            // reason: get_risk.val,
+            reason:
+              val.high_risk_transaction == 1
+                ? "block for transaction"
+                : val.block_for_suspicious_ip == 1
+                ? "block for suspicious ip"
+                : val.block_for_suspicious_email == 1
+                ? "block for suspicious email"
+                : val.block_for_transaction_limit == 1
+                ? "block for transaction limit"
+                : val.high_risk_country == 1
+                ? "block for high risk country"
+                : "",
+            risk_rating:
+              val.high_risk_transaction +
+              val.block_for_suspicious_ip +
+              val.block_for_suspicious_email +
+              val.block_for_transaction_limit +
+              val.high_risk_country,
+            high_risk_country: val.high_risk_country
+              ? val.high_risk_country
+              : 0,
+            high_risk_transaction: val.high_risk_transaction
+              ? val.high_risk_transaction
+              : 0,
+            block_for_suspicious_ip: val.block_for_suspicious_ip
+              ? val.block_for_suspicious_ip
+              : 0,
+            block_for_suspicious_email: val.block_for_suspicious_email
+              ? val.block_for_suspicious_email
+              : 0,
+            block_for_transaction_limit: val.block_for_transaction_limit
+              ? val.block_for_transaction_limit
+              : 0,
+            transaction_date: moment(val.created_at).format(
+              "DD-MM-YYYY H:mm:ss"
+            ),
+          };
+          send_res.push(res);
+        }
+        total_count = await TransactionsModel.get_count_risk(
+          and_filter_obj,
+          date_condition,
+          get_risk,
+          table_name
+        );
+
+        res
+          .status(statusCode.ok)
+          .send(
+            response.successdatamsg(
+              send_res,
+              "List fetched successfully.",
+              total_count
+            )
+          );
+      })
+      .catch((error) => {
+        logger.error(500, { message: error, stack: error.stack });
+        res
+          .status(statusCode.internalError)
+          .send(response.errormsg(error.message));
+      });
+  },
+
+  header_update: async (req, res) => {
+    try {
+      let order_id = req.bodyString("order_id");
+      let order_data = {
+        browser: req.headers.browser,
+        browser_version: req.headers.browser_version,
+        os: req.headers.os,
+        ip: req.headers["ip"],
+        ip_country: req.headers.ipcountry,
+        device_type:
+          req.headers.mobilebrand != "" ? req.headers.mobilebrand : "Desktop",
+      };
+      //console.log(req.headers);
+      let table_name = "";
+      if (req.bodyString("mode") == "test") {
+        table_name = "test_orders";
+      } else {
+        table_name = "orders";
+      }
+
+      $ins_id = await TransactionsModel.orderDetailsUpdate(
+        { order_id: order_id },
+        order_data,
+        table_name
+      );
+      res
+        .status(statusCode.ok)
+        .send(response.successmsg("Record updated successfully"));
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+      res
+        .status(statusCode.internalError)
+        .send(response.errormsg(error.message));
+    }
+  },
 };
 function extractParams(req) {
   return {
