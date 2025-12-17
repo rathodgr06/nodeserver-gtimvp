@@ -898,6 +898,234 @@ var data_set = {
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
+  dropdown_list: async (req, res) => {
+    console.log("🚀 ~ eq.body:", req.body)
+    let perpage = 10; // default
+    let page = 1;    // default
+
+    const perPageStr = req.bodyString("per_page");
+    const pageStr = req.bodyString("page");
+
+    if (perPageStr && pageStr) {
+      perpage = parseInt(perPageStr, 10);
+      page = parseInt(pageStr, 10);
+
+      // validate
+      if (isNaN(perpage) || perpage <= 0) perpage = 10;
+      if (isNaN(page) || page <= 0) page = 1;
+    }
+
+    const pagination = {
+      limit: perpage,
+      offset: (page - 1) * perpage
+    };
+
+    const search_text = req.bodyString("search");
+    const status = helpers.get_status(req.bodyString("status"));
+    const country = await helpers.get_country_id_by_name(
+      req.bodyString("country")
+    );
+    const state = `'${req.bodyString("state")}'`;
+    const city = `'${req.bodyString("city")}'`;
+
+    let search = '';
+    if (req.user.type == "merchant") {
+      let mer_details = await SubmerchantModel.main_merchant_details({
+        "mm.super_merchant_id": req.user.super_merchant_id ? req.user.super_merchant_id : req.user.id,
+      });
+      search = {
+        ["s.deleted"]: 0,
+        ["s.super_merchant_id"]: req.user.super_merchant_id ? req.user.super_merchant_id : req.user.id,
+        // ["s.live"]: mer_details.mode == "live" ? 1 : 0,
+      };
+      search_count = {
+        ["deleted"]: 0,
+        ["super_merchant_id"]: req.user.super_merchant_id ? req.user.super_merchant_id : req.user.id,
+        // ["live"]: mer_details.mode == "live" ? 1 : 0,
+      };
+    } else {
+      search = { ["s.deleted"]: 0 };
+      search_count = { deleted: 0 };
+    }
+    const filter = {};
+    if (req.bodyString("submerchant_id") && req.bodyString("submerchant_id") != '' && req.bodyString("submerchant_id") != 0) {
+      let submerchant_id = req.bodyString("submerchant_id");
+      if (submerchant_id?.length > 10) {
+        submerchant_id = await enc_dec.cjs_decrypt(submerchant_id);
+      }
+      search["s.id"] = submerchant_id;
+    }
+    if (req.bodyString("super_merchant_id") && req.bodyString("super_merchant_id") != '' && req.bodyString("super_merchant_id") != 0) {
+      let super_merchant_id = req.bodyString("super_merchant_id");
+      if (super_merchant_id?.length > 10) {
+        super_merchant_id = await enc_dec.cjs_decrypt(super_merchant_id);
+      }
+      search["s.super_merchant_id"] = super_merchant_id;
+    }
+    if (req.bodyString("country")) {
+      search.country = country;
+    }
+    if (req.bodyString("city")) {
+      search.city = city;
+    }
+    if (req.bodyString("state")) {
+      search.state = state;
+    }
+    if (req.bodyString("status")) {
+      search.status = status;
+    }
+    if (search_text) {
+      filter.company_name = search_text;
+      filter.email = search_text;
+      filter.legal_person_email = search_text;
+      filter.business_phone_number = search_text;
+    }
+
+    MerchantModel.dropdownselect(search, filter, pagination)
+      .then(async (result) => {
+        let send_res = [];
+        for (let val of result) {
+          let res = {
+            submerchant_id: enc_dec.cjs_encrypt(val?.id),
+            show_id: val?.id ? await helpers.formatNumber(val?.id) : "",
+            merchant_name: val?.company_name,
+            legal_business_name: val?.company_name,
+            // email: val.email,
+            // country_code: val.code,
+            // mobile_no: val.mobile_no,
+            status: val?.status == 1 ? "Deactivated" : "Active",
+          };
+          send_res.push(res);
+        }
+
+        total_count = await MerchantModel.dropdownselect_count(search, filter);
+        res
+          .status(statusCode.ok)
+          .send(
+            response.successdatamsg(
+              send_res,
+              "List fetched successfully.",
+              total_count
+            )
+          );
+      })
+      .catch((error) => {
+       console.log("🚀 ~ error:", error)
+       logger.error(500,{message: error,stack: error.stack}); 
+        res
+          .status(statusCode.internalError)
+          .send(response.errormsg(error.message));
+      });
+  },
+  mid_dropdown_list: async (req, res) => {
+    // console.log("🚀 ~ req:", req.body);
+    let limit = {
+      perpage: 0,
+      page: 0,
+    };
+    if (req.bodyString("per_page") && req.bodyString("page")) {
+      perpage = parseInt(req.bodyString("per_page"));
+      start = parseInt(req.bodyString("page"));
+
+      limit.perpage = perpage;
+      limit.start = (start - 1) * perpage;
+    }
+    const search_text = req.bodyString("search");
+    const status = helpers.get_status(req.bodyString("status"));
+    const country = await helpers.get_country_id_by_name(
+      req.bodyString("country")
+    );
+    const state = `'${req.bodyString("state")}'`;
+    const city = `'${req.bodyString("city")}'`;
+
+    let search = '';
+    if (req.user.type == "merchant") {
+      let mer_details = await SubmerchantModel.main_merchant_details({
+        "mm.super_merchant_id": req.user.super_merchant_id ? req.user.super_merchant_id : req.user.id, });
+      search = {
+        ["s.deleted"]: 0,
+        ["s.super_merchant_id"]: req.user.super_merchant_id ? req.user.super_merchant_id : req.user.id,
+        // ["s.live"]: mer_details.mode == "live" ? 1 : 0,
+      };
+      search_count = {
+        ["deleted"]: 0,
+        ["super_merchant_id"]: req.user.super_merchant_id ? req.user.super_merchant_id : req.user.id,
+        // ["live"]: mer_details.mode == "live" ? 1 : 0,
+      };
+    } else {
+      search = { ["s.deleted"]: 0 };
+      search_count = { deleted: 0 };
+    }
+    const filter = {};
+    if (req.bodyString("submerchant_id") && req.bodyString("submerchant_id") != '' && req.bodyString("submerchant_id") != 0) {
+      let submerchant_id = req.bodyString("submerchant_id");
+      if (submerchant_id?.length > 10) {
+        submerchant_id = await enc_dec.cjs_decrypt(submerchant_id);
+      }
+      search["s.id"] = submerchant_id;
+    }
+    if (req.bodyString("live")) {
+      search["s.live"] = 1;
+    }
+    if (req.bodyString("onboarding_done")) {
+      search["s.onboarding_done"] = 1;
+    }
+
+    if (req.bodyString("country")) {
+      search.country = country;
+    }
+    if (req.bodyString("city")) {
+      search.city = city;
+    }
+    if (req.bodyString("state")) {
+      search.state = state;
+    }
+    if (req.bodyString("status")) {
+      search.status = status;
+    }
+    if (search_text) {
+      filter.company_name = search_text;
+      filter.email = search_text;
+      filter.legal_person_email = search_text;
+      filter.business_phone_number = search_text;
+    }
+
+    MerchantModel.middropdownselect(search, filter, limit)
+      .then(async (result) => {
+        let send_res = [];
+        for (let val of result) {
+          let res = {
+            submerchant_id: enc_dec.cjs_encrypt(val?.id),
+            show_id: val?.id ? await helpers.formatNumber(val?.id) : "",
+            merchant_name: val?.company_name,
+            legal_business_name: val?.company_name,
+            // email: val.email,
+            // country_code: val.code,
+            // mobile_no: val.mobile_no,
+            status: val?.status == 1 ? "Deactivated" : "Active",
+          };
+          send_res.push(res);
+        }
+
+        total_count = await MerchantModel.middropdownselect_count(search, filter);
+        res
+          .status(statusCode.ok)
+          .send(
+            response.successdatamsg(
+              send_res,
+              "List fetched successfully.",
+              total_count
+            )
+          );
+      })
+      .catch((error) => {
+       console.log("🚀 ~ error:", error)
+       logger.error(500,{message: error,stack: error.stack}); 
+        res
+          .status(statusCode.internalError)
+          .send(response.errormsg(error.message));
+      });
+  },
 };
 
 module.exports = data_set;

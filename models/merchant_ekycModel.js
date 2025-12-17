@@ -643,7 +643,8 @@ var MerchantEkycModel = {
               ") order by id desc LIMIT " +
               limit.perpage +
               limit.start
-          );
+            );
+            console.log("🚀 ~ query:", qb.last_query());
         } catch (error) {
           logger.error(500,{message: error,stack: error.stack}); 
         } finally {
@@ -658,6 +659,7 @@ var MerchantEkycModel = {
             .order_by("id", "desc")
             .limit(limit.perpage, limit.start)
             .get(super_merchant_table);
+            console.log("🚀 ~ query:", qb.last_query());
         } catch (error) {
           logger.error(500,{message: error,stack: error.stack}); 
         } finally {
@@ -859,11 +861,35 @@ var MerchantEkycModel = {
       qb = await pool.get_connection();
       let strQuery = `SELECT acc.id, acc.type, acc.account_id, acc.account_type,acc.account_for, acc.payer_id, acc.country, acc.currency, acc.beneficiary_id as receiver_id, acc.submerchant_id as merchant_id, acc.account_details, acc.status, acc.bank_verified, acc.deleted, acc.created_at,acc.updated_at, super_merchant.legal_business_name AS supermerchant_legal_name, sub_merchant_details.company_name FROM pg_merchant_accounts acc LEFT JOIN pg_master_merchant sub_merchant ON acc.submerchant_id = sub_merchant.id LEFT JOIN pg_master_super_merchant super_merchant ON sub_merchant.super_merchant_id = super_merchant.id LEFT JOIN pg_master_merchant_details sub_merchant_details ON sub_merchant.id = sub_merchant_details.merchant_id WHERE acc.deleted = 0`;
 
-      if (conditions.submerchant_id) {
-        strQuery = strQuery + ` AND submerchant_id = ${conditions.submerchant_id} `;
+      if (conditions?.submerchant_id) {
+        strQuery = strQuery + ` AND acc.submerchant_id = '${conditions?.submerchant_id}' `;
       }
 
+      if (conditions?.super_merchant_id) {
+        strQuery = strQuery + ` AND sub_merchant.super_merchant_id = '${conditions?.super_merchant_id}' `;
+      }
+      if (conditions?.receiver_id) {
+        strQuery = strQuery + ` AND acc.beneficiary_id = '${conditions?.receiver_id}' `;
+      }
+      if (conditions?.country) {
+        strQuery = strQuery + ` AND acc.country = '${conditions?.country}' `;
+      }
+      if (conditions?.currency) {
+        strQuery = strQuery + ` AND acc.currency = '${conditions?.currency}' `;
+      }
+      if (conditions?.account_type) {
+        strQuery = strQuery + ` AND acc.account_type = '${conditions?.account_type}' `;
+      }
+      if (conditions?.bank_verified || conditions?.bank_verified == 0) {
+        strQuery = strQuery + ` AND acc.bank_verified = '${conditions?.bank_verified}' `;
+      }
+      if (conditions?.status || conditions?.status == 0) {
+        strQuery = strQuery + ` AND acc.status = '${conditions?.status}' `;
+      }
+      
+      console.log("🚀 ~ conditions:", conditions)
       strQuery = strQuery + ` ORDER BY acc.id DESC LIMIT ${limit} OFFSET ${offset}`;
+      console.log("🚀 ~ strQuery:", strQuery)
 
       var rows = await qb.query(strQuery);
       console.log("🚀 ~ fetchAllMerchantDetails: ~ strQuery:", strQuery);
@@ -886,11 +912,43 @@ var MerchantEkycModel = {
       qb.release(); // release after query 1
       qb = await pool.get_connection(); // new connection for count query
 
-      let countQuery = `SELECT COUNT(*) AS total FROM pg_merchant_accounts WHERE deleted=0`;
+      let countQuery = `SELECT COUNT(*) AS total FROM pg_merchant_accounts acc LEFT JOIN pg_master_merchant sub_merchant ON acc.submerchant_id = sub_merchant.id LEFT JOIN pg_master_super_merchant super_merchant ON sub_merchant.super_merchant_id = super_merchant.id LEFT JOIN pg_master_merchant_details sub_merchant_details ON sub_merchant.id = sub_merchant_details.merchant_id WHERE acc.deleted = 0 `;
 
       if (conditions.submerchant_id) {
-        countQuery = countQuery + ` AND submerchant_id = ${conditions.submerchant_id} `;
+        countQuery = countQuery + ` AND acc.submerchant_id = ${conditions.submerchant_id} `;
       }
+
+      if (conditions?.receiver_id) {
+        countQuery = countQuery + ` AND acc.beneficiary_id = '${conditions?.receiver_id}' `;
+      }
+
+      if (conditions.super_merchant_id) {
+        countQuery = countQuery + ` AND sub_merchant.super_merchant_id = ${conditions.super_merchant_id} `;
+      }
+
+      if (conditions?.country) {
+        countQuery = countQuery + ` AND acc.country = '${conditions?.country}' `;
+      }
+
+      if (conditions?.currency) {
+        countQuery = countQuery + ` AND acc.currency = '${conditions?.currency}' `;
+      }
+
+      if (conditions?.account_type) {
+        countQuery = countQuery + ` AND acc.account_type = '${conditions?.account_type}' `;
+      }
+
+      if (conditions?.bank_verified || conditions?.bank_verified == 0) {
+        countQuery = countQuery + ` AND acc.bank_verified = '${conditions?.bank_verified}' `;
+      }
+
+      if (conditions?.status || conditions?.status == 0) {
+        countQuery = countQuery + ` AND acc.status = '${conditions?.status}' `;
+      }
+
+      countQuery = countQuery + ` ORDER BY acc.id DESC`;
+
+      console.log("🚀 ~ fetchAllMerchantDetails: ~ countQuery:", countQuery);
 
       // 2. Total count query
       const [countResult] = await qb.query(countQuery);
@@ -1069,6 +1127,26 @@ var MerchantEkycModel = {
       qb.release();
     }
     return response;
+  },
+  getMerchantDetails: async (condition) => {
+    let qb = await pool.get_connection();
+    let response;
+
+    try {
+      response = await qb
+        .select("`mm.id`,`mm.super_merchant_id`,`mm.name`, `mm.email`, `mm.code`, `mm.mobile_no`,`mm.referral_code`,`mm.register_at`,`mmd.company_name`,`pc.country_code as register_business_country`")
+        .join("pg_master_merchant_details as mmd", "mmd.merchant_id = mm.id")
+        .join("pg_country as pc", "mmd.register_business_country = pc.id")
+        .where(condition)
+        .limit(1)             // <-- LIMIT 1 added here
+        .get("pg_master_merchant as mm");
+    } catch (error) {
+      console.error("Database query failed:", error);
+    } finally {
+      qb.release();
+    }
+
+    return response?.[0];
   }
 
 };

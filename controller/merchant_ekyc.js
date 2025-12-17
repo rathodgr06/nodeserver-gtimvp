@@ -31,6 +31,7 @@ const logger = require('../config/logger');
 const admin_activity_logger = require("../utilities/activity-logger/admin_activity_logger");
 const nodeCache = require("../utilities/helper/CacheManeger");
 const MerchantSetupModal = require("../models/MerchantSetupModal");
+const checkifrecordexist = require("../utilities/validations/checkifrecordexist");
 
 var MerchantEkyc = {
   login: async (req, res) => {
@@ -6812,6 +6813,7 @@ var MerchantEkyc = {
         super_merchant_id: 0,
       };
     }
+    
     MerchantEkycModel.selectAll("*", condition)
       .then(async (result) => {
         let send_res = [];
@@ -7342,6 +7344,8 @@ var MerchantEkyc = {
     }
   },
   super_merchant_master: async (req, res) => {
+    console.log("req.body......",req.body);
+    
     let condition = {};
     if (req.user.type == "admin") {
       condition = {
@@ -7356,6 +7360,28 @@ var MerchantEkyc = {
         super_merchant_id: 0,
       };
     }
+
+    if (req.bodyString("status")) {
+      condition.status = req.bodyString("status") === 'Active' ? 0 : 1;
+    }
+    if (req.bodyString("ekyc_status")) {
+      // condition.status = req.bodyString("status");
+    }
+    if (req.bodyString("business_address")) {
+      if(req.bodyString("business_address")?.length > 10){
+        condition.registered_business_address = enc_dec.cjs_decrypt(req.bodyString("business_address"));
+      }
+    }
+    if (req.bodyString("type_of_business")) {
+      // condition.status = req.bodyString("status");
+    }
+    if (req.bodyString("industry_type")) {
+      // condition.status = req.bodyString("status");
+    }
+    if (req.bodyString("super_merchant")) {
+      condition.id = req.bodyString("super_merchant");
+    }
+
     let limit = {
       perpage: 0,
       page: 0,
@@ -7810,7 +7836,80 @@ var MerchantEkyc = {
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
     }
-  }
+  },
+  sub_merchant_details: async (req, res) => {
+    console.log("req", req.params);
+
+    // 
+    let submerchant_id = req.params.sub_merchant_id;
+
+    // Check user exist
+    let user_exist = await checkifrecordexist(
+      {
+        id: submerchant_id,
+        deleted: 0,
+      },
+      "master_merchant"
+    );
+
+    if (!user_exist) {
+      return res
+        .status(statusCode.ok)
+        .send(response.errormsg("Merchant not found"));
+    }
+
+
+    let condition = { "mm.id": submerchant_id };
+    let details_result = await MerchantEkycModel.getMerchantDetails(condition);
+    console.log("details_result: ", details_result);
+
+    
+    let selection = "`id`,`super_merchant_id`,`name`, `email`, `code`, `mobile_no`,`referral_code`,`register_at`";
+
+    condition = { id: submerchant_id };
+    let table_name = config.table_prefix + "master_merchant";
+
+
+    let merchant_result = await MerchantEkycModel.selectDynamicSingle(selection, condition, table_name);
+    console.log("merchant_result: ", merchant_result);
+    
+    selection = "`company_name`,`register_business_country`";
+    condition = { merchant_id: submerchant_id };
+    let merchant_details_result = await MerchantEkycModel.selectMerchantDetails(selection, condition);
+
+    let key_response = await MerchantModel.get_key({ merchant_id: submerchant_id});
+    let webhook_response = await MerchantModel.select_merchant_webhook_details("*",{ merchant_id: submerchant_id, enabled: 0});
+    console.log("webhook_response: ", webhook_response);
+
+    let registrationResponse = {
+      merchant_id: helpers.formatNumber(submerchant_id + ""),
+      sub_merchant_id: submerchant_id,
+      super_merchant_id: details_result?.super_merchant_id,
+      business_name: details_result?.company_name,
+      business_address: details_result?.register_business_country,
+      business_email: details_result?.email,
+      business_country_code: details_result?.code,
+      business_mobile_no: details_result?.mobile_no,
+      referral_code: details_result?.referral_code,
+      // access_token: aToken,
+      access: key_response,
+      webhook_key: webhook_response?.length > 0 ? webhook_response?.[0].notification_url : "",
+      webhook_secret: webhook_response?.length > 0 ? webhook_response?.[0].notification_secret : "",
+      register_at: merchant_result?.register_at,
+    };
+
+    console.log("registrationResponse: ", registrationResponse);
+
+    return res
+      .status(statusCode.ok)
+      .send(
+        response.registrationDataResponse(
+          registrationResponse,
+          "Merchant details found!"
+        )
+      );
+  },
+
 };
 
 module.exports = MerchantEkyc;

@@ -54,7 +54,7 @@ const fundingMethodValidator = {
       funding_source_type: Joi.string().valid("1", "2", "3").required(),
       currency: Joi.string().length(3).required(),
       payer_id: Joi.alternatives()
-        .try(Joi.string().valid("ORANGE_MONEY", "MTN_MOMO", "MTN", "ORANGE"), Joi.number(), Joi.string().pattern(/^AP_\d+$/))
+        .try(Joi.string().valid("ORANGE_MONEY", "MTN_MOMO", "MTN", "ORANGE"), Joi.number(), Joi.string().pattern(/^AP_\d+$/), Joi.string().pattern(/^MAP_\d+$/))
         .required()
         .label("Valid Payer id required"),
       MSISDN: Joi.string().when("payer_id", {
