@@ -609,6 +609,7 @@ var lookup = {
 
       next();
     } catch (error) {
+      console.log(error);
       logger.error(500,{message: error,stack: error.stack}); 
       return res.status(statusCode.ok).send(response.errormsg(error.message));
     }
@@ -934,7 +935,7 @@ var lookup = {
 async function checkMidIsValid(mid, card_details, order_details) {
   try{
   const mid_details = await merchantOrderModel.selectDynamicONE(
-    "payment_methods,payment_schemes,domestic,international,minTxnAmount,maxTxnAmount,currency_id as currency",
+    "payment_methods,payment_schemes,domestic,international,minTxnAmount,maxTxnAmount,currency_id as currency,supported_currency",
     { id: mid, deleted: 0 },
     "mid"
   );
@@ -959,9 +960,27 @@ async function checkMidIsValid(mid, card_details, order_details) {
   ) {
     return false;
   }
-  if (currency_details.code != order_details.currency) {
-    return false;
-  }
+  
+   if (currency_details.code != order_details.currency) {
+    let dcc_enabled = await helpers.fetchDccStatus();
+      if (dcc_enabled) {
+        let supported_currency = mid_details.supported_currency;
+        if (!supported_currency) {
+          return false;
+        } else {
+          const exists = supported_currency
+            .split(",")
+            .includes(order_details.currency);
+          if (!exists) {
+            return false;
+          }
+        }
+      }else{
+        return false;
+      }
+  } 
+  
+  
   let is_domestic_or_international = "";
   if (card_details.country_code3 == "ARE") {
     is_domestic_or_international = "Domestic";

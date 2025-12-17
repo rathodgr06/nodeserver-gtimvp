@@ -40,7 +40,7 @@ const s2s_3ds = async (req, res) => {
     console.log(order_id);
     order_table = mode === 'live' ? 'orders' : 'test_orders';
     order_data = await helpers.get_data_list(
-        "order_id as p_order_id,merchant_order_id as m_order_id,amount,psp,payment_mode,scheme,cardType,pan as mask_card_number,merchant_customer_id as m_customer_id,card_id as m_payment_token,cardType as card_type,card_country,merchant_id,success_url,failure_url,pan",
+        "order_id as p_order_id,merchant_order_id as m_order_id,amount,order_amount,order_currency,psp,payment_mode,scheme,cardType,pan as mask_card_number,merchant_customer_id as m_customer_id,card_id as m_payment_token,cardType as card_type,card_country,merchant_id,success_url,failure_url,pan",
         order_table,
         {
             order_id: order_id,
@@ -230,6 +230,8 @@ const s2s_3ds = async (req, res) => {
                     return_url: process.env.PAYMENT_URL + "/status",
                     transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
                     amount: order_data[0]?.amount.toFixed(2) || "",
+                    order_amount: order_data[0]?.order_amount.toFixed(2) || "",
+                    order_currency:order_data[0]?.order_currency,
                     m_customer_id: order_data[0]?.m_customer_id || "",
                     psp: order_data[0]?.psp || "",
                     payment_method: order_data[0]?.payment_mode || "",

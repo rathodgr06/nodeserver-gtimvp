@@ -1946,6 +1946,39 @@ const Validator = {
       res.status(StatusCode.badRequest).send(ServerResponse.badRequest);
     }
   },
+   fetchBumpUpRate: async (req, res, next) => {
+    if (checkEmpty(req.body, ["currency",])) {
+      const schema = Joi.object().keys({
+        currency: Joi.string()
+          .currency()
+          .pattern(new RegExp(/^[a-zA-Z]+$/))
+          .min(1)
+          .max(3)
+          .required()
+          .error(() => {
+            return new Error("Valid currency required");
+          }),
+      });
+
+      try {
+        const result = schema.validate(req.body);
+        if (result.error) {
+          res
+            .status(StatusCode.badRequest)
+            .send(ServerResponse.validationResponse(result.error.message));
+        } else {
+          next();
+        }
+      } catch (error) {
+    logger.error(400,{message: error,stack: error?.stack});
+        res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse(error));
+      }
+    } else {
+      res.status(StatusCode.badRequest).send(ServerResponse.badRequest);
+    }
+  },
   currency_deactivate: async (req, res, next) => {
     if (checkEmpty(req.body, ["currency_id"])) {
       const schema = Joi.object().keys({

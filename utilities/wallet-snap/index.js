@@ -15,11 +15,25 @@ module.exports = async () => {
     if (fetchWallets.length > 0) {
       
       for (let row of fetchWallets) {
-        //if(row.wallet_id=="494104627940"){
+        
+        // if(row.wallet_id=="000805283044"){
         // fetch last snap for the particular wallet if no data then it return total,available and pending balance is 0 and last_snap date is 1970-01-01
         let lastSnapDetails = await transacationChargesModel.getLastSnapDate(
           row.wallet_id
         );
+        let pendingTurnBalance = 0;
+        if(lastSnapDetails.last_snap_date=="1970-01-01 00:00:00"){
+          pendingTurnBalance = 0;
+        }else{
+          let pendingTurnedBalancePayload = {
+          receiver_id: row?.beneficiary_id,
+          sub_merchant_id: row?.sub_merchant_id,
+          currency: row?.currency,
+          last_cut_off_date:moment(lastSnapDetails.last_snap_date).format("YYYY-MM-DD 23:59:59"),
+          currentDate: moment().subtract(1, "days").format("YYYY-MM-DD 23:59:59")
+        };
+          pendingTurnBalance = await transacationChargesModel.getPendingTurnedBalance(pendingTurnedBalancePayload);
+        }
         let currentDate = moment()
           .subtract(1, "days")
           .format("YYYY-MM-DD 23:59:59");
@@ -40,16 +54,12 @@ module.exports = async () => {
         console.log(`pending balance`);
         console.log(pending_balance);
         // fetch the sum of the net amount transaction which are in pending but turned to Failed Or Completed
-        let pendingTurnedBalancePayload = {
-          receiver_id: row?.beneficiary_id,
-          sub_merchant_id: row?.sub_merchant_id,
-          currency: row?.currency
-        };
+        
         
      
         // calculate total pending balance 
         let lastSnapPendingBalance = isNaN(parseFloat(lastSnapDetails.pending_balance)) ? 0 : parseFloat(lastSnapDetails.pending_balance);
-        let totalPendingBalance = lastSnapPendingBalance+pending_balance;
+        let totalPendingBalance = lastSnapPendingBalance+pending_balance-pendingTurnBalance;
         // fetch the transaction charges after the snap
          let conditionForSum = {
           receiver_id: row.beneficiary_id,
@@ -83,11 +93,14 @@ module.exports = async () => {
         // }
       // }
         
-      }
-    }
+  // }
+}
+    
+  }
+    return;
   } catch (error) {
     logger.error(400,{message: error,stack: error?.stack});
     console.error("Error in auto capture:", error);
   }
-  console.log("Wallet Snap  Ended");
+ 
 };

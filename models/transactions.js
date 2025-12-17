@@ -1574,7 +1574,7 @@ var dbModel = {
       let exact_query = `
         SELECT 
           id, status, order_id, merchant_order_id, payment_id, updated_at, created_at,
-          currency, amount, psp, payment_mode, pan, is_one_click, merchant_customer_id,
+          currency, amount,order_currency,order_amount, psp, payment_mode, pan, is_one_click, merchant_customer_id,
           customer_email, customer_code, customer_mobile, billing_country, merchant_id,
           terminal_id, scheme, card_country, cardType, card_id, other_description, origin,
           customer_name, high_risk_country, high_risk_transaction, block_for_suspicious_ip,
@@ -1610,7 +1610,7 @@ var dbModel = {
       let data_query = `
         SELECT 
           id, status, order_id, merchant_order_id, payment_id, updated_at, created_at,
-          currency, amount, psp, payment_mode, pan, is_one_click, merchant_customer_id,
+          currency, amount,order_amount,order_currency,order_currency,order_amount,psp, payment_mode, pan, is_one_click, merchant_customer_id,
           customer_email, customer_code, customer_mobile, billing_country, merchant_id,
           terminal_id, scheme, card_country, cardType, card_id, other_description, origin,
           customer_name, high_risk_country, high_risk_transaction, block_for_suspicious_ip,
@@ -1629,7 +1629,7 @@ var dbModel = {
       let simple_query = `
         SELECT 
           id, status, order_id, merchant_order_id, payment_id, updated_at, created_at,
-          currency, amount, psp, payment_mode, pan, is_one_click, merchant_customer_id,
+          currency, amount,order_currency,order_amount,  psp, payment_mode, pan, is_one_click, merchant_customer_id,
           customer_email, customer_code, customer_mobile, billing_country, merchant_id,
           terminal_id, scheme, card_country, cardType, card_id, other_description, origin,
           customer_name, high_risk_country, high_risk_transaction, block_for_suspicious_ip,
@@ -1762,7 +1762,7 @@ var dbModel = {
       let simple_query = `
         SELECT 
           id, status, order_id, merchant_order_id, payment_id, updated_at, created_at,
-          currency, amount, psp, payment_mode, pan, is_one_click, merchant_customer_id,
+          currency, amount,order_amount,order_currency, psp, payment_mode, pan, is_one_click, merchant_customer_id,
           customer_email, customer_code, customer_mobile, billing_country, merchant_id,
           terminal_id, scheme, card_country, cardType, card_id, other_description, origin,
           customer_name, high_risk_country, high_risk_transaction, block_for_suspicious_ip,

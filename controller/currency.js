@@ -277,6 +277,35 @@ var currency = {
             res.status(statusCode.internalError).send(response.errormsg(error.message));
         }
     },
+    fetchBumpUpRate: async (req, res) => {
+        try {
+            let currency = req.bodyString("currency");
+            let rates = await CurrencyModel.selectBumpUpRate(currency);
+            res.status(statusCode.ok).send(response.successdatamsg(rates, 'rates fetched successfully.'));
+        
+        } catch (error) {
+            logger.error(500,{message: error,stack: error.stack}); 
+            res.status(statusCode.internalError).send(response.errormsg(error.message));
+        }
+    },
+    storeRate:async(req,res)=>{
+       try {
+           let baseCurrency = req.body?.rates?.[0]?.base_currency;
+           if(baseCurrency){
+            let DeleteRes = await CurrencyModel.removeOldRate(baseCurrency);
+            let newRates = req.body.rates;
+            let bulkAddRes = await CurrencyModel.addRate(newRates);
+            res.status(statusCode.ok).send(response.successmsg('rates updated successfully.'));
+           }else{
+            res.status(statusCode.ok).send(response.errorMsg('unable to update rate.'));
+           }
+        
+        } catch (error) {
+            console.log(error);
+            logger.error(500,{message: error,stack: error.stack}); 
+            res.status(statusCode.internalError).send(response.errormsg(error.message));
+        }
+    }
 
 }
 module.exports = currency;

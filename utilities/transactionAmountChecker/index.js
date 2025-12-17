@@ -76,6 +76,7 @@ module.exports = async (req, res, next) => {
           submerchant_id: submerchant_id,
           currency_id: currency_id,
           deleted: 0,
+          currency:order_currency
         });
       
       

@@ -9,6 +9,7 @@ const moment = require('moment');
 const env = process.env.ENVIRONMENT;
 const config = require("../config/config.json")[env];
 const fraudEngine = require("../utilities/fraud/index.js");
+const DccService = require('../service/dccService.js');
 class TerminalControllerClass {
   orderrouting = async (req, res, next) => {
 
@@ -35,8 +36,13 @@ class TerminalControllerClass {
       const card_type = req?.card_details?.card_brand;
       const card_dc = req?.card_details?.card_type+' CARD';
       const orderData = order_details; //await merchantOrderModel.selectOne('*', { order_id: order_id },table_name);
-      const midquery = `SELECT md.* , mc.code , mc.currency  FROM pg_mid md INNER JOIN pg_master_currency mc ON mc.id = md.currency_id WHERE md.submerchant_id = '${parseInt(order_details.merchant_id)}'   AND  md.status = 0 AND md.deleted = 0 AND md.env ='${payment_mode}' AND FIND_IN_SET('${card_type}', md.payment_schemes) AND FIND_IN_SET('${card_dc}',md.payment_methods) AND  mc.code = '${order_details?.currency}';`;
-      console.log(midquery);
+      let midquery;
+       let dcc_enabled = await helpers.fetchDccStatus();
+      if(dcc_enabled){
+         midquery = `SELECT md.* , mc.code , mc.currency  FROM pg_mid md INNER JOIN pg_master_currency mc ON mc.id = md.currency_id WHERE md.submerchant_id = '${parseInt(order_details.merchant_id)}'   AND  md.status = 0 AND md.deleted = 0 AND md.env ='${payment_mode}' AND FIND_IN_SET('${card_type}', md.payment_schemes) AND FIND_IN_SET('${card_dc}',md.payment_methods) AND  (mc.code = '${order_details?.currency}' OR FIND_IN_SET('${order_details?.currency}',md.supported_currency)>0);`;
+      }else{
+         midquery = `SELECT md.* , mc.code , mc.currency  FROM pg_mid md INNER JOIN pg_master_currency mc ON mc.id = md.currency_id WHERE md.submerchant_id = '${parseInt(order_details.merchant_id)}'   AND  md.status = 0 AND md.deleted = 0 AND md.env ='${payment_mode}' AND FIND_IN_SET('${card_type}', md.payment_schemes) AND FIND_IN_SET('${card_dc}',md.payment_methods) AND mc.code = '${order_details?.currency}';`;
+      }
       const getmid = await merchantOrderModel.order_query(midquery);
       let is_domestic_or_international = "";
       let merchant_details = await merchantOrderModel.selectOne('register_business_country',{merchant_id:order_details.merchant_id},'master_merchant_details');
@@ -223,6 +229,17 @@ class TerminalControllerClass {
           // if(fraudData){
           //   return res.status(StatusCode.ok).send(ServerResponse.errorMsgWithData("Transaction Failed.", fraudData));
           // }
+          // From here if call to DCC is needed or not 
+          if(order_details.currency !=getmid[0].currency){
+            return res.status(StatusCode.badRequest).send(ServerResponse.errormsg("No Active mid found for this transactions"));
+            // if(process.env.DCC_ENABLED){
+            // let mid_currency_details = await helpers.get_currency_details({id:getmid[0].currency_id});
+            //  let rate = await DccService.fetchRate(payment_mode,order_id,mid_currency_details?.code,order_details.currency,order_details.amount);
+            // }else{
+            //    return res.status(StatusCode.badRequest).send(ServerResponse.errormsg("No Active mid found for this transactions"));
+            // }
+          }
+
 
           return res.status(StatusCode.ok).send(
 

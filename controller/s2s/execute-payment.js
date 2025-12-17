@@ -22,6 +22,7 @@ const orangeService = require("../../service/orangeService");
 const alpayService = require("../../service/alpayService");
 const MerchantRegistrationModel = require("../../models/merchant_registration");
 const logger = require('../../config/logger');
+const DccService = require('../../service/dccService');
 const execuatePayment = async (req, res) => {
   try {
     req.body.data = req.body;
@@ -273,6 +274,8 @@ async function createOrder(req) {
     amount: order_details.amount,
     amount_left: order_details.amount,
     currency: order_details.currency,
+    order_amount: order_details.amount,
+    order_currency:order_details.currency,
     // return_url: order_details.return_url,
     description: order_details?.description,
     other_description: order_details?.description,
@@ -344,7 +347,7 @@ async function binLookUp(req, order_id, mode) {
     let card_no;
     const ord_table = mode === "test" ? "test_orders" : "orders";
     const needed_data = await helpers.get_data_list(
-      "merchant_id,currency,amount",
+      "merchant_id,currency,amount,order_id",
       ord_table,
       { order_id }
     );
@@ -459,7 +462,8 @@ async function binLookUp(req, order_id, mode) {
       const checkmid = await checkMidIsValid(
         midData?.midId,
         lookup_result,
-        needed_data[0]
+        needed_data[0],
+        mode
       );
       if (checkmid) {
         count += 1;
@@ -574,20 +578,36 @@ async function checkbrandingcard(req, order_id, mode) {
   }
 }
 
-async function checkMidIsValid(mid, card_details, order_details) {
-  const mid_details = await merchantOrderModel.selectDynamicONE(
-    "payment_methods,payment_schemes,domestic,international,minTxnAmount,maxTxnAmount,currency_id as currency",
-    { id: mid, deleted: 0 },
-    "mid"
-  );
+async function checkMidIsValid(mid, card_details, order_details,payment_mode) {
+  console.log(`order details in check mid is valid or not`);
+  console.log(order_details);
+  console.log(card_details);
+  console.log(mid);
+  
+  // const mid_details = await merchantOrderModel.selectDynamicONE(
+  //   "payment_methods,payment_schemes,domestic,international,minTxnAmount,maxTxnAmount,currency_id as currency",
+  //   { id: mid, deleted: 0 },
+  //   "mid"
+  // );
+  let dcc_enabled = await helpers.fetchDccStatus();
+   let midquery;
+      if(dcc_enabled){
+         midquery = `SELECT md.* , mc.code , mc.currency  FROM pg_mid md INNER JOIN pg_master_currency mc ON mc.id = md.currency_id WHERE md.submerchant_id = '${parseInt(order_details.merchant_id)}'   AND  md.status = 0 AND md.deleted = 0 AND md.env ='${payment_mode}' AND  (mc.code = '${order_details?.currency}' OR FIND_IN_SET('${order_details?.currency}',md.supported_currency)>0) AND md.id=${mid};`;
+      }else{
+         midquery = `SELECT md.* , mc.code , mc.currency  FROM pg_mid md INNER JOIN pg_master_currency mc ON mc.id = md.currency_id WHERE md.submerchant_id = '${parseInt(order_details.merchant_id)}'   AND  md.status = 0 AND md.deleted = 0 AND md.env ='${payment_mode}' AND mc.code = '${order_details?.currency} AND md.id=${mid}';`;
+      }
+ const getmid = await merchantOrderModel.order_query(midquery);
+const mid_details = getmid?.[0];
   const currency_details = await merchantOrderModel.selectDynamicONE(
     "code",
-    { id: mid_details?.currency },
+    { id: mid_details?.currency_id },
     "master_currency"
   );
   if (
     !mid_details?.payment_methods.toUpperCase().includes(card_details.card_type)
   ) {
+    console.log(mid_details.payment_methods);
+    console.log(card_details.card_type)
     return false;
   }
   if (
@@ -601,9 +621,24 @@ async function checkMidIsValid(mid, card_details, order_details) {
   ) {
     return false;
   }
-  if (currency_details.code != order_details.currency) {
-    return false;
-  }
+   if (order_details.currency != getmid[0].currency) {
+    console.log(`inside checking order currency is not equal to mid currency`);
+     let dcc_enabled = await helpers.fetchDccStatus();
+     if (dcc_enabled) {
+       let mid_currency_details = await helpers.get_currency_details({
+         id: getmid[0].currency_id,
+       });
+       let rate = await DccService.fetchRate(
+         payment_mode,
+         order_details.order_id,
+         mid_currency_details?.code,
+         order_details.currency,
+         order_details.amount
+       );
+     } else {
+       return false;
+     }
+   }
   let is_domestic_or_international = "";
   if (card_details.country_code3 == "ARE") {
     is_domestic_or_international = "Domestic";
@@ -2430,7 +2465,8 @@ async function routingOrderBasedMidList(
     let checkMidIsValidForTxn = await checkMidIsValid(
       ro.mid_id,
       card_details,
-      order_details
+      order_details,
+      mode
     );
     if (checkMidIsValidForTxn) {
       mid_list_arr.push(ro.mid_id);

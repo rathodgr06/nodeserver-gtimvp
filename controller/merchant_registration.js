@@ -1349,7 +1349,7 @@ var MerchantRegistration = {
           let dataLive = {
             live:1
           };
-          await MerchantRegistrationModel.updateDyn({id: master_merchant_inserted_obj.insertI},dataLive,'master_merchant');
+          await MerchantRegistrationModel.updateDyn({id: master_merchant_inserted_obj.insertId},dataLive,'master_merchant');
         }
         let all_mids = [...test_mid, ...live_mid];
         for (let mid of all_mids) {

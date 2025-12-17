@@ -1382,17 +1382,13 @@ const charges_invoice_controller = {
           { id: submerchant_id, deleted: 0, status: 0 },
           "master_merchant"
         );
+        console.log(result);
       } else if (receiver_id) {
         result = await charges_invoice_models.validate_receiver(receiver_id);
       }
       // check if order id exits and it is pending 
-      let orderExits = await charges_invoice_models.new_select_one({order_id:order_id,order_status:'PENDING',status:0},'payout_pending_transactions');
-      // if(!orderExits){
-      //   return res
-      //     .status(statusCode.badRequest)
-      //     .send(response.errormsg("Invalid order id"));
-      // }
-      if (result) {
+      let orderExits = await charges_invoice_models.new_select_one({order_id:order_id,status:0},'payout_pending_transactions');
+      // if (result) {
         // lets check the order status
         let order_status = req.bodyString("order_status");
         let amt = req.bodyString("amount");
@@ -1400,8 +1396,8 @@ const charges_invoice_controller = {
           case "COMPLETED":
             order_status = "PAID";
             let data = {
-              sub_merchant_id: null == submerchant_id ? 0 : submerchant_id,
-              receiver_id: null == receiver_id ? 0 : receiver_id,
+              sub_merchant_id: helpers.normalizeId(submerchant_id),
+              receiver_id: helpers.normalizeId(receiver_id),
               order_id: req.bodyString("order_id"),
               order_status: "PAID",
               transaction_id: req.bodyString("transaction_id"),
@@ -1414,10 +1410,11 @@ const charges_invoice_controller = {
               updated_at: moment().format("YYYY-MM-DD HH:mm:ss"),
             };
             await charges_invoice_models.addCharges(data);
-
-            let completedData = {
-              sub_merchant_id: null == submerchant_id ? 0 : submerchant_id,
-              receiver_id: null == receiver_id ? 0 : receiver_id,
+            
+            if(orderExits && orderExits?.order_status!="COMPLETED"){
+             let completedData = {
+              sub_merchant_id:helpers.normalizeId(submerchant_id),
+              receiver_id: helpers.normalizeId(receiver_id),
               order_id: req.bodyString("order_id"),
               order_status: "COMPLETED",
               transaction_id: req.bodyString("transaction_id"),
@@ -1426,33 +1423,20 @@ const charges_invoice_controller = {
               status: 0,
               created_at: moment().format("YYYY-MM-DD HH:mm:ss"),
               updated_at: moment().format("YYYY-MM-DD HH:mm:ss"),
-            };
+            };  
             await charges_invoice_models.addPendingPayoutTransaction(
               completedData
             );
+            }
             break;
 
           case "FAILED":
-            //  order_status = "PAYOUT-REVERSAL";
-            // let dataCharges = {
-            //   sub_merchant_id: null == submerchant_id ? 0 : submerchant_id,
-            //   receiver_id: null == receiver_id ? 0 : receiver_id,
-            //   order_id: req.bodyString("order_id"),
-            //   order_status: "PAYOUT-REVERSAL",
-            //   transaction_id: req.bodyString("transaction_id"),
-            //   currency: req.bodyString("currecny"),
-            //   amount: amt,
-            //   net_amount: amt,
-            //   transaction_status: "AUTHORISED",
-            //   status: 0,
-            //   created_at: moment().format("YYYY-MM-DD HH:mm:ss"),
-            //   updated_at: moment().format("YYYY-MM-DD HH:mm:ss"),
-            // };
-            // await charges_invoice_models.addCharges(dataCharges);
-            order_status = "FAILED";
+            console.log(orderExits?.order_status);
+            if(orderExits && orderExits?.order_status!="FAILED"){
+               order_status = "FAILED";
             let failedData = {
-              sub_merchant_id: null == submerchant_id ? 0 : submerchant_id,
-              receiver_id: null == receiver_id ? 0 : receiver_id,
+              sub_merchant_id: helpers.normalizeId(submerchant_id),
+              receiver_id: helpers.normalizeId(receiver_id),
               order_id: req.bodyString("order_id"),
               order_status: "FAILED",
               transaction_id: req.bodyString("transaction_id"),
@@ -1465,12 +1449,26 @@ const charges_invoice_controller = {
             await charges_invoice_models.addPendingPayoutTransaction(
               failedData
             );
+          }
             break;
 
           case "PENDING":
-            let pendingData = {
-              sub_merchant_id: null == submerchant_id ? 0 : submerchant_id,
-              receiver_id: null == receiver_id ? 0 : receiver_id,
+            if(orderExits){
+              let pendingPayload = {
+              sub_merchant_id: helpers.normalizeId (submerchant_id),
+              receiver_id:  helpers.normalizeId (receiver_id),
+              order_status: "PENDING",
+              transaction_id: req.bodyString("transaction_id"),
+              updated_at: moment().format("YYYY-MM-DD HH:mm:ss"),
+              }
+               await charges_invoice_models.updatePendingPayout(
+              pendingPayload,{order_id:order_id}
+            );
+
+            }else{
+              let pendingData = {
+              sub_merchant_id: helpers.normalizeId (submerchant_id),
+              receiver_id:  helpers.normalizeId (receiver_id),
               order_id: req.bodyString("order_id"),
               order_status: "PENDING",
               transaction_id: req.bodyString("transaction_id"),
@@ -1483,17 +1481,19 @@ const charges_invoice_controller = {
             await charges_invoice_models.addPendingPayoutTransaction(
               pendingData
             );
+            }
+            
             break;
         }
 
         res
           .status(statusCode.ok)
           .send(response.successmsg("Payout details updated successfully."));
-      } else {
-        res
-          .status(statusCode.badRequest)
-          .send(response.errormsg("Invalid sub merchant id"));
-      }
+      // } else {
+      //   res
+      //     .status(statusCode.badRequest)
+      //     .send(response.errormsg("Invalid sub merchant id"));
+      // }
     } catch (error) {
       logger.error(500,{message: error,stack: error.stack}); 
       res
