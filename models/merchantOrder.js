@@ -531,12 +531,14 @@ var merchantOrderModel = {
     let response;
     try {
       let dcc_enabled = await helpers.fetchDccStatus();
-      
+      console.log(`dcc_enabled`);
+      console.log(dcc_enabled);
       if(dcc_enabled){
       let queryStr = `SELECT MIN(minTxnAmount) AS minTxnAmount, MAX(maxTxnAmount) AS maxTxnAmount FROM pg_mid mid WHERE submerchant_id = ${condition.submerchant_id} AND(currency_id = ${condition.currency_id} OR FIND_IN_SET('${condition.currency}',supported_currency)>0) AND deleted = 0`;
       console.log(queryStr);
       response = await qb.query(queryStr);
       }else{
+        delete condition.currency;
         response = await qb.select_min("minTxnAmount")
         .select_max("maxTxnAmount")
         .from(config.table_prefix + "mid mid")
@@ -544,6 +546,7 @@ var merchantOrderModel = {
         .get();
       }
     } catch (error) {
+      console.log(error);
       logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();

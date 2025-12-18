@@ -96,7 +96,7 @@ var all_data = {
           )
         );
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -467,7 +467,7 @@ var all_data = {
       const [result, total_count] = await Promise.all([
         SubmerchantModel.select(condition, filter, limit, condition2),
         SubmerchantModel.get_sub_merchant_count(condition, filter, condition2),
-      ]); 
+      ]);
 
       // 5. Process results efficiently
       const send_res = await processResultsInParallel(result);
@@ -483,42 +483,41 @@ var all_data = {
           )
         );
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
     }
   },
   psp_list: async (req, res) => {
-    let rec_id = await enc_dec.cjs_decrypt(req.bodyString("submerchant_id"));
-
-    SubmerchantModel.selectpspList({ merchant_id: rec_id })
-
-      .then(async (result) => {
-        let send_res = [];
-        for (let val of result) {
-          let res = {
-            data_id: enc_dec.cjs_encrypt(val.id),
-            submerchant_id: enc_dec.cjs_encrypt(val.merchant_id),
-            psp_id: enc_dec.cjs_encrypt(val.psp_id),
-            psp_name: await helpers.get_psp_name_by_id(val.psp_id),
-          };
-
-          send_res.push(res);
-        }
-
-        res
-          .status(statusCode.ok)
-          .send(
-            response.successdatamsg(send_res, "List fetched successfully.")
-          );
-      })
-      .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
-        res
-          .status(statusCode.internalError)
-          .send(response.errormsg(error.message));
+    let rec_id = enc_dec.cjs_decrypt(req.bodyString("submerchant_id"));
+    try {
+      let super_merchant = await SubmerchantModel.getMerchantIdBySubMerchant({
+        id: rec_id,
       });
+      let fetchPSPListonSuperStore =
+        await SubmerchantModel.selectPSPListBySuperMerchant(super_merchant);
+        console.log(fetchPSPListonSuperStore);
+      let send_res = [];
+      for (let val of fetchPSPListonSuperStore) {
+        let res = {
+          psp_id: enc_dec.cjs_encrypt(val.psp_id),
+          psp_name: val.psp_name,
+          country_id:enc_dec.cjs_encrypt(val.country),
+        };
+
+        send_res.push(res);
+      }
+
+      res
+        .status(statusCode.ok)
+        .send(response.successdatamsg(send_res, "List fetched successfully."));
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+      res
+        .status(statusCode.internalError)
+        .send(response.errormsg(error.message));
+    }
   },
 
   details: async (req, res) => {
@@ -607,7 +606,7 @@ var all_data = {
           );
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -626,7 +625,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("Submerchant updated successfully"));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -655,7 +654,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("Submerchant deactivated successfully"));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -685,7 +684,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("Submerchant activated successfully"));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -713,7 +712,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("Submerchant deleted successfully"));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -857,7 +856,7 @@ var all_data = {
         })
         .catch((error) => {
           console.log(error);
-         logger.error(500,{message: error,stack: error.stack}); 
+          logger.error(500, { message: error, stack: error.stack });
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
@@ -1037,7 +1036,7 @@ var all_data = {
         .send(response.successmsg("Submerchant branding updated successfully"));
     } catch (error) {
       console.log(error);
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1094,7 +1093,7 @@ var all_data = {
           submerchant_id: submerchant_id,
           methods: method,
           sequence: i,
-          is_visible: split_show[count] == '' ? 1 : split_show[count],
+          is_visible: split_show[count] == "" ? 1 : split_show[count],
           created_at: moment().format("YYYY-MM-DD HH:mm:s"),
           mode: mode,
         };
@@ -1199,7 +1198,7 @@ var all_data = {
       res.status(statusCode.ok).send(response.successmsg(message));
     } catch (error) {
       console.log(error);
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1217,7 +1216,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("Submerchant blocked successfully"));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1235,7 +1234,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("Submerchant unblocked successfully"));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1259,7 +1258,7 @@ var all_data = {
           );
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1501,7 +1500,7 @@ var all_data = {
         });
       }
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
 
       res
         .status(statusCode.internalError)
@@ -1527,7 +1526,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("MID deleted successfully"));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1563,7 +1562,7 @@ var all_data = {
         password: req.bodyString("password"),
         psp_id: psp_id,
         currency_id: currency_id,
-        supported_currency:req.body.supported_currency,
+        supported_currency: req.body.supported_currency,
         submerchant_id: submerchant_id,
         payment_methods: req_payment_method,
         payment_schemes: req.bodyString("payment_schemes"),
@@ -1806,7 +1805,7 @@ var all_data = {
         .send(response.successmsg("MID added successfully"));
     } catch (error) {
       console.log(error);
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
 
       return res
         .status(statusCode.internalError)
@@ -1841,7 +1840,7 @@ var all_data = {
         password: req.bodyString("password"),
         //psp_id: psp,
         currency_id: currency_id,
-        supported_currency:req.body.supported_currency,
+        supported_currency: req.body.supported_currency,
         // submerchant_id: submerchant_id,
         payment_methods: req_payment_method,
         payment_schemes: req.bodyString("payment_schemes"),
@@ -2052,7 +2051,7 @@ var all_data = {
         .send(response.successmsg("MID updated successfully"));
     } catch (error) {
       console.log(error);
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
@@ -2306,7 +2305,7 @@ var all_data = {
         .send(response.successmsg("MID deleted successfully"));
     } catch (error) {
       console.log(error);
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
@@ -2321,7 +2320,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("MID activated successfully"));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
@@ -2335,7 +2334,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("MID deactivated successfully"));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
@@ -2398,7 +2397,7 @@ var all_data = {
               currency_name: val?.currency_id
                 ? await helpers.get_currency_name_by_id(val.currency_id)
                 : "",
-              supported_currency:val.supported_currency,  
+              supported_currency: val.supported_currency,
               status: parseInt(val?.deleted) === 0 ? "Active" : "Inactive",
 
               country_id: val?.country_id
@@ -2447,14 +2446,14 @@ var all_data = {
             );
         })
         .catch((error) => {
-         logger.error(500,{message: error,stack: error.stack}); 
+          logger.error(500, { message: error, stack: error.stack });
           console.log("error", error);
           return res
             .status(statusCode.internalError)
             .send(response.errormsg(error));
         });
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
 
       return res
         .status(statusCode.internalError)
@@ -2475,7 +2474,7 @@ var all_data = {
       condition["submerchant_id"] = submerchant_id;
     }
 
-     SubmerchantModel.selectOneMID("*", condition)
+    SubmerchantModel.selectOneMID("*", condition)
       .then(async (result) => {
         // console.log("🚀 ~ .then ~ result:", result);
         let send_res = [];
@@ -2539,7 +2538,7 @@ var all_data = {
           );
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         console.log("error", error);
         return res
           .status(statusCode.internalError)
@@ -2565,7 +2564,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successdatamsg(send_res, "List fetched successfully."));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
 
       return res
         .status(statusCode.internalError)
@@ -2600,7 +2599,7 @@ var all_data = {
             password: data?.password || "",
             primary_key: data?.primary_key || "",
             currency: currency?.code || "",
-            supported_currency:data.supported_currency,
+            supported_currency: data.supported_currency,
             mode: data?.mode || "",
             payment_methods: data?.payment_methods || "",
             payment_schemes: data?.payment_schemes || "",
@@ -2645,14 +2644,14 @@ var all_data = {
             .send(response.successdatamsg(temp, "List fetched successfully."));
         })
         .catch((error) => {
-         logger.error(500,{message: error,stack: error.stack}); 
+          logger.error(500, { message: error, stack: error.stack });
 
           return res
             .status(statusCode.internalError)
             .send(response.errormsg(error));
         });
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
 
       return res
         .status(statusCode.internalError)
@@ -2689,7 +2688,7 @@ var all_data = {
           )
         );
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
 
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
@@ -2757,7 +2756,7 @@ var all_data = {
           );
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -2776,7 +2775,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successmsg("Deactivated successfully"));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -2819,7 +2818,7 @@ var all_data = {
       }
       res.status(statusCode.ok).send(response.successdatamsg(send_res));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -2859,7 +2858,7 @@ var all_data = {
           .send(response.successmsg("Features updated successfully"));
       }
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -3244,7 +3243,7 @@ var all_data = {
 
         .send(response.successdatamsg({}, "Settings changed successfully!"));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
 
       res
 
@@ -3312,14 +3311,15 @@ var all_data = {
           submerchant_id
         ),
 
-        icon_name: val?.icon?val?.icon:'',
+        icon_name: val?.icon ? val?.icon : "",
 
         // logo_name: "",
         logo_name: company_logo,
 
-        language: val?.language?enc_dec.cjs_encrypt(val?.language):enc_dec.cjs_encrypt(1),
+        language: val?.language
+          ? enc_dec.cjs_encrypt(val?.language)
+          : enc_dec.cjs_encrypt(1),
 
-       
         payment_methods: payment_methods,
 
         available_payment_method: available_payment_method,
@@ -3327,10 +3327,9 @@ var all_data = {
         // logo: "",
         logo: process.env.STATIC_URL + "/static/images/" + company_logo,
 
-        accept_image:
-          val?.we_accept_image
-            ? process.env.STATIC_URL + "/static/files/" + val?.we_accept_image
-            : process.env.STATIC_URL + "/static/files/" + "payment-list.png",
+        accept_image: val?.we_accept_image
+          ? process.env.STATIC_URL + "/static/files/" + val?.we_accept_image
+          : process.env.STATIC_URL + "/static/files/" + "payment-list.png",
 
         use_logo_instead_icon: 0,
 
@@ -3348,15 +3347,19 @@ var all_data = {
 
         is_back_transfer: check_bank_transfer,
 
-        test_card_payment_scheme: val?.test_card_payment_scheme?val?.test_card_payment_scheme:"",
+        test_card_payment_scheme: val?.test_card_payment_scheme
+          ? val?.test_card_payment_scheme
+          : "",
 
-        test_stored_card_scheme: val?.test_stored_card_scheme?val?.test_stored_card_scheme:"",
+        test_stored_card_scheme: val?.test_stored_card_scheme
+          ? val?.test_stored_card_scheme
+          : "",
       };
-    if (val?.icon) {
-      resp.icon = `${process.env.STATIC_URL}/static/files/${val.icon}`;
-    }else{
-       resp.icon = ``;
-    }
+      if (val?.icon) {
+        resp.icon = `${process.env.STATIC_URL}/static/files/${val.icon}`;
+      } else {
+        resp.icon = ``;
+      }
       send_res = resp;
 
       res
@@ -3367,7 +3370,7 @@ var all_data = {
           response.successdatamsg(send_res, "Details fetched successfully.")
         );
     } catch (error) {
-    logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
 
         .status(statusCode.ok)
@@ -3389,8 +3392,7 @@ var all_data = {
           }
           break;
         case "Merchant":
-          let merchant_id =
-            req.bodyString("sub_merchant_id")
+          let merchant_id = req.bodyString("sub_merchant_id");
           let id = req.user.id.toString();
           if (merchant_id != id) {
             return res
@@ -3432,7 +3434,7 @@ var all_data = {
       // If Payer ID is AlPay get institutionCode from payer id
       if (payer_id.includes("MAP_")) {
         fundingData.institutionCode = payer_id?.replace("MAP_", "");
-      }else if (payer_id.includes("AP_")) {
+      } else if (payer_id.includes("AP_")) {
         fundingData.institutionCode = payer_id?.replace("AP_", "");
       }
 
@@ -3453,7 +3455,7 @@ var all_data = {
         beneficiary_id: receiver_id ? receiver_id : 0, // Default receiver id, can be updated later
         status: is_active ? is_active : 1,
       };
-      console.log("🚀 ~ fundingDetails:", fundingDetails)
+      console.log("🚀 ~ fundingDetails:", fundingDetails);
       let store = await MerchantEkycModel.storeFundingDetails(fundingDetails);
 
       if (store) {
@@ -3486,7 +3488,7 @@ var all_data = {
           .send(response.successdatamsg([], "Unable to add funding details."));
       }
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -3601,7 +3603,7 @@ var all_data = {
           );
       }
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
     /*  try {
@@ -3694,37 +3696,35 @@ var all_data = {
       let updateData = {
         bank_verified: verificationStatus,
         updated_at: moment().format("YYYY-MM-DD HH:mm"),
-        status:1
+        status: 1,
       };
       let result = await MerchantEkycModel.updateFundingDetails(
         { account_id: account_id },
         updateData
       );
       if (result.affectedRows > 0) {
-        res
-          .status(statusCode.ok)
-          .send(
-            response.successdatamsg(
-              {
-                account_id: account_id,
-                is_verified: 1,
-                deleted: account_details?.deleted,
-                is_active: account_details?.status,
-                created_at: moment(account_details?.created_at).format(
-                  "YYYY-MM-DD HH:mm"
-                ),
-                updated_at: moment().format("YYYY-MM-DD HH:mm"),
-              },
-              "Funding details verification status updated successfully."
-            )
-          );
+        res.status(statusCode.ok).send(
+          response.successdatamsg(
+            {
+              account_id: account_id,
+              is_verified: 1,
+              deleted: account_details?.deleted,
+              is_active: account_details?.status,
+              created_at: moment(account_details?.created_at).format(
+                "YYYY-MM-DD HH:mm"
+              ),
+              updated_at: moment().format("YYYY-MM-DD HH:mm"),
+            },
+            "Funding details verification status updated successfully."
+          )
+        );
       } else {
         res
           .status(statusCode.badRequest)
           .send(response.errormsg("Invalid account id."));
       }
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -3773,36 +3773,34 @@ var all_data = {
         updateData
       );
       if (result.affectedRows > 0) {
-        res
-          .status(statusCode.ok)
-          .send(
-            response.successdatamsg(
-              {
-                account_id: account_id,
-                is_verified: account_details?.bank_verified,
-                deleted: account_details?.deleted,
-                is_active: status,
-                created_at: moment(account_details?.created_at).format(
-                  "YYYY-MM-DD HH:mm"
-                ),
-                updated_at: moment().format("YYYY-MM-DD HH:mm"),
-              },
-              "Funding details  status updated successfully."
-            )
-          );
+        res.status(statusCode.ok).send(
+          response.successdatamsg(
+            {
+              account_id: account_id,
+              is_verified: account_details?.bank_verified,
+              deleted: account_details?.deleted,
+              is_active: status,
+              created_at: moment(account_details?.created_at).format(
+                "YYYY-MM-DD HH:mm"
+              ),
+              updated_at: moment().format("YYYY-MM-DD HH:mm"),
+            },
+            "Funding details  status updated successfully."
+          )
+        );
       } else {
         res
           .status(statusCode.badRequest)
           .send(response.errormsg("Invalid account id."));
       }
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
   fetchPayer: async (req, res) => {
     let country_iso_code = req.bodyString("country_iso_code");
-    console.log("🚀 ~ country_iso_code:", country_iso_code)
+    console.log("🚀 ~ country_iso_code:", country_iso_code);
     let service_id =
       req.bodyString("fundingType") || req.bodyString("funding_source_type");
     let currency = req.bodyString("currency");
@@ -3922,10 +3920,10 @@ var all_data = {
         console.log(`the service id is here`);
         console.log(service_id);
         // send_res = await alpay_payer_list(service_id);
-        if (process.env.CHARGES_MODE === 'live') {
-          send_res = await  alpay_payer_list(service_id);
-        }else{
-          send_res = await  mock_alpay_payer_list(service_id);
+        if (process.env.CHARGES_MODE === "live") {
+          send_res = await alpay_payer_list(service_id);
+        } else {
+          send_res = await mock_alpay_payer_list(service_id);
         }
         res
           .status(statusCode.ok)
@@ -3990,8 +3988,6 @@ var all_data = {
               },
             ];
           }
-
-          
         }
         res
           .status(statusCode.ok)
@@ -4000,7 +3996,7 @@ var all_data = {
           );
       }
     } catch (error) {
-    logger.error(500,{message: error,stack: error.stack});
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.badRequest)
         .send(
@@ -4012,13 +4008,30 @@ var all_data = {
     }
   },
   fetchPayerDetails: async (req, res) => {
-    console.log("🚀 ~ req:", req.body)
+    console.log("🚀 ~ req:", req.body);
     let payer_id = req.bodyString("payer_id");
     let transaction_type = req.bodyString("transaction_type");
     let customer_type = req.bodyString("customer_type");
-    let transaction_attachment_type =  ["invoice","purchase_order","delivery_slip","contract","customs_declaration","bill_of_lading","others","identification_documents","proof_of_address","proof_of_source_of_funds","registration_documents"];
+    let transaction_attachment_type = [
+      "invoice",
+      "purchase_order",
+      "delivery_slip",
+      "contract",
+      "customs_declaration",
+      "bill_of_lading",
+      "others",
+      "identification_documents",
+      "proof_of_address",
+      "proof_of_source_of_funds",
+      "registration_documents",
+    ];
     try {
-      if (payer_id == "MTN_MOMO" || payer_id == "MTN" || payer_id == "ORANGE_MONEY" || payer_id == "ORANGE") {
+      if (
+        payer_id == "MTN_MOMO" ||
+        payer_id == "MTN" ||
+        payer_id == "ORANGE_MONEY" ||
+        payer_id == "ORANGE"
+      ) {
         res.status(statusCode.ok).send({
           payer_id: payer_id,
           payer_name: payer_id.split("_").join(" "),
@@ -4042,13 +4055,14 @@ var all_data = {
         });
       } else if (payer_id.includes("MAP") || payer_id.includes("AP")) {
         let payer = await get_alpay_payer_by_id(payer_id);
-        console.log("🚀 ~ payer:", payer)
+        console.log("🚀 ~ payer:", payer);
         res.status(statusCode.ok).send({
           payer_id: payer_id,
           payer_name: payer?.name,
           transaction_type: transaction_type,
           funding_source_type: payer?.funding_type,
-          funding_source_name: payer?.funding_type == 1 ? "MobileWallet" : "BankAccount",
+          funding_source_name:
+            payer?.funding_type == 1 ? "MobileWallet" : "BankAccount",
           customer_type: customer_type,
           country_iso_code: "GHA",
           currency: ["GHS"],
@@ -4067,15 +4081,24 @@ var all_data = {
       } else {
         let result;
         const axios = require("axios");
-        const username = process.env.THUNES_MODE=='test'?"a0895b2a-b05c-45cc-b218-6c103d3d67e9":"7a15c7bc-d2b4-4290-905c-a601a58b8705";
-        const password = process.env.THUNES_MODE=='test'?"fcc52714-1d66-4f63-8aec-aeaae62299f3":"97f3164f-5f83-40a3-adef-8cc6ac3eb113";
+        const username =
+          process.env.THUNES_MODE == "test"
+            ? "a0895b2a-b05c-45cc-b218-6c103d3d67e9"
+            : "7a15c7bc-d2b4-4290-905c-a601a58b8705";
+        const password =
+          process.env.THUNES_MODE == "test"
+            ? "fcc52714-1d66-4f63-8aec-aeaae62299f3"
+            : "97f3164f-5f83-40a3-adef-8cc6ac3eb113";
         const base64Credentials = Buffer.from(
           `${username}:${password}`
         ).toString("base64");
         let config = {
           method: "get",
           maxBodyLength: Infinity,
-          url: process.env.THUNES_MODE=='test'?`${credentials["thunes"]["test_url"]}/v2/money-transfer/payers/${payer_id}`:`${credentials["thunes"]["url"]}/v2/money-transfer/payers/${payer_id}`,
+          url:
+            process.env.THUNES_MODE == "test"
+              ? `${credentials["thunes"]["test_url"]}/v2/money-transfer/payers/${payer_id}`
+              : `${credentials["thunes"]["url"]}/v2/money-transfer/payers/${payer_id}`,
           headers: {
             Authorization: `Basic ${base64Credentials}`,
           },
@@ -4180,7 +4203,7 @@ var all_data = {
         });
       }
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -4197,7 +4220,7 @@ var all_data = {
         receiver_id: receiver_id,
         currency: currency,
       });
-      console.log("🚀 ~ merchantResult:", merchantResult)
+      console.log("🚀 ~ merchantResult:", merchantResult);
       if (!merchantResult) {
         return res
           .status(statusCode.badRequest)
@@ -4279,14 +4302,14 @@ var all_data = {
           .send(response.errormsg("Account not found"));
       }
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.ok)
         .send(response.errormsg("Unable to fetch funding details."));
     }
   },
   getFundingDetailsList: async (req, res) => {
-    console.log("🚀 ~ req:", req.body)
+    console.log("🚀 ~ req:", req.body);
     try {
       let submerchant_id = req.bodyString("sub_merchant_id");
       let receiver_id = req.bodyString("receiver_id");
@@ -4386,33 +4409,42 @@ var all_data = {
           );
       }
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.ok)
         .send(response.errormsg("Unable to fetch funding details."));
     }
   },
   getPayoutCountries: async (req, res) => {
-    let countries=[];
+    let countries = [];
     try {
       const axios = require("axios");
-      const username = process.env.THUNES_MODE=="test"?"a0895b2a-b05c-45cc-b218-6c103d3d67e9":"7a15c7bc-d2b4-4290-905c-a601a58b8705";
-      const password = process.env.THUNES_MODE=="test"?"fcc52714-1d66-4f63-8aec-aeaae62299f3":"97f3164f-5f83-40a3-adef-8cc6ac3eb113";
+      const username =
+        process.env.THUNES_MODE == "test"
+          ? "a0895b2a-b05c-45cc-b218-6c103d3d67e9"
+          : "7a15c7bc-d2b4-4290-905c-a601a58b8705";
+      const password =
+        process.env.THUNES_MODE == "test"
+          ? "fcc52714-1d66-4f63-8aec-aeaae62299f3"
+          : "97f3164f-5f83-40a3-adef-8cc6ac3eb113";
       const base64Credentials = Buffer.from(`${username}:${password}`).toString(
         "base64"
       );
       let config = {
         method: "get",
         maxBodyLength: Infinity,
-        url: process.env.THUNES_MODE=='test'?`${credentials["thunes"]["test_url"]}/v2/money-transfer/countries`:`${credentials["thunes"]["url"]}/v2/money-transfer/countries`,
+        url:
+          process.env.THUNES_MODE == "test"
+            ? `${credentials["thunes"]["test_url"]}/v2/money-transfer/countries`
+            : `${credentials["thunes"]["url"]}/v2/money-transfer/countries`,
         headers: {
           Authorization: `Basic ${base64Credentials}`,
         },
       };
 
       let result = await axios.request(config);
-      console.log("🚀 ~ result:", result)
-       countries = result.data.map(({ iso_code, ...rest }) => ({
+      console.log("🚀 ~ result:", result);
+      countries = result.data.map(({ iso_code, ...rest }) => ({
         country_iso_code: iso_code,
         ...rest,
       }));
@@ -4427,8 +4459,8 @@ var all_data = {
           )
         );
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
-        countries.push({ country_iso_code: "LBR", name: "Liberia" });
+      logger.error(500, { message: error, stack: error.stack });
+      countries.push({ country_iso_code: "LBR", name: "Liberia" });
       res
         .status(statusCode.ok)
         .send(
@@ -4454,14 +4486,14 @@ var all_data = {
           )
         );
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.ok)
         .send(response.successdatamsg("", "Unable to fetch."));
     }
   },
   getAllFundingDetails: async (req, res) => {
-    console.log("🚀 ~ req:", req.body)
+    console.log("🚀 ~ req:", req.body);
     try {
       let page = req.bodyString("page") || 0;
       let per_page = req.bodyString("per_page") || 50;
@@ -4477,7 +4509,7 @@ var all_data = {
       let where = {
         page: page,
         per_page: per_page,
-        deleted: 0
+        deleted: 0,
       };
 
       if (sub_merchant_id) {
@@ -4518,7 +4550,7 @@ var all_data = {
       let merchantResult = await MerchantEkycModel.fetchAllMerchantDetails(
         where
       );
-      console.log("🚀 ~ merchantResult:", merchantResult)
+      console.log("🚀 ~ merchantResult:", merchantResult);
 
       res
         .status(statusCode.ok)
@@ -4529,7 +4561,7 @@ var all_data = {
           )
         );
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.ok)
         .send(response.successdatamsg([], "Unable to fetch funding details."));
@@ -4547,7 +4579,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successdatamsg(send_res, "IP list fetch successfully."));
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res.status(statusCode.ok).send(response.errormsg("Unable to IP list."));
     }
   },
@@ -4580,7 +4612,7 @@ var all_data = {
         .status(statusCode.ok)
         .send(response.successdatamsg([], "IP list updated successfully."));
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.ok)
         .send(response.errormsg("Unable to update IP list."));
@@ -4598,19 +4630,17 @@ var all_data = {
           { deleted: 1, status: 0 }
         );
         if (result.affectedRows > 0) {
-          res
-            .status(statusCode.ok)
-            .send(
-              response.successdatamsg(
-                {
-                  account_id: account_id,
-                  deleted: 1,
-                  status: 1,
-                  is_verified: merchantResult.bank_verified,
-                },
-                "Funding details deleted successfully."
-              )
-            );
+          res.status(statusCode.ok).send(
+            response.successdatamsg(
+              {
+                account_id: account_id,
+                deleted: 1,
+                status: 1,
+                is_verified: merchantResult.bank_verified,
+              },
+              "Funding details deleted successfully."
+            )
+          );
         } else {
           res
             .status(statusCode.badRequest)
@@ -4622,7 +4652,7 @@ var all_data = {
           .send(response.errormsg("Invalid sub merchant id or account id."));
       }
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -4696,7 +4726,7 @@ var all_data = {
           response.successdatamsg(results, "Funding details added successfully")
         );
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -4736,7 +4766,7 @@ var all_data = {
           )
         );
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -4757,7 +4787,7 @@ var all_data = {
           .send(response.errormsg("Merchant details not found"));
       }
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -4770,7 +4800,7 @@ var all_data = {
           response.successdatamsg(company_details, "Company details found")
         );
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -4785,12 +4815,10 @@ var all_data = {
           .status(statusCode.ok)
           .send(response.successdatamsg(result, "Found"));
       } else {
-        res
-          .status(statusCode.ok)
-          .send(response.errormsg("Not Found"));
+        res.status(statusCode.ok).send(response.errormsg("Not Found"));
       }
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -4811,7 +4839,7 @@ var all_data = {
         res.status(statusCode.ok).send(response.errormsg("Payers not found"));
       }
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
@@ -4822,17 +4850,19 @@ var all_data = {
         const condition = { id: sub_merchant_id };
         const data = { onboarding_done: 1, ekyc_done: 3, video_kyc_done: 1 };
         const table = "master_merchant";
-        let result = await SubmerchantModel.update(condition, data, table)
+        let result = await SubmerchantModel.update(condition, data, table);
         res
           .status(statusCode.ok)
-          .send(response.successdatamsg({}, "Merchant onboarding status changed"));
+          .send(
+            response.successdatamsg({}, "Merchant onboarding status changed")
+          );
       } else {
         res
           .status(statusCode.badRequest)
           .send(response.errormsg("Submerchant ID required"));
       }
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
