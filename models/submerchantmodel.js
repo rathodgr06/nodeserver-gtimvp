@@ -1676,6 +1676,7 @@ var dbModel = {
   }
   },
 
+
 bulkDeleteDraftPaymentMethods: async (merchant_ids, mode) => {
   if (!merchant_ids || !Array.isArray(merchant_ids) || merchant_ids.length === 0) {
     throw new Error('merchant_ids must be a non-empty array');
@@ -1709,6 +1710,19 @@ get_bulk_count_mid: async (merchant_ids) => {
     }
     return response;
   },
+  selectPSPListBySuperMerchant:async(super_merchant_id)=>{
+     let qb = await pool.get_connection();
+    let response;
+    try {
+      let query =`SELECT DISTINCT p.id AS psp_id, p.name AS psp_name,p.country FROM pg_psp p JOIN pg_mid m ON m.psp_id = p.id JOIN ( SELECT MIN(mid.id) AS min_mid_id FROM pg_mid mid JOIN pg_master_merchant mm ON mm.id = mid.submerchant_id WHERE mm.super_merchant_id = ${super_merchant_id} AND mid.deleted = 0 GROUP BY mid.psp_id ) x ON x.min_mid_id = m.id;`;
+      response = await qb.query(query);
+    } catch (error) {
+      logger.error(500,{message: error,stack: error.stack}); 
+    } finally {
+      qb.release();
+    }
+    return response;
+  }
 
 };
 

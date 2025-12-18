@@ -594,7 +594,8 @@ async function checkMidIsValid(mid, card_details, order_details,payment_mode) {
       if(dcc_enabled){
          midquery = `SELECT md.* , mc.code , mc.currency  FROM pg_mid md INNER JOIN pg_master_currency mc ON mc.id = md.currency_id WHERE md.submerchant_id = '${parseInt(order_details.merchant_id)}'   AND  md.status = 0 AND md.deleted = 0 AND md.env ='${payment_mode}' AND  (mc.code = '${order_details?.currency}' OR FIND_IN_SET('${order_details?.currency}',md.supported_currency)>0) AND md.id=${mid};`;
       }else{
-         midquery = `SELECT md.* , mc.code , mc.currency  FROM pg_mid md INNER JOIN pg_master_currency mc ON mc.id = md.currency_id WHERE md.submerchant_id = '${parseInt(order_details.merchant_id)}'   AND  md.status = 0 AND md.deleted = 0 AND md.env ='${payment_mode}' AND mc.code = '${order_details?.currency} AND md.id=${mid}';`;
+         midquery = `SELECT md.* , mc.code , mc.currency  FROM pg_mid md INNER JOIN pg_master_currency mc ON mc.id = md.currency_id WHERE md.submerchant_id = '${parseInt(order_details.merchant_id)}'   AND  md.status = 0 AND md.deleted = 0 AND md.env ='${payment_mode}' AND mc.code = '${order_details?.currency}' AND md.id=${mid};`;
+         console.log(midquery);
       }
  const getmid = await merchantOrderModel.order_query(midquery);
 const mid_details = getmid?.[0];
