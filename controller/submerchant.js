@@ -4070,7 +4070,7 @@ var all_data = {
           increment: null,
           maximum_transaction_amount: null,
           minimum_transaction_amount: null,
-          data: "accountNumber, accountName",
+          data: "accountNumber, accountName, country_iso_code",
           required_documents: [],
           purpose_of_remittance: [],
           transaction_attachment_type: transaction_attachment_type,
