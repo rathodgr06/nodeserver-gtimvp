@@ -170,6 +170,8 @@ const threeds = async (req, res) => {
 
         }
         let final_data = JSON.stringify(payload);
+        console.log(`mpgs after 3ds payload`);
+        console.log(final_data);
 
         let merchant_id = await helpers.get_data_list(
             "merchant_id",

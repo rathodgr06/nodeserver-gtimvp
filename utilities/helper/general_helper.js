@@ -874,19 +874,33 @@ let helpers = {
 
     return output_string1;
   },
-  get_and_conditional_string: async (obj) => {
-    var output_string = "";
-    for (var key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        output_string += "and " + key + " = '" + obj[key] + "' ";
+get_and_conditional_string: async (obj) => {
+  let conditions = [];
+
+  for (let key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const value = obj[key];
+
+      // If value is an array → use IN clause
+      if (Array.isArray(value)) {
+        if (value.length > 0) {
+          const inValues = value
+            .map(v => `'${v}'`)
+            .join(',');
+          conditions.push(`${key} IN (${inValues})`);
+        }
+      } 
+      // Normal value → use =
+      else {
+        conditions.push(`${key} = '${value}'`);
       }
     }
+  }
 
-    let words = output_string.split(" ");
-    let output_string1 = words.slice(1).join(" ");
+  // Join with AND
+  return conditions.join(' AND ');
+},
 
-    return output_string1;
-  },
 
   get_and_conditional_string_in: async (obj) => {
     var output_string = "";
@@ -6910,6 +6924,59 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
           txn_status: "SYSTEM_ERROR",
           remark: "System error",
           status_code: "99",
+        },
+      },
+      "MTN":{
+        CREATED: {
+          status: "PENDING",
+          order_status: "PENDING",
+          txn_status: "PENDING",
+          remark: "Transaction Pending",
+          status_code: "02",
+        },
+        PENDING: {
+          status: "PENDING",
+          order_status: "PENDING",
+          txn_status: "PENDING",
+          remark: "Transaction Pending",
+          status_code: "02",
+        },
+        SUCCESSFUL: {
+          status: "SUCCESS",
+          order_status: "CAPTURED",
+          txn_status: "CAPTURED",
+          remark: "Transaction Successfull",
+          status_code: "00",
+        },
+        FAILED: {
+          status: "FAILED",
+          order_status: "FAILED",
+          txn_status: "FAILED",
+          remark: "Transaction FAILED",
+          status_code: "01",
+        },
+      },
+      "Orange":{
+        TI: {
+          status: "PENDING",
+          order_status: "PENDING",
+          txn_status: "PENDING",
+          remark: "Transaction Pending",
+          status_code: "02",
+        },
+        TF: {
+          status: "FAILED",
+          order_status: "FAILED",
+          txn_status: "FAILED",
+          remark: "Transaction FAILED",
+          status_code: "01",
+        },
+        TS: {
+          status: "SUCCESS",
+          order_status: "CAPTURED",
+          txn_status: "CAPTURED",
+          remark: "Transaction Successfull",
+          status_code: "00",
         },
       },
     };

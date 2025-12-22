@@ -4866,6 +4866,68 @@ var all_data = {
       res.status(statusCode.internalError).send(response.errormsg(error));
     }
   },
+   storeList: async (req, res) => {
+    try {
+      console.log("🚀 ~ req:", req.user);
+      let user_id = req.user.id;
+      let allStores = false;
+      let stores=[];
+      let fetchStores = await MerchantModel.selectOneSuperMerchant('stores',{id:user_id});
+      console.log(fetchStores);
+      let storeArray = fetchStores?.stores.split(',').map(v => v.trim());
+      console.log(storeArray);
+      
+      if(storeArray.includes('All') || fetchStores?.stores==""){
+        allStores = true;
+      }else{
+        for(let storeEncId of storeArray){
+          let store = enc_dec.cjs_decrypt(storeEncId.trim());
+          stores.push(store);
+        }
+        req.body.stores = stores;
+      }
+     
+      // 1. Extract and validate pagination parameters
+      const { perpage, page } = extractPaginationParams(req);
+      const limit = calculatePagination(perpage, page);
+
+      // 2. Build conditions using helper functions
+      const { condition, condition2 } = await buildQueryConditions(req,allStores);
+      if(!allStores){
+        condition['s.id'] = stores;
+      }
+
+      // 3. Build search filter
+      const filter = buildSearchFilter(req.bodyString("search"));
+
+      console.log(condition);
+
+      // 4. Fetch data and total count in parallel
+      const [result, total_count] = await Promise.all([
+        SubmerchantModel.select(condition, filter, limit, condition2),
+        SubmerchantModel.get_sub_merchant_count(condition, filter, condition2),
+      ]);
+
+      // 5. Process results efficiently
+      const send_res = await processResultsInParallel(result);
+
+      // 6. Send response
+      res
+        .status(statusCode.ok)
+        .send(
+          response.successdatamsg(
+            send_res,
+            "List fetched successfully.",
+            total_count
+          )
+        );
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+      res
+        .status(statusCode.internalError)
+        .send(response.errormsg(error.message));
+    }
+  },
 };
 module.exports = all_data;
 
@@ -4918,7 +4980,7 @@ async function buildQueryConditions(req) {
   applyStatusFilter(req, condition);
   applyStringFilter(req, condition, condition2, "company_name", "m.company_name", false);
   applyEkycStatusFilter(req, condition, condition2);
-
+  
   return { condition, condition2 };
 }
 function applyStringFilter(req, condition, condition2, paramName, dbField, needsDecryption) {

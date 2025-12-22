@@ -32,6 +32,7 @@ var protector = {
         return output;
     },
     cjs_decrypt: (cipher_text) => {
+        console.log(`inside the decrypt function`);
         // let bytes  = CryptoJS.AES.decrypt(cipher_text, sk);
         // let originalText = bytes.toString(CryptoJS.enc.Utf8);
         // return originalText;
@@ -40,6 +41,7 @@ var protector = {
         }
        const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
         if (!base64Regex.test(cipher_text)) {
+            console.log(`the pattern not match`)
           logger.error(500, {
             message: `Text which decoded ${cipher_text} contains invalid characters`,
           });

@@ -212,6 +212,8 @@ const createSession = async (req, res) => {
   };
 
   try {
+    console.log(`mpgs session payload`);
+    console.log(JSON.stringify(data1));
     let url = mode=="live"?credentials[getpsp.credentials_key].base_url:credentials[getpsp.credentials_key].test_url;
     const config1 = {
       method: "post",
@@ -298,6 +300,8 @@ const createSession = async (req, res) => {
       };
       payload["sourceOfFunds"]['provided']['card']['storedOnFile'] = "TO_BE_STORED";
     }
+    console.log(`mpgs update payload`);
+    console.log(JSON.stringify(payload))
     let data = JSON.stringify(payload);
     console.log(`data is here`);
     console.log(data);
