@@ -212,11 +212,14 @@ var dbModel = {
   },
 
   selectOneSupermerchent: async (selection, condition) => {
+    console.log(`inside the one super merchant thing`);
     let qb = await pool.get_connection();
     let response;
     try {
-      response = await qb.select(selection).where(condition).get("");
+      response = await qb.select(selection).where(condition).get(super_merchant_table);
+      console.log(qb.last_query());
     } catch (error) {
+      console.log(error);
       logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();

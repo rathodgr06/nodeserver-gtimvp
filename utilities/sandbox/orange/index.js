@@ -118,7 +118,7 @@ router.get("/OM/Transaction/Status", (req, res) => {
     TF: ["233800900114", "233800900115"],
     TI: ["233800900116", "233800900117"],
   };
-
+  console.log(tx.msisdn);
   if (msisdnRules.TS.includes(tx.msisdn)) {
     tx.status = "TS";
   } else if (msisdnRules.TF.includes(tx.msisdn)) {

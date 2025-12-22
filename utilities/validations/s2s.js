@@ -107,7 +107,7 @@ const S2SValidator = {
                     is: "1",
                     then: Joi.object().keys({
                         walletType: Joi.string()
-                            .valid("mtn-momo","orange-money","ZEEPAY GHANA LIMITED","G-MONEY","MTN","AIRTELTIGO MONEY","VODAFONE CASH","GHANAPAY","YUP GHANA LIMITED")
+                            .valid("mtn-momo","mtn","orange","orange-money","ZEEPAY GHANA LIMITED","G-MONEY","MTN","AIRTELTIGO MONEY","VODAFONE CASH","GHANAPAY","YUP GHANA LIMITED")
                             .required()
                             .error(() => new Error("Valid wallet type required when is_wallet is 1")),
                         mobileCode:Joi.string()
