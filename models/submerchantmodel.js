@@ -271,7 +271,6 @@ var dbModel = {
       "s.super_merchant_id,s.id,m.id as rep_id,s.ekyc_done,s.email,m.legal_person_first_name,m.legal_person_last_name,s.onboarding_done,s.ekyc_required,s.psp_mail_send,s.status,s.live,m.register_business_country,m.type_of_business,m.company_name,m.business_phone_number,m.legal_person_email,m.company_registration_number,m.merchant_id,m.currency,m.last_updated as last_updated";
     let response;
     let qb = await pool.get_connection();
-    console.log(`inside the select submerchant ${limit.perpage}`);
     if (limit.perpage) {
       if (Object.keys(filter).length) {
         try {
@@ -294,6 +293,7 @@ var dbModel = {
               "," +
               limit.perpage
             );
+             console.log(qb.last_query());
           } else {
             response = await qb.query(
               "select " +
@@ -337,6 +337,7 @@ var dbModel = {
               "," +
               limit.perpage
             );
+             console.log(qb.last_query());
           } else {
             response = qb
               .where(condition)
@@ -349,6 +350,7 @@ var dbModel = {
               console.log(qb.last_query());
           }
         } catch (error) {
+          console.log(error);
           logger.error(500,{message: error,stack: error.stack}); 
         } finally {
           qb.release();
@@ -409,7 +411,19 @@ var dbModel = {
               " and " +
               condition2 +
               "order by s.id desc"
+
             );
+            console.log( "select " +
+              select +
+              " from " +
+              dbtable +
+              " s INNER JOIN " +
+              merchant_details +
+              " m ON  s.id=m.merchant_id where " +
+              condition +
+              " and " +
+              condition2 +
+              "order by s.id desc");
           } else {
             $sql =
               "select " +
@@ -422,17 +436,19 @@ var dbModel = {
               condition +
               " order by s.id desc";
             response = await qb.query($sql);
+            
             console.log($sql);
           }
           
         } catch (error) {
+          console.log(error);
           logger.error(500,{message: error,stack: error.stack}); 
         } finally {
           qb.release();
         }
       }
     }
-
+    
     return response;
   },
   // select: async (condition_obj,filter,limit) => {

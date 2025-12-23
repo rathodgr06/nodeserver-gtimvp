@@ -122,9 +122,6 @@ var Setting = {
               //   : req.user.id,
           }
         );
-        console.log(`here is super merchant_id`);
-        console.log(supermerchant_live);
-        console.log(req.user.id);
         const today = moment();
         if(supermerchant_live.user==0){
         mer_list = await merchantModel.sub_merchant_list({
