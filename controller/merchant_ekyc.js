@@ -184,8 +184,11 @@ var MerchantEkyc = {
             merchant_data.auth_2fa_token
           );
         }
-        console.log(`here is merchant data`);
-        console.log(merchant_data);
+        
+        let is_user = 1;
+        if(merchant_data.super_merchant_id==0){
+          is_user=0;
+        }
         // if (verification_result) {
         if (
           // verification_result ||
@@ -206,7 +209,8 @@ var MerchantEkyc = {
             user.super_merchant_id > 0 ? user.super_merchant_id : "",
             mode: user.super_merchant_id > 0 ? super_merchant_live.mode : "",
             name: user.name,
-            type: "merchant"
+            type: "merchant",
+            is_user:is_user
           };
           payload = encrypt_decrypt("encrypt", JSON.stringify(payload));
           const aToken = merchantToken(payload);

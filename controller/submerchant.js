@@ -450,7 +450,7 @@ var all_data = {
   /* Optimise list function is below */
   list: async (req, res) => {
     try {
-      console.log("🚀 ~ req:", req.body);
+      
       // 1. Extract and validate pagination parameters
       const { perpage, page } = extractPaginationParams(req);
       const limit = calculatePagination(perpage, page);
@@ -460,8 +460,9 @@ var all_data = {
 
       // 3. Build search filter
       const filter = buildSearchFilter(req.bodyString("search"));
+      console.log(`condition is like below`);
 
-      console.log(condition);
+      console.log(condition2);
 
       // 4. Fetch data and total count in parallel
       const [result, total_count] = await Promise.all([
@@ -483,6 +484,7 @@ var all_data = {
           )
         );
     } catch (error) {
+      console.log(error);
       logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
@@ -4868,7 +4870,7 @@ var all_data = {
   },
    storeList: async (req, res) => {
     try {
-      console.log("🚀 ~ req:", req.user);
+      console.log("🚀 ~ req:", req.body);
       let user_id = req.user.id;
       let allStores = false;
       let stores=[];
@@ -4892,10 +4894,13 @@ var all_data = {
       const limit = calculatePagination(perpage, page);
 
       // 2. Build conditions using helper functions
-      const { condition, condition2 } = await buildQueryConditions(req,allStores);
+      const { condition, condition2 } = await buildQueryConditionsForStoreList(req);
       if(!allStores){
         condition['s.id'] = stores;
+      }else{
+         condition['s.super_merchant_id']= req.user.id || req.user.super_merchant_id;
       }
+      
 
       // 3. Build search filter
       const filter = buildSearchFilter(req.bodyString("search"));
@@ -4922,6 +4927,7 @@ var all_data = {
           )
         );
     } catch (error) {
+      console.log(error);
       logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
@@ -4953,18 +4959,42 @@ function calculatePagination(perpage, page) {
 async function buildQueryConditions(req) {
   let condition = {};
   let condition2 = {};
+  let allStores = false;
+  let stores=[];
 
   // Base condition based on user type
   if (req.user.type === "merchant") {
+    
     const selected_merchant = await SubmerchantModel.getSelectedMerchantId(req.user.id);
     
     if (selected_merchant !== 0) {
       condition = { ["m.merchant_id"]: selected_merchant };
     } else {
-      condition = {
-        ["s.deleted"]: 0,
-        ["s.super_merchant_id"]: req.user.super_merchant_id || req.user.id,
-      };
+      if (req.user.is_user == 0) {
+        condition = {
+          ["s.deleted"]: 0,
+          ["s.super_merchant_id"]: req.user.id,
+        };
+      }else{
+         let fetchStores = await MerchantModel.selectOneSuperMerchant(
+           "stores",
+           { id: req.user.id }
+         );
+         console.log(fetchStores);
+         let storeArray = fetchStores?.stores.split(",").map((v) => v.trim());
+         console.log(storeArray);
+
+         if (storeArray.includes("All") || fetchStores?.stores == "") {
+           allStores = true;
+         } else {
+           for (let storeEncId of storeArray) {
+             let store = enc_dec.cjs_decrypt(storeEncId.trim());
+             stores.push(store);
+           }
+           req.body.stores = stores;
+         }
+        condition = { ["s.deleted"]: 0 };
+      }
     }
   } else {
     condition = { ["s.deleted"]: 0 };
@@ -4980,6 +5010,10 @@ async function buildQueryConditions(req) {
   applyStatusFilter(req, condition);
   applyStringFilter(req, condition, condition2, "company_name", "m.company_name", false);
   applyEkycStatusFilter(req, condition, condition2);
+  if(!allStores){
+        condition['s.id'] = stores;
+  }
+
   
   return { condition, condition2 };
 }
@@ -6057,4 +6091,22 @@ async function mock_alpay_payer_list(funding_type) {
    logger.error(500,{message: error,stack: error.stack}); 
     return [];
   }
+}
+async function buildQueryConditionsForStoreList(req) {
+  let condition = {};
+  let condition2 = {};
+
+
+  // Apply filters using helper functions
+  applyStringFilter(req, condition, condition2, "registration_number", "m.company_registration_number", false);
+  applyStringFilter(req, condition, condition2, "business_address", "m.register_business_country", true);
+  applyStringFilter(req, condition, condition2, "type_of_business", "m.type_of_business", true);
+  applyStringFilter(req, condition, condition2, "industry_type", "m.mcc_codes", true);
+  applyStringFilter(req, condition, condition2, "super_merchant", "s.super_merchant_id", true);
+  applyStringFilter(req, condition, condition2, "super_merchant_id", "s.super_merchant_id", false);
+  applyStatusFilter(req, condition);
+  applyStringFilter(req, condition, condition2, "company_name", "m.company_name", false);
+  applyEkycStatusFilter(req, condition, condition2);
+  
+  return { condition, condition2 };
 }
