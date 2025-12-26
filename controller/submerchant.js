@@ -3405,10 +3405,10 @@ var all_data = {
         case "Admin":
           break;
       }
-      let submerchant_id = req.bodyString("sub_merchant_id");
+      let submerchant_id = enc_dec.cjs_decrypt(req.bodyString("sub_merchant_id"))||req.bodyString("sub_merchant_id");
       let account_id = await helpers.make_sequential_no("ORD");
       let customer_type = req.bodyString("customer_type");
-      let receiver_id = req.bodyString("receiver_id");
+      let receiver_id = enc_dec.cjs_decrypt(req.bodyString("receiver_id"))||req.bodyString("receiver_id");
       let funding_source_type = req.bodyString("funding_source_type");
       let currency = req.bodyString("currency");
       let country = req.bodyString("country_iso_code");
