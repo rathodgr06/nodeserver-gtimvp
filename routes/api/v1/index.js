@@ -5050,4 +5050,5 @@ app.get(
 app.post("/merchant-droupdown-list", CheckHeader, CheckToken, merchant.dropdown_list);
 app.post("/mid-merchant-droupdown-list", CheckHeader, CheckToken, merchant.mid_dropdown_list);
 app.post("/store/list",CheckHeader,CheckMerchantToken,submerchant.storeList);
+app.post("/submerchant/list-export",CheckHeader,CheckMerchantToken,submerchant.listExport);
 module.exports = app;

@@ -365,6 +365,8 @@ const createSession = async (req, res) => {
       status: "success",
     });
   } catch (error) {
+    console.log(`the error`)
+    console.log(error?.response?.data?.error);
      logger.error(500,{message: error,stack: error.stack}); 
     let invalidMid = false;
     if (error?.response?.status == "401") {
