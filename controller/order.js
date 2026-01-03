@@ -2518,13 +2518,13 @@ async function transformTransaction(val, params, table_name) {
   const order_date = moment(val.created_at).format("YYYY-MM-DD");
 
   const [
-    _getmid,
+    // _getmid,
     trans_data,
     country,
     is_retry,
     is_cascade
   ] = await Promise.all([
-    merchantOrderModel.selectOne("*", { terminal_id: val?.terminal_id }, "mid"),
+    // merchantOrderModel.selectOne("*", { terminal_id: val?.terminal_id }, "mid"),
     helpers.get_trans_data(val?.order_id, mode),
     val?.billing_country ? helpers.get_customer_country(val.billing_country, 'country') : Promise.resolve(''),
     TransactionsModel.get_transactions_retry(val?.order_id, mode),
@@ -2554,8 +2554,8 @@ async function transformTransaction(val, params, table_name) {
     payment_id: val.payment_id,
     merchant_name: await helpers.get_merchantdetails_name_by_id(val.merchant_id),
     order_amount: val.amount.toFixed(2),
-    allowVoid: _getmid?.allowVoid == 0 ? 0 : 1,
-    allowRefunds: _getmid?.allowRefunds == 0 ? 0 : 1,
+    allowVoid: 0,//_getmid?.allowVoid == 0 ? 0 : 1,
+    allowRefunds:0, //_getmid?.allowRefunds == 0 ? 0 : 1,
     order_currency: val.currency,
     customer_name: val.customer_name,
     customer_email: val.customer_email,

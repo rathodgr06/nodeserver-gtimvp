@@ -4934,6 +4934,49 @@ var all_data = {
         .send(response.errormsg(error.message));
     }
   },
+  listExport: async (req, res) => {
+    try {
+      
+      // 1. Extract and validate pagination parameters
+      const { perpage, page } = extractPaginationParams(req);
+      const limit = calculatePagination(500, page);
+
+      // 2. Build conditions using helper functions
+      const { condition, condition2 } = await buildQueryConditions(req);
+
+      // 3. Build search filter
+      const filter = buildSearchFilter(req.bodyString("search"));
+      console.log(`condition is like below`);
+
+      console.log(condition2);
+
+      // 4. Fetch data and total count in parallel
+      const [result, total_count] = await Promise.all([
+        SubmerchantModel.select(condition, filter, limit, condition2),
+        SubmerchantModel.get_sub_merchant_count(condition, filter, condition2),
+      ]);
+
+      // 5. Process results efficiently
+      const send_res = await processResultsInParallel(result);
+
+      // 6. Send response
+      res
+        .status(statusCode.ok)
+        .send(
+          response.successdatamsg(
+            send_res,
+            "List fetched successfully.",
+            total_count
+          )
+        );
+    } catch (error) {
+      console.log(error);
+      logger.error(500, { message: error, stack: error.stack });
+      res
+        .status(statusCode.internalError)
+        .send(response.errormsg(error.message));
+    }
+  },
 };
 module.exports = all_data;
 
