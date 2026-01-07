@@ -12,6 +12,8 @@ const multipleupload_branding = require("../../../uploads/multipleupload_brandin
 const multipleupload_owners = require("../../../uploads/multipleupload_owners");
 // const multipleupload_owners_indi = require("../../../uploads/multipleupload_indi");
 const uploadCustomerProfilePic = require("../../../uploads/uploadcustomerprofile");
+const uploadBanner = require("../../../uploads/uploadBanner.js");
+
 /*Validator Imported*/
 const invoice = require("../../../controller/invoice");
 const responseImport = require("../../../controller/response_import");
@@ -205,6 +207,9 @@ const payAlPay = require("../../../controller/AlPay/Pay.js");
 const confirmAlpay = require("../../../controller/AlPay/confirm.js");
 const superMerchantLogoUpload = require("../../../uploads/merchantLogoUpload.js")
 const { apiRateLimiter } = require('../../../utilities/api-ratelimiter/index.js');
+const Banner = require("../../../controller/banner.js");
+
+
 app.post("/login", CheckHeader, Validator.login, Auth.login);
 app.post("/generate-token", async function (req, res) {
   payload = {
@@ -5051,4 +5056,14 @@ app.post("/merchant-droupdown-list", CheckHeader, CheckToken, merchant.dropdown_
 app.post("/mid-merchant-droupdown-list", CheckHeader, CheckToken, merchant.mid_dropdown_list);
 app.post("/store/list",CheckHeader,CheckMerchantToken,submerchant.storeList);
 app.post("/submerchant/list-export",CheckHeader,CheckMerchantToken,submerchant.listExport);
+
+// banner
+app.post("/banner/add", CheckHeader, CheckToken, uploadBanner, function(req,res,next){ console.log(req.body)}, Validator.banner_add, Banner.add);
+app.post("/banner/list", CheckHeader, CheckToken, Banner.list);
+app.post("/banner/details", CheckHeader, CheckToken, Validator.banner_details, Banner.details);
+app.post("/banner/update", CheckHeader, CheckToken, uploadBanner, Validator.banner_update, Banner.update);
+app.post("/banner/delete", CheckHeader, CheckToken, Validator.banner_delete, Banner.delete);
+app.post( "/banner/change-status", CheckHeader, CheckToken, Validator.banner_change_status, Banner.changeStatus);
+
+
 module.exports = app;

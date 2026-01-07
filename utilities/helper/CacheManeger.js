@@ -7,7 +7,7 @@ const port = process.env.SERVER_PORT;
 const DBRun = require("../../models/DBRun");
 const fs = require("fs");
 const enc_dec = require("../../utilities/decryptor/decryptor");
-const logger = require('../../config/logger');
+const logger = require("../../config/logger");
 
 const AppCache = require("./AppCache");
 const KEY_ALL_LANGUAGE_LIST = "key_all_lang_list";
@@ -44,7 +44,7 @@ let nodeCache = {
         }
       } catch (error) {
         console.error("Error reading file:", error.message);
-        logger.error(500,{message: error,stack: error?.stack});
+        logger.error(500, { message: error, stack: error?.stack });
       }
 
       let langData = {
@@ -100,6 +100,26 @@ let nodeCache = {
   },
   del: async (key) => {
     await AppCache.del(key);
+  },
+
+  /**
+   *
+   * @param {*} slug
+   * @returns Get active banner by slug
+   */
+  getActiveBannerBySlug: async (slug) => {
+    const search_condition = {
+      slug,
+      status: "Active",
+    };
+
+    const list = await DBRun.exec_condition(
+      "id, page_name, slug, file_name, status",
+      search_condition,
+      config.table_prefix + "banners"
+    );
+
+    return Array.isArray(list) && list.length > 0 ? list[0] : {};
   },
 };
 

@@ -18,7 +18,7 @@ const getLimitData = require("../../utilities/validations/getLimitData");
 const checkifrecordexistandexpiration = require("../../utilities/validations/checkifrecordexistandexpiration");
 const checkifaccountblock = require("./checkifaccountblock");
 const checkifadminaccountblock = require("./checkifadminaccountblock");
-const logger = require('../../config/logger');
+const logger = require("../../config/logger");
 
 const Validator = {
   login: async (req, res, next) => {
@@ -73,7 +73,7 @@ const Validator = {
           }
         }
       } catch (error) {
-          logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -108,7 +108,7 @@ const Validator = {
           next();
         }
       } catch (error) {
-        logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -162,7 +162,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -273,7 +273,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -512,7 +512,7 @@ const Validator = {
         }
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       console.log(error);
       res
         .status(StatusCode.badRequest)
@@ -552,7 +552,7 @@ const Validator = {
         }
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -593,7 +593,7 @@ const Validator = {
         }
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -632,7 +632,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -911,7 +911,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -956,7 +956,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1001,7 +1001,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1042,7 +1042,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1087,7 +1087,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1132,7 +1132,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1168,7 +1168,7 @@ const Validator = {
           next();
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1222,7 +1222,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1267,7 +1267,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1337,7 +1337,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1382,7 +1382,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1427,7 +1427,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1468,7 +1468,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1515,7 +1515,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1559,7 +1559,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1622,7 +1622,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1667,7 +1667,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1712,7 +1712,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1753,7 +1753,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1815,7 +1815,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1859,7 +1859,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1937,7 +1937,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -1946,8 +1946,8 @@ const Validator = {
       res.status(StatusCode.badRequest).send(ServerResponse.badRequest);
     }
   },
-   fetchBumpUpRate: async (req, res, next) => {
-    if (checkEmpty(req.body, ["currency",])) {
+  fetchBumpUpRate: async (req, res, next) => {
+    if (checkEmpty(req.body, ["currency"])) {
       const schema = Joi.object().keys({
         currency: Joi.string()
           .currency()
@@ -1970,7 +1970,7 @@ const Validator = {
           next();
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -2015,7 +2015,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -2060,7 +2060,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -2101,7 +2101,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -2150,7 +2150,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -2194,7 +2194,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -2259,7 +2259,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -2306,7 +2306,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -2353,7 +2353,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -2396,7 +2396,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -2450,7 +2450,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -2493,7 +2493,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -2562,7 +2562,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -2668,14 +2668,14 @@ const Validator = {
                   record_exist
                     ? "Country already exist."
                     : country_code_exist
-                      ? "Country code already exist."
-                      : ""
+                    ? "Country code already exist."
+                    : ""
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -2720,7 +2720,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -2837,16 +2837,16 @@ const Validator = {
                   !record_exist
                     ? "Record not found"
                     : country_name
-                      ? "Country name already exist."
-                      : country_code
-                        ? "Country code already exist."
-                        : ""
+                    ? "Country name already exist."
+                    : country_code
+                    ? "Country code already exist."
+                    : ""
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -2891,7 +2891,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -2936,7 +2936,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -2977,7 +2977,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -3082,14 +3082,14 @@ const Validator = {
                   record_exist
                     ? "Country already exist."
                     : country_code_exist
-                      ? "Country code already exist."
-                      : ""
+                    ? "Country code already exist."
+                    : ""
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -3134,7 +3134,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -3251,16 +3251,16 @@ const Validator = {
                   !record_exist
                     ? "Record not found"
                     : country_name
-                      ? "Country name already exist."
-                      : country_code
-                        ? "Country code already exist."
-                        : ""
+                    ? "Country name already exist."
+                    : country_code
+                    ? "Country code already exist."
+                    : ""
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -3305,7 +3305,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -3350,7 +3350,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -3391,7 +3391,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -3504,14 +3504,14 @@ const Validator = {
                   record_exist
                     ? "Country already exist."
                     : country_code_exist
-                      ? "Country code already exist."
-                      : ""
+                    ? "Country code already exist."
+                    : ""
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -3556,7 +3556,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -3680,16 +3680,16 @@ const Validator = {
                   !record_exist
                     ? "Record not found"
                     : country_name
-                      ? "Country name already exist."
-                      : country_code
-                        ? "Country code already exist."
-                        : ""
+                    ? "Country name already exist."
+                    : country_code
+                    ? "Country code already exist."
+                    : ""
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -3734,7 +3734,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -3779,7 +3779,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -3820,7 +3820,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -3899,16 +3899,16 @@ const Validator = {
                   !country_exist
                     ? "Country not found."
                     : record_exist
-                      ? "State already exist."
-                      : state_code_exist
-                        ? "State code already exist."
-                        : ""
+                    ? "State already exist."
+                    : state_code_exist
+                    ? "State code already exist."
+                    : ""
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -4009,7 +4009,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         console.log(error);
         return res
           .status(StatusCode.badRequest)
@@ -4055,7 +4055,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -4144,16 +4144,16 @@ const Validator = {
                   state_name
                     ? "state name already exist."
                     : state_code
-                      ? "state code already exist."
-                      : !record_exist
-                        ? "Record not found"
-                        : ""
+                    ? "state code already exist."
+                    : !record_exist
+                    ? "Record not found"
+                    : ""
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -4198,7 +4198,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -4243,7 +4243,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -4284,7 +4284,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -4365,16 +4365,16 @@ const Validator = {
                   !country_exist
                     ? "Country not found."
                     : !state_exist
-                      ? "State not found."
-                      : record_exist
-                        ? "Record already exist."
-                        : ""
+                    ? "State not found."
+                    : record_exist
+                    ? "Record already exist."
+                    : ""
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -4480,14 +4480,14 @@ const Validator = {
                   !country_exist
                     ? "Country not found"
                     : !state_exist
-                      ? "State not found"
-                      : ""
+                    ? "State not found"
+                    : ""
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -4532,7 +4532,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -4617,18 +4617,18 @@ const Validator = {
                   !country_exist
                     ? "Country not found."
                     : !state_exist
-                      ? "State not found."
-                      : city_name
-                        ? "City name already exist."
-                        : !record_exist
-                          ? "Record not found"
-                          : ""
+                    ? "State not found."
+                    : city_name
+                    ? "City name already exist."
+                    : !record_exist
+                    ? "Record not found"
+                    : ""
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -4673,7 +4673,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -4718,7 +4718,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -4759,7 +4759,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -4867,14 +4867,14 @@ const Validator = {
                   language_exist
                     ? "Language already exist."
                     : error
-                      ? error
-                      : "Error in data."
+                    ? error
+                    : "Error in data."
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -4917,7 +4917,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -5024,7 +5024,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -5070,7 +5070,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -5115,7 +5115,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -5156,7 +5156,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -5191,7 +5191,7 @@ const Validator = {
           next();
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -5379,18 +5379,18 @@ const Validator = {
                   email_exist
                     ? "Email already exist."
                     : mobile_exist
-                      ? "Mobile already exist."
-                      : username_exist
-                        ? "Username already exist."
-                        : error
-                          ? error
-                          : "Error in data"
+                    ? "Mobile already exist."
+                    : username_exist
+                    ? "Username already exist."
+                    : error
+                    ? error
+                    : "Error in data"
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -5435,7 +5435,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -5645,18 +5645,18 @@ const Validator = {
                   !user_exist
                     ? "Record not found."
                     : email_exist
-                      ? "Email already exist."
-                      : mobile_exist
-                        ? "Mobile already exist."
-                        : username_exist
-                          ? "Username already exist."
-                          : "Error in data"
+                    ? "Email already exist."
+                    : mobile_exist
+                    ? "Mobile already exist."
+                    : username_exist
+                    ? "Username already exist."
+                    : "Error in data"
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -5701,7 +5701,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -5746,7 +5746,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -5787,7 +5787,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -5832,7 +5832,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -5877,7 +5877,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -5917,7 +5917,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -6158,7 +6158,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -6236,7 +6236,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -6369,7 +6369,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -6445,7 +6445,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -6657,20 +6657,20 @@ const Validator = {
                   email_exist
                     ? "Email already exist."
                     : mobile_exist
-                      ? "Mobile already exist."
-                      : username_exist
-                        ? "Username already exist."
-                        : api_key_exist
-                          ? "API key already exist."
-                          : error
-                            ? error
-                            : "Error in data"
+                    ? "Mobile already exist."
+                    : username_exist
+                    ? "Username already exist."
+                    : api_key_exist
+                    ? "API key already exist."
+                    : error
+                    ? error
+                    : "Error in data"
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -6715,7 +6715,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -6955,20 +6955,20 @@ const Validator = {
                   !user_exist
                     ? "Record not found."
                     : email_exist
-                      ? "Email already exist."
-                      : mobile_exist
-                        ? "Mobile already exist."
-                        : username_exist
-                          ? "Username already exist."
-                          : api_key_exist
-                            ? "API key already exist."
-                            : "Error in data"
+                    ? "Email already exist."
+                    : mobile_exist
+                    ? "Mobile already exist."
+                    : username_exist
+                    ? "Username already exist."
+                    : api_key_exist
+                    ? "API key already exist."
+                    : "Error in data"
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -7013,7 +7013,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -7058,7 +7058,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -7099,7 +7099,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -7144,7 +7144,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -7189,7 +7189,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -7304,7 +7304,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -7407,7 +7407,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -7424,21 +7424,33 @@ const Validator = {
         .error(() => {
           return new Error("Valid sub-merchant ID required");
         }),
-      env: Joi.string().required().error(() => {
-        return new Error("Environment type required");
-      }),
-      card_payment: Joi.string().allow("").required().error(() => {
-        return new Error("Card Payment required");
-      }),
-      stored_card: Joi.string().allow("").required().error(() => {
-        return new Error("Stored card type required");
-      }),
-      payment_methods: Joi.string().required().error(() => {
-        return new Error("Payment method required");
-      }),
-      show: Joi.string().required().error(() => {
-        return new Error("Show fields required");
-      }),
+      env: Joi.string()
+        .required()
+        .error(() => {
+          return new Error("Environment type required");
+        }),
+      card_payment: Joi.string()
+        .allow("")
+        .required()
+        .error(() => {
+          return new Error("Card Payment required");
+        }),
+      stored_card: Joi.string()
+        .allow("")
+        .required()
+        .error(() => {
+          return new Error("Stored card type required");
+        }),
+      payment_methods: Joi.string()
+        .required()
+        .error(() => {
+          return new Error("Payment method required");
+        }),
+      show: Joi.string()
+        .required()
+        .error(() => {
+          return new Error("Show fields required");
+        }),
     });
 
     try {
@@ -7467,7 +7479,7 @@ const Validator = {
         }
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -7546,7 +7558,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -7587,7 +7599,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -7619,7 +7631,7 @@ const Validator = {
           next();
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -7662,7 +7674,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -7705,7 +7717,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -7760,7 +7772,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -7820,14 +7832,14 @@ const Validator = {
                   !details_exist
                     ? "Record not found."
                     : error
-                      ? error
-                      : "Error in data"
+                    ? error
+                    : "Error in data"
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -7872,7 +7884,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -7917,7 +7929,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -7958,7 +7970,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8003,7 +8015,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8048,7 +8060,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8149,7 +8161,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8195,7 +8207,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8242,7 +8254,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8318,7 +8330,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8381,7 +8393,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8426,7 +8438,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8471,7 +8483,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8512,7 +8524,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8561,7 +8573,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8605,7 +8617,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8668,7 +8680,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8713,7 +8725,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8758,7 +8770,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8799,7 +8811,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8859,7 +8871,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8903,7 +8915,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -8977,7 +8989,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -9022,7 +9034,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -9067,7 +9079,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -9108,7 +9120,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -9152,7 +9164,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -9196,7 +9208,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -9259,7 +9271,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -9304,7 +9316,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -9349,7 +9361,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -9390,7 +9402,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -9442,7 +9454,7 @@ const Validator = {
             .send(ServerResponse.validationResponse(error));
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -9476,7 +9488,7 @@ const Validator = {
         next();
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -9535,7 +9547,7 @@ const Validator = {
         }
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -9585,7 +9597,7 @@ const Validator = {
         }
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -9650,7 +9662,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -9695,7 +9707,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -9768,7 +9780,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -9810,7 +9822,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -9849,7 +9861,7 @@ const Validator = {
         next();
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -9896,7 +9908,7 @@ const Validator = {
         next();
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -9956,14 +9968,14 @@ const Validator = {
                   record_exist
                     ? "Nationality already exist."
                     : nationality_code_exist
-                      ? "Nationality code already exist."
-                      : ""
+                    ? "Nationality code already exist."
+                    : ""
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error.message));
@@ -10008,7 +10020,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error.message));
@@ -10084,16 +10096,16 @@ const Validator = {
                   !record_exist
                     ? "Record not found"
                     : nationality
-                      ? "Nationality already exist."
-                      : nationality_code
-                        ? "Nationality code already exist."
-                        : ""
+                    ? "Nationality already exist."
+                    : nationality_code
+                    ? "Nationality code already exist."
+                    : ""
                 )
               );
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error.message));
@@ -10138,7 +10150,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -10183,7 +10195,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -10224,7 +10236,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error.message));
@@ -10266,7 +10278,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -10311,7 +10323,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -10378,7 +10390,7 @@ const Validator = {
         }
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -10413,7 +10425,7 @@ const Validator = {
         }
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -10421,7 +10433,7 @@ const Validator = {
   },
   document_update: async (req, res, next) => {
     const schema = Joi.object().keys({
-       country: Joi.string()
+      country: Joi.string()
         .required()
         .error(() => {
           return new Error("Country required");
@@ -10478,7 +10490,7 @@ const Validator = {
         }
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -10516,7 +10528,7 @@ const Validator = {
         }
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -10555,7 +10567,7 @@ const Validator = {
         }
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -10588,7 +10600,7 @@ const Validator = {
     delete reqBody.is_mobile;
     req.body = reqBody;
     let schema = {};
-    if (is_mobile==1) {
+    if (is_mobile == 1) {
       console.log(`inside the mobile 1`);
       schema = Joi.object().keys({
         username: Joi.string()
@@ -10607,7 +10619,8 @@ const Validator = {
             return new Error("Password not valid/not supplied");
           }),
         mid_primary_key: Joi.string()
-          .allow("").optional()
+          .allow("")
+          .optional()
           .error(() => {
             return new Error("Mid Primary Key valid/not supplied");
           }),
@@ -10621,12 +10634,12 @@ const Validator = {
           .error(() => {
             return new Error("Currency not valid/not supplied");
           }),
-         supported_currency: Joi.string()
-          .allow('')
+        supported_currency: Joi.string()
+          .allow("")
           .optional()
           .error(() => {
             return new Error("Supported Currency not valid/not supplied");
-          }),  
+          }),
         mode: Joi.string()
           .required()
           .error(() => {
@@ -10709,7 +10722,9 @@ const Validator = {
           .min(0)
           .required()
           .error(
-            new Error("Auto capture within time must be a non-negative integer.")
+            new Error(
+              "Auto capture within time must be a non-negative integer."
+            )
           ),
         minTxnAmount: Joi.number()
           .positive()
@@ -10762,12 +10777,12 @@ const Validator = {
           .error(() => {
             return new Error("Currency not valid/not supplied");
           }),
-          supported_currency: Joi.string()
-          .allow('')
+        supported_currency: Joi.string()
+          .allow("")
           .optional()
           .error(() => {
             return new Error("Supported Currency not valid/not supplied");
-          }),    
+          }),
         mode: Joi.string()
           .required()
           .error(() => {
@@ -10865,7 +10880,9 @@ const Validator = {
           .min(0)
           .required()
           .error(
-            new Error("Auto capture within time must be a non-negative integer.")
+            new Error(
+              "Auto capture within time must be a non-negative integer."
+            )
           ),
         minTxnAmount: Joi.number()
           .positive()
@@ -10929,7 +10946,7 @@ const Validator = {
         next();
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -10943,7 +10960,7 @@ const Validator = {
     delete reqBody.is_mobile;
     req.body = reqBody;
     let schema = {};
-    if (is_mobile==1) {
+    if (is_mobile == 1) {
       schema = Joi.object().keys({
         mid_id: Joi.string()
           .required()
@@ -10966,7 +10983,8 @@ const Validator = {
             return new Error("Password not valid/not supplied");
           }),
         mid_primary_key: Joi.string()
-          .allow("").optional()
+          .allow("")
+          .optional()
           .error(() => {
             return new Error("Mid Primary Key valid/not supplied");
           }),
@@ -10980,12 +10998,12 @@ const Validator = {
           .error(() => {
             return new Error("Currency not valid/not supplied");
           }),
-         supported_currency: Joi.string()
-          .allow('')
+        supported_currency: Joi.string()
+          .allow("")
           .optional()
           .error(() => {
             return new Error("Supported Currency not valid/not supplied");
-          }),      
+          }),
         mode: Joi.string()
           .required()
           .error(() => {
@@ -11066,7 +11084,9 @@ const Validator = {
           .min(0)
           .required()
           .error(
-            new Error("Auto capture within time must be a non-negative integer.")
+            new Error(
+              "Auto capture within time must be a non-negative integer."
+            )
           ),
         minTxnAmount: Joi.number()
           .positive()
@@ -11122,12 +11142,12 @@ const Validator = {
           .error(() => {
             return new Error("Currency not valid/not supplied");
           }),
-         supported_currency: Joi.string()
-          .allow('')
+        supported_currency: Joi.string()
+          .allow("")
           .optional()
           .error(() => {
             return new Error("Supported Currency not valid/not supplied");
-          }),      
+          }),
         mode: Joi.string()
           .required()
           .error(() => {
@@ -11223,7 +11243,9 @@ const Validator = {
           .min(0)
           .required()
           .error(
-            new Error("Auto capture within time must be a non-negative integer.")
+            new Error(
+              "Auto capture within time must be a non-negative integer."
+            )
           ),
         minTxnAmount: Joi.number()
           .positive()
@@ -11297,7 +11319,7 @@ const Validator = {
         }
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -11349,7 +11371,7 @@ const Validator = {
         }
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -11392,7 +11414,7 @@ const Validator = {
         }
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -11435,7 +11457,7 @@ const Validator = {
         }
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -11491,7 +11513,7 @@ const Validator = {
         next();
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error.message));
@@ -11516,7 +11538,7 @@ const Validator = {
         next();
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error.message));
@@ -11574,7 +11596,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -11620,7 +11642,7 @@ const Validator = {
         }
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -11650,7 +11672,7 @@ const Validator = {
         next();
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -11674,7 +11696,7 @@ const Validator = {
         next();
       }
     } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       return res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error?.message));
@@ -11710,7 +11732,7 @@ const Validator = {
           next();
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -11755,7 +11777,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -11800,7 +11822,7 @@ const Validator = {
           }
         }
       } catch (error) {
-    logger.error(400,{message: error,stack: error?.stack});
+        logger.error(400, { message: error, stack: error?.stack });
         res
           .status(StatusCode.badRequest)
           .send(ServerResponse.validationResponse(error));
@@ -11823,6 +11845,219 @@ const Validator = {
         }),
     });
 
+    next();
+  },
+
+  // Banner
+  banner_add: async (req, res, next) => {
+    if (checkEmpty(req.body, ["page_name", "slug"])) {
+      try {
+        const page_name = req.bodyString("page_name");
+        const slug = req.bodyString("slug");
+        const status = req.bodyString("status");
+
+        if (!page_name || page_name.length < 2 || page_name.length > 200) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(
+              ServerResponse.validationResponse(
+                "Page name must be between 2 and 200 characters"
+              )
+            );
+        }
+
+        if (!slug || slug.length < 2 || slug.length > 200) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(
+              ServerResponse.validationResponse(
+                "Slug must be between 2 and 200 characters"
+              )
+            );
+        }
+
+        if (!banner_type || banner_type.length < 2 || banner_type.length > 100) {
+          return res
+        }
+        if (status && !["Active", "Inactive"].includes(status)) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(ServerResponse.validationResponse("Invalid status value"));
+        }
+
+        if (!req.all_files || !req.all_files.banner_image) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(
+              ServerResponse.validationResponse("Banner image is required")
+            );
+        }
+
+        const rec_exist = await checkifrecordexist({ slug }, "banners");
+        if (rec_exist) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(ServerResponse.validationResponse("Slug already exists"));
+        }
+
+        next();
+      } catch (error) {
+        console.log("xsdghfdgdfvdhvj",error);
+        logger.error(400, { message: error, stack: error?.stack });
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse(error));
+      }
+    } else {
+      return res.status(StatusCode.badRequest).send(ServerResponse.badRequest);
+    }
+  },
+
+  banner_details: async (req, res, next) => {
+    if (checkEmpty(req.body, ["banner_id"])) {
+      const schema = Joi.object({
+        banner_id: Joi.string().min(2).max(300).required(),
+      });
+
+      try {
+        const { error } = schema.validate(req.body);
+        if (error) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(ServerResponse.validationResponse(error.message));
+        }
+
+        const banner_id = enc_dec.cjs_decrypt(req.bodyString("banner_id"));
+
+        const record_exist = await checkifrecordexist(
+          { id: banner_id },
+          "banners"
+        );
+
+        if (!record_exist) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(ServerResponse.validationResponse("Record not found."));
+        }
+
+        next();
+      } catch (err) {
+        logger.error(400, { message: err.message, stack: err.stack });
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse(err.message));
+      }
+    } else {
+      return res.status(StatusCode.badRequest).send(ServerResponse.badRequest);
+    }
+  },
+
+  banner_update: async (req, res, next) => {
+    if (
+      checkEmpty(req.body, [
+        "banner_id",
+        "page_name",
+        "slug",
+        "file_name",
+        "status",
+      ])
+    ) {
+      const schema = Joi.object({
+        banner_id: Joi.string().min(2).max(300).required(),
+        page_name: Joi.string().min(2).max(200).required(),
+        slug: Joi.string().min(2).max(200).required(),
+        file_name: Joi.string().min(2).max(200).required(),
+        status: Joi.string().valid("Active", "Inactive").required(),
+      });
+
+      try {
+        const { error } = schema.validate(req.body);
+        if (error) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(ServerResponse.validationResponse(error.message));
+        }
+
+        const record_id = enc_dec.cjs_decrypt(req.bodyString("banner_id"));
+
+        const record_exist = await checkifrecordexist(
+          { id: record_id },
+          "banners"
+        );
+
+        if (!record_exist) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(ServerResponse.validationResponse("Record not found."));
+        }
+
+        const slug_exist = await checkifrecordexist(
+          { slug: req.bodyString("slug"), "id !=": record_id },
+          "banners"
+        );
+
+        if (slug_exist) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(ServerResponse.validationResponse("Slug already exists."));
+        }
+
+        next();
+      } catch (err) {
+        logger.error(400, { message: err.message, stack: err.stack });
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse(err.message));
+      }
+    } else {
+      return res.status(StatusCode.badRequest).send(ServerResponse.badRequest);
+    }
+  },
+
+  banner_delete: async (req, res, next) => {
+    if (checkEmpty(req.body, ["banner_id"])) {
+      const schema = Joi.object({
+        banner_id: Joi.string().min(2).max(300).required(),
+      });
+
+      try {
+        const { error } = schema.validate(req.body);
+        if (error) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(ServerResponse.validationResponse(error.message));
+        }
+
+        const banner_id = enc_dec.cjs_decrypt(req.bodyString("banner_id"));
+
+        const record_exist = await checkifrecordexist(
+          { id: banner_id },
+          "banners"
+        );
+
+        if (!record_exist) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(ServerResponse.validationResponse("Record not found."));
+        }
+
+        next();
+      } catch (err) {
+        logger.error(400, { message: err.message, stack: err.stack });
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse(err.message));
+      }
+    } else {
+      return res.status(StatusCode.badRequest).send(ServerResponse.badRequest);
+    }
+  },
+  banner_change_status: (req, res, next) => {
+    if (!req.body.banner_id || !req.body.status) {
+      return res
+        .status(statusCode.badRequest)
+        .send(response.errormsg("banner_id and status are required"));
+    }
     next();
   },
 };
