@@ -5074,7 +5074,7 @@ app.post("/mail-template/update", CheckHeader, CheckToken, Validator.mail_templa
 app.post("/mail-template/delete", CheckHeader, CheckToken, Validator.mail_template_delete, MailTemplate.delete);
 app.post("/mail-template/change-status", CheckHeader, CheckToken, Validator.mail_template_change_status, MailTemplate.changeStatus);
 
-/* const apiDocument = require("../../../controller/ApiDocument.js");
+const apiDocument = require("../../../controller/ApiDocument.js");
 const uploadApiDoc = require("../../../uploads/uploadApiDoc.js");
 
 
@@ -5084,5 +5084,5 @@ app.post("/api-documentation/list", CheckHeader, CheckToken, apiDocument.list);
 app.post("/api-documentation/details", CheckHeader, CheckToken, apiDocument.details);
 app.post("/api-documentation/update", CheckHeader, CheckToken, uploadApiDoc, Validator.api_document_update, apiDocument.update);
 app.post("/api-documentation/delete", CheckHeader, CheckToken, apiDocument.delete);
-app.post("/api-documentation/change-status", CheckHeader, CheckToken, apiDocument.changeStatus); */
+app.post("/api-documentation/change-status", CheckHeader, CheckToken, apiDocument.changeStatus);
 module.exports = app;

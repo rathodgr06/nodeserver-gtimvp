@@ -287,16 +287,16 @@ var Setting = {
           name: user_details.name
             ? user_details.name
             : mer_details.company_name
-            ? mer_details.company_name
-            : user_details.legal_business_name,
+              ? mer_details.company_name
+              : user_details.legal_business_name,
           roles: user_details.role,
           avatar: image_path + "default.jpg",
           mode:
             user_details.super_merchant_id == 0
               ? mer_details.mode
               : await helpers.main_super_merchant_mode({
-                  super_merchant_id: req.user.super_merchant_id,
-                }),
+                super_merchant_id: req.user.super_merchant_id,
+              }),
           live: supermerchant_live.live,
           isLiveMode: isLiveMode,
           allow_mid: allowMid,
@@ -317,11 +317,11 @@ var Setting = {
           submerchant_name:
             user_details.selected_submerchant != 0
               ? (await helpers.get_submerchant_name_by_id(
-                  user_details.selected_submerchant
-                ))
+                user_details.selected_submerchant
+              ))
                 ? await helpers.get_submerchant_name_by_id(
-                    user_details.selected_submerchant
-                  )
+                  user_details.selected_submerchant
+                )
                 : user_details.legal_business_name
               : "All",
           user: user_details.super_merchant_id > 0 ? "user" : "super_merchant",
@@ -381,11 +381,11 @@ var Setting = {
       let image_path = process.env.STATIC_URL + "/static/images/";
       let company_details;
       //if (req.user.type == "partner") {
-        //company_details = await helpers.company_details({
-        //  partner_id: req.user.id,
-        //});
+      //company_details = await helpers.company_details({
+      //  partner_id: req.user.id,
+      //});
       //} else {
-        company_details = await helpers.company_details({ id: 1 });
+      company_details = await helpers.company_details({ id: 1 });
       //}
 
       var data = {
@@ -399,8 +399,8 @@ var Setting = {
           : "",
         country_name: company_details.company_country
           ? await helpers.get_country_name_by_id(
-              company_details.company_country
-            )
+            company_details.company_country
+          )
           : "",
         state_id: company_details.company_state
           ? await enc_dec.cjs_encrypt(company_details.company_state)
@@ -441,8 +441,8 @@ var Setting = {
         ),
         currency_name: company_details.company_currency
           ? await helpers.get_currency_name_by_id(
-              company_details.company_currency
-            )
+            company_details.company_currency
+          )
           : "",
         batch_size: company_details.batch_size,
         android_link: company_details.android_link,
@@ -687,8 +687,6 @@ var Setting = {
       //   console.log("🚀 ~ login_info: ~ language2:", language);
       // }
 
-      //------------------------------------------------------------------------
-
       let storedLanguageList = await nodeCache.getAllLanguageList();
       let language_list = [];
       let i = 0;
@@ -703,7 +701,6 @@ var Setting = {
         i++;
       }
 
-      //------------------------------------------------------------------------
 
       let language_id = 1;
       if (req.body.language_id) {
@@ -712,7 +709,6 @@ var Setting = {
       language_id = enc_dec.cjs_encrypt(language_id + "");
       let language = await nodeCache.getActiveLanguageById(language_id);
 
-      //------------------------------------------------------------------------
 
       // banner
       const slug = req.body.slug;
@@ -731,7 +727,13 @@ var Setting = {
             : "",
         };
       } else {
-        console.log("⚠️ No active banner found for slug");
+        banner = {
+          banner_id: null,
+          page_name: null,
+          slug: null,
+          status: 0,
+          image: "https://placehold.co/500X400",
+        };
       }
 
       var data = {

@@ -12360,7 +12360,7 @@ const Validator = {
 
     next();
   },
-  /* api_document_add: async (req, res, next) => {
+  api_document_add: async (req, res, next) => {
     console.log("Validator: api_document_add called", req.body);
     if (!checkEmpty(req.body, ["name", "title"])) {
       console.log("Validator: checkEmpty failed for name or title");
@@ -12524,7 +12524,7 @@ const Validator = {
           )
         );
     }
-  }, */
+  },
 };
 
 module.exports = Validator;
