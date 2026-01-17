@@ -874,33 +874,30 @@ let helpers = {
 
     return output_string1;
   },
-get_and_conditional_string: async (obj) => {
-  let conditions = [];
+  get_and_conditional_string: async (obj) => {
+    let conditions = [];
 
-  for (let key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      const value = obj[key];
+    for (let key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        const value = obj[key];
 
-      // If value is an array → use IN clause
-      if (Array.isArray(value)) {
-        if (value.length > 0) {
-          const inValues = value
-            .map(v => `'${v}'`)
-            .join(',');
-          conditions.push(`${key} IN (${inValues})`);
+        // If value is an array → use IN clause
+        if (Array.isArray(value)) {
+          if (value.length > 0) {
+            const inValues = value.map((v) => `'${v}'`).join(",");
+            conditions.push(`${key} IN (${inValues})`);
+          }
         }
-      } 
-      // Normal value → use =
-      else {
-        conditions.push(`${key} = '${value}'`);
+        // Normal value → use =
+        else {
+          conditions.push(`${key} = '${value}'`);
+        }
       }
     }
-  }
 
-  // Join with AND
-  return conditions.join(' AND ');
-},
-
+    // Join with AND
+    return conditions.join(" AND ");
+  },
 
   get_and_conditional_string_in: async (obj) => {
     var output_string = "";
@@ -6926,7 +6923,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
           status_code: "99",
         },
       },
-      "MTN":{
+      MTN: {
         CREATED: {
           status: "PENDING",
           order_status: "PENDING",
@@ -6956,7 +6953,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
           status_code: "01",
         },
       },
-      "Orange":{
+      Orange: {
         TI: {
           status: "PENDING",
           order_status: "PENDING",
@@ -7011,13 +7008,13 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
   normalizeId: (value) => {
     return value == null || value === "" || isNaN(value) ? 0 : value;
   },
-  fetchDccStatus: async() => {
-     let qb = await pool.get_connection();
+  fetchDccStatus: async () => {
+    let qb = await pool.get_connection();
     let response;
     try {
       response = await qb
         .select("dcc_enabled")
-        .where({ id: 1})
+        .where({ id: 1 })
         .get("pg_dcc_setup");
     } catch (error) {
       console.error("Database query failed:", error);
@@ -7026,18 +7023,21 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       qb.release();
     }
     if (response?.[0]) {
-      return response?.[0]?.dcc_enabled==1?true:false ;
+      return response?.[0]?.dcc_enabled == 1 ? true : false;
     } else {
       return false;
     }
   },
-  haveAccesstoSuperStore:async(store_id,super_merchant_id)=>{
-      let qb = await pool.get_connection();
+  haveAccesstoSuperStore: async (store_id, super_merchant_id) => {
+    let qb = await pool.get_connection();
     let response;
     try {
-      response = await qb.query(`SELECT id FROM pg_master_super_merchant WHERE id=${super_merchant_id} AND FIND_IN_SET('${store_id}', stores) > 0`);
-      console.log(`SELECT id FROM pg_master_super_merchant WHERE id=${super_merchant_id} AND FIND_IN_SET('${store_id}', stores) > 0`);
-       
+      response = await qb.query(
+        `SELECT id FROM pg_master_super_merchant WHERE id=${super_merchant_id} AND FIND_IN_SET('${store_id}', stores) > 0`
+      );
+      console.log(
+        `SELECT id FROM pg_master_super_merchant WHERE id=${super_merchant_id} AND FIND_IN_SET('${store_id}', stores) > 0`
+      );
     } catch (error) {
       console.error("Database query failed:", error);
       logger.error(500, { message: error, stack: error?.stack });
@@ -7045,17 +7045,18 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       qb.release();
     }
     if (response?.[0]) {
-      return response?.[0]?.id?true:false ;
+      return response?.[0]?.id ? true : false;
     } else {
       return false;
     }
   },
-  checkAllowMidOnSuperMerchant:async(super_merchant_id)=>{
-      let qb = await pool.get_connection();
+  checkAllowMidOnSuperMerchant: async (super_merchant_id) => {
+    let qb = await pool.get_connection();
     let response;
     try {
-      response = await qb.query(`SELECT allow_mid FROM pg_master_super_merchant WHERE id=${super_merchant_id}`);
-       
+      response = await qb.query(
+        `SELECT allow_mid FROM pg_master_super_merchant WHERE id=${super_merchant_id}`
+      );
     } catch (error) {
       console.error("Database query failed:", error);
       logger.error(500, { message: error, stack: error?.stack });
@@ -7063,12 +7064,36 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       qb.release();
     }
     if (response?.[0]) {
-      return response?.[0]?.allow_mid ;
+      return response?.[0]?.allow_mid;
     } else {
       return 0;
     }
-  }
-
+  },
+  sanitizeDescriptor: (value) => {
+    return value
+      .toUpperCase()
+      .replace(/[^A-Z0-9* ]/g, "")
+      .substring(0, 21);
+  },
+  checkAllowDescriptorOnMerchant: async (merchant_id) => {
+    let qb = await pool.get_connection();
+    let response;
+    try {
+      response = await qb.query(
+        `SELECT allow_statement_descriptor FROM pg_master_merchant WHERE id=${merchant_id}`
+      );
+    } catch (error) {
+      console.error("Database query failed:", error);
+      logger.error(500, { message: error, stack: error?.stack });
+    } finally {
+      qb.release();
+    }
+    if (response?.[0]) {
+      return response?.[0]?.allow_statement_descriptor;
+    } else {
+      return 1;
+    }
+  },
 };
 
 module.exports = helpers;

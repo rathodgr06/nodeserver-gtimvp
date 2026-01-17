@@ -116,7 +116,7 @@ var Setting = {
         supermerchant_live = await merchantModel.selectOneSuperMerchant(
           "live,allow_mid,super_merchant_id,name,stores,selected_submerchant,user",
           {
-            id: req.user.id
+            id: supermerchant_live.user==0 ? req.user.id :user_details.super_merchant_id
               // user_details.super_merchant_id > 0
               //   ? req.user.super_merchant_id
               //   : req.user.id,

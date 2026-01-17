@@ -39,11 +39,13 @@ class TerminalControllerClass {
       let midquery;
        let dcc_enabled = await helpers.fetchDccStatus();
       if(dcc_enabled){
-         midquery = `SELECT md.* , mc.code , mc.currency  FROM pg_mid md INNER JOIN pg_master_currency mc ON mc.id = md.currency_id WHERE md.submerchant_id = '${parseInt(order_details.merchant_id)}'   AND  md.status = 0 AND md.deleted = 0 AND md.env ='${payment_mode}' AND FIND_IN_SET('${card_type}', md.payment_schemes) AND FIND_IN_SET('${card_dc}',md.payment_methods) AND  (mc.code = '${order_details?.currency}' OR FIND_IN_SET('${order_details?.currency}',md.supported_currency)>0);`;
+         midquery = `SELECT md.* , mc.code , mc.code  as currency  FROM pg_mid md INNER JOIN pg_master_currency mc ON mc.id = md.currency_id WHERE md.submerchant_id = '${parseInt(order_details.merchant_id)}'   AND  md.status = 0 AND md.deleted = 0 AND md.env ='${payment_mode}' AND FIND_IN_SET('${card_type}', md.payment_schemes) AND FIND_IN_SET('${card_dc}',md.payment_methods) AND  (mc.code = '${order_details?.currency}' OR FIND_IN_SET('${order_details?.currency}',md.supported_currency)>0);`;
       }else{
-         midquery = `SELECT md.* , mc.code , mc.currency  FROM pg_mid md INNER JOIN pg_master_currency mc ON mc.id = md.currency_id WHERE md.submerchant_id = '${parseInt(order_details.merchant_id)}'   AND  md.status = 0 AND md.deleted = 0 AND md.env ='${payment_mode}' AND FIND_IN_SET('${card_type}', md.payment_schemes) AND FIND_IN_SET('${card_dc}',md.payment_methods) AND mc.code = '${order_details?.currency}';`;
+         midquery = `SELECT md.* , mc.code ,mc.code as currency  FROM pg_mid md INNER JOIN pg_master_currency mc ON mc.id = md.currency_id WHERE md.submerchant_id = '${parseInt(order_details.merchant_id)}'   AND  md.status = 0 AND md.deleted = 0 AND md.env ='${payment_mode}' AND FIND_IN_SET('${card_type}', md.payment_schemes) AND FIND_IN_SET('${card_dc}',md.payment_methods) AND mc.code = '${order_details?.currency}';`;
       }
       const getmid = await merchantOrderModel.order_query(midquery);
+      console.log(`mid details are below`);
+      console.log(getmid);
       let is_domestic_or_international = "";
       let merchant_details = await merchantOrderModel.selectOne('register_business_country',{merchant_id:order_details.merchant_id},'master_merchant_details');
       let fetchCountryCode = await helpers.get_currency_name_by_id(merchant_details.register_business_country);
@@ -170,10 +172,10 @@ class TerminalControllerClass {
           }
 
           const updateorder = {
-            description:
-              order_details.remark == ""
-                ? psp_name.toUpperCase()
-                : order_details.description,
+            // description:
+            //   order_details.remark == ""
+            //     ? psp_name.toUpperCase()
+            //     : order_details.description,
             remark:
               order_details.remark == ""
                 ? psp_name.toUpperCase()
@@ -194,9 +196,9 @@ class TerminalControllerClass {
             cancel_url: redirect_url.cancel,
             failure_url: redirect_url.failure
           };
-          if (!orderData.description) {
-            updateorder.description = psp_name;
-          }
+          // if (!orderData.description) {
+          //   updateorder.description = psp_name;
+          // }
           console.log(getmid[0]?.terminal_id);
           console.log(`update order is here`);
           console.log(updateorder);
@@ -406,10 +408,10 @@ class TerminalControllerClass {
           console.log("_terminal_details?.mode", maxObj?.mode)
 
           const updateorder = {
-            description:
-              order_details.description == ""
-                ? maxObj.psp_name.toUpperCase()
-                : order_details.description,
+            // description:
+            //   order_details.description == ""
+            //     ? maxObj.psp_name.toUpperCase()
+            //     : order_details.description,
             remark:
               order_details.remark == ""
                 ? maxObj.psp_name.toUpperCase()

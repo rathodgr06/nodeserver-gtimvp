@@ -337,6 +337,15 @@ const MerchantOrderValidator = {
                   .error(() => {
                     return new Error("Description not valid/not supplied");
                   }),
+                 statement_descriptor: Joi.string()
+                .optional()
+                .allow("")
+                .error(
+                  () =>
+                    new Error(
+                      "Statement descriptior not valid/not supplied (max 22 characters)"
+                    )
+                ),  
               });
               const billingDetailsSchema = Joi.object({
                 address_line1: Joi.string()

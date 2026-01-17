@@ -5051,4 +5051,8 @@ app.post("/merchant-droupdown-list", CheckHeader, CheckToken, merchant.dropdown_
 app.post("/mid-merchant-droupdown-list", CheckHeader, CheckToken, merchant.mid_dropdown_list);
 app.post("/store/list",CheckHeader,CheckMerchantToken,submerchant.storeList);
 app.post("/submerchant/list-export",CheckHeader,CheckMerchantToken,submerchant.listExport);
+
+app.post("/master-merchant/allow-descriptor",CheckHeader,CheckMerchantToken,MerchantEkyc.allow_descriptor);
+
+  
 module.exports = app;

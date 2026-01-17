@@ -40,7 +40,7 @@ const threeds = async (req, res) => {
     console.log(order_id);
     order_table = mode === 'live' ? 'orders' : 'test_orders';
     order_data = await helpers.get_data_list(
-        "order_id as p_order_id,merchant_order_id as m_order_id,amount,psp,payment_mode,scheme,cardType,pan as mask_card_number,merchant_customer_id as m_customer_id,card_id as m_payment_token,cardType as card_type,card_country,merchant_id,success_url,failure_url,pan,order_amount,order_currency",
+        "order_id as p_order_id,merchant_order_id as m_order_id,amount,psp,payment_mode,scheme,cardType,pan as mask_card_number,merchant_customer_id as m_customer_id,card_id as m_payment_token,cardType as card_type,card_country,merchant_id,success_url,failure_url,pan,order_amount,order_currency,description",
         order_table,
         {
             order_id: order_id,
@@ -91,10 +91,14 @@ const threeds = async (req, res) => {
             ["expiry_date >= "]: moment().format("YYYY-MM-DD"),
             is_active: 1,
         });
+        console.log(secret_key);
         fetch_card_details = await helpers.fetchTempLastCard({ order_id: order_id, mode: mode });
+        console.log(`fetchc card details`);
+        console.log(fetch_card_details);
+        
         const card_number = await enc_dec.dynamic_decryption(
             fetch_card_details.card,
-            secret_key.id
+            fetch_card_details.cipher_id
         );
         console.log(`card no ------------>`)
         console.log(card_number);
@@ -145,9 +149,34 @@ const threeds = async (req, res) => {
 
         };
         let payment_token_id = '';
-        if (mid_details.statementDescriptor != '') {
-            payload['order']['statementDescriptor']['name'] = mid_details.statementDescriptor;
-        }
+         let checkIfAllowDescriptor =
+           await helpers.checkAllowDescriptorOnMerchant(
+             order_details?.merchant_id
+           );
+         if (checkIfAllowDescriptor == 0) {
+            console.log(`type of order_details.description`)
+            console.log(order_details.description);
+           if (
+             typeof order_details?.description === "string" &&
+             order_details.description.trim() !== "" &&
+             order_details.description !== "NULL"
+           ) {
+             payload.order.statementDescriptor.name =
+               helpers.sanitizeDescriptor(order_details.description);
+           }
+         }
+         if (
+           checkIfAllowDescriptor == 1 &&
+           typeof mid_details?.statementDescriptor === "string" &&
+           mid_details.statementDescriptor.trim() !== "" &&
+           mid_details.statementDescriptor !== "NULL"
+         ) {
+           console.log(`this is statement descriptor`);
+           console.log(mid_details.statementDescriptor);
+           payload.order.statementDescriptor.name = helpers.sanitizeDescriptor(
+             mid_details.statementDescriptor
+           );
+         }
         if (order_details.origin == 'SUBSCRIPTION') {
             console.log(`----------------------------------------->`)
             let subscriptiondetails = await order_transactionModel.selectSubsData(order_id)
@@ -213,7 +242,19 @@ const threeds = async (req, res) => {
                 status: (final_response.data.result === 'SUCCESS') ? (mid_details.mode == 'SALE' ? "CAPTURED" : "AUTHORISED") : "FAILED",
                 '3ds': final_response.data.authentication?.version ? 1 : 0,
                 '3ds_status': final_response.data.transaction?.authenticationStatus,
-                'payment_token_id': payment_token_id
+                'payment_token_id': payment_token_id,
+                 remark:
+                    final_response?.data?.order?.authenticationStatus +
+                    "/" +
+                    final_response?.data?.response?.acquirerCode +
+                    "/" +
+                    final_response?.data?.response?.acquirerMessage +
+                    "/" +
+                    final_response?.data?.response?.gatewayCode +
+                    "/" +
+                    final_response?.data?.response?.gatewayRecommendation,
+                other_description:
+                    final_response?.data?.order?.authenticationStatus,
             };
             const condition = { order_id: order_id };
             console.log(`status at success to updated dynamic`);
@@ -403,9 +444,12 @@ const threeds = async (req, res) => {
 
             // console.log(`inside the catch block`);
             // console.log(error);
-            // console.log(`error is here`);
-            // console.log(error.response.data.error);
-            await merchantOrderModel.updateDynamic({ status: "FAILED" }, { order_id: order_id }, order_table);
+            console.log(`error is here`);
+            console.log(error.response.data.error);
+            await merchantOrderModel.updateDynamic({
+                status: "FAILED",
+                remark:error?.response?.data?.error?.cause+'/'+error?.response?.data?.error?.validationType+'/'+error?.response?.data?.error?.field+'/'+error?.response?.data?.error?.explanation
+             }, { order_id: order_id }, order_table);
             const insertFunction = mode === 'live' ? order_transactionModel.add : order_transactionModel.test_txn_add;
             const order_txn_update = {
                 txn: transaction_id.toString() ? transaction_id.toString() : "",

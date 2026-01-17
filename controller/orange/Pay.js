@@ -163,7 +163,7 @@ const Pay = async (req, res) => {
     console.log(JSON.stringify(final_response.data));
     // Call updateDynamic to store sessionId in the database
     await merchantOrderModel.updateDynamic(
-      { payment_id: payment_id,pan:`${req.bodyString("country_code")}${req.bodyString("mobile_no")}` },
+      { payment_id: payment_id,pan:`${req.bodyString("country_code")}${req.bodyString("mobile_no")}`,session: final_response.data?.resultset?.TXNID},
       { order_id: order_id },
       order_table
     );
@@ -190,7 +190,7 @@ const Pay = async (req, res) => {
     
     return res.json({
       data: {
-        transaction_ref_id: final_response.data?.resultset?.TXNID, // from meps api
+        transaction_ref_id: final_response.data?.resultset?.TXNID, // from orange money
         order_id: order_id, // paydart order id
         transaction_id: payment_id.toString(), //paydart txn id, make an entry in txn table with AUTH/SALE,depending upon MID action
        mode:mode

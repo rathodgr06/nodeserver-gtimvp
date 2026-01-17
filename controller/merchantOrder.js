@@ -2302,6 +2302,9 @@ const capture = async (req, res, next) => {
         case "fiserv":
           await fiserv_capture(req, res);
           break;
+        case "MPGS-KSA":
+          await mpgs_capture(req, res);
+          break;  
         default:
           res
             .status(statusCode.ok)
@@ -2358,6 +2361,9 @@ const order_telr_cancel = async (req, res, next) => {
         break;
       case "fiserv":
         await fiserv_void(req, res);
+        break;
+      case "MPGS-KSA":
+        await mpgs_void(req, res);
         break;
       default:
         res
@@ -2418,6 +2424,9 @@ const open_telr_refund = async (req, res) => {
       case "fiserv":
         await fiserv_refund(req, res);
         break;
+      case "MPGS-KSA":
+        await mpgs_refund(req, res);
+        break;  
       default:
         res
           .status(statusCode.ok)
@@ -2437,498 +2446,508 @@ const open_telr_refund = async (req, res) => {
 
 var MerchantOrder = {
   create: async (req, res) => {
-    try{
-    const logs = [];
-    logs.push(
-      `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : protocol type ${
-        req.protocol
-      }`
-    );
-    logs.push(
-      `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : httpMethod ${req.method}`
-    );
-    logs.push(
-      `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : requestedURL ${req.url}`
-    );
-    logs.push(
-      `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : Request content-type = ${
-        req.headers["content-type"]
-      }`
-    );
-    logs.push(
-      `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : Content length = ${
-        req.headers["content-length"]
-      }`
-    );
-    logs.push(
-      `${moment().format(
-        "DD/MM/YYYY HH:mm:ss.SSS"
-      )} : MerchantOrder.create initiated`
-    );
-    logs.push(
-      `${moment().format(
-        "DD/MM/YYYY HH:mm:ss.SSS"
-      )} : request with headers ${JSON.stringify(req.headers)}`
-    );
-    logs.push(
-      `${moment().format(
-        "DD/MM/YYYY HH:mm:ss.SSS"
-      )} : request with data ${JSON.stringify(req.body)}`
-    );
+    try {
+      const logs = [];
+      logs.push(
+        `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : protocol type ${
+          req.protocol
+        }`
+      );
+      logs.push(
+        `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : httpMethod ${
+          req.method
+        }`
+      );
+      logs.push(
+        `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : requestedURL ${
+          req.url
+        }`
+      );
+      logs.push(
+        `${moment().format(
+          "DD/MM/YYYY HH:mm:ss.SSS"
+        )} : Request content-type = ${req.headers["content-type"]}`
+      );
+      logs.push(
+        `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : Content length = ${
+          req.headers["content-length"]
+        }`
+      );
+      logs.push(
+        `${moment().format(
+          "DD/MM/YYYY HH:mm:ss.SSS"
+        )} : MerchantOrder.create initiated`
+      );
+      logs.push(
+        `${moment().format(
+          "DD/MM/YYYY HH:mm:ss.SSS"
+        )} : request with headers ${JSON.stringify(req.headers)}`
+      );
+      logs.push(
+        `${moment().format(
+          "DD/MM/YYYY HH:mm:ss.SSS"
+        )} : request with data ${JSON.stringify(req.body)}`
+      );
 
-    let client = {
-      os: req.headers.os,
-      browser: req.headers.browser ? req.headers.browser : "",
-      ip: req.headers.ip ? req.headers.ip : "",
-      browser_version: req.headers["x-browser-version"],
-    };
-    let created_at = moment().format("YYYY-MM-DD HH:mm:ss");
-    let updated_at = moment().format("YYYY-MM-DD HH:mm:ss");
-    let customer_details = req.body.data.customer_details;
-    let order_details = req.body.data.order_details;
-    let billing_details = req.body.data.billing_details;
-    let shipping_details = req.body.data.shipping_details;
-    let urls = req.body?.data.urls;
-    let mid_data = await helpers.get_mid_by_merchant_id(
-      req?.credentials?.merchant_id
-    );
-    const uid = new ShortUniqueId({
-      length: 10,
-    });
-    let order_id = await helpers.make_sequential_no("ORD");
-
-    logs.push(
-      `${moment().format(
-        "DD/MM/YYYY HH:mm:ss.SSS"
-      )} : helpers.make_sequential_no ${order_id}`
-    );
-
-    let status = "PENDING";
-    let token_payload = {
-      order_id: order_id,
-      amount: order_details.amount,
-      currency: order_details.currency,
-      return_url: order_details.return_url,
-      env: req.credentials.type,
-      merchant_id: req.credentials.merchant_id,
-      email: customer_details.email,
-    };
-    let mode = "";
-    if (req.credentials.type == "test") {
-      mode = "live";
-    } else {
-      mode = "live";
-    }
-    let token = accessToken(token_payload);
-
-    logs.push(
-      `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : accessToken ${token}`
-    );
-
-    let ins_body = {
-      merchant_id: req.credentials.merchant_id,
-      mcc: req.credentials.mcc_id,
-      mcc_category: req.credentials.mcc_cat_id,
-      super_merchant: req.credentials.super_merchant_id,
-      customer_name: customer_details.name,
-      customer_email: customer_details.email,
-      customer_code: customer_details.code,
-      customer_mobile: customer_details.mobile,
-      billing_address_line_1: billing_details.address_line1
-        ? billing_details.address_line1
-        : "",
-      billing_address_line_2: billing_details.address_line2
-        ? billing_details.address_line2
-        : "",
-      billing_city: billing_details.city ? billing_details.city : "",
-      billing_pincode: billing_details.pin ? billing_details.pin : "",
-      billing_province: billing_details.province
-        ? billing_details.province
-        : "",
-      billing_country: billing_details.country ? billing_details.country : "",
-      shipping_address_line_1: shipping_details.address_line1
-        ? shipping_details.address_line1
-        : "",
-      shipping_address_line_2: shipping_details.address_line2
-        ? shipping_details.address_line2
-        : "",
-      shipping_city: shipping_details.city ? shipping_details.city : "",
-      shipping_country: shipping_details.country
-        ? shipping_details.country
-        : "",
-      shipping_province: shipping_details.province
-        ? shipping_details.province
-        : "",
-      shipping_pincode: shipping_details.pin ? shipping_details.pin : "",
-      amount: order_details.amount,
-      amount_left: order_details.amount,
-      currency: order_details.currency,
-      return_url: order_details.return_url,
-      description: order_details?.description ? order_details?.description : "",
-      other_description: order_details?.description
-        ? order_details?.description
-        : "",
-      status: status,
-      origin: "API",
-      order_id: order_id,
-      browser: client.browser,
-      browser_version: client.browser_version,
-      ip: client.ip,
-      os: client.os,
-      created_at: created_at,
-      updated_at: updated_at,
-      action: req.body.data.action,
-      merchant_order_id: order_details?.m_order_id
-        ? order_details?.m_order_id
-        : "",
-      success_url: urls?.success ? urls?.success : mid_data[0]?.success_url,
-      cancel_url: urls?.cancel ? urls?.cancel : mid_data[0]?.cancel_url,
-      failure_url: urls?.failure ? urls?.failure : mid_data[0]?.failure_url,
-    };
-    logs.push(
-      `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : initiate mode ${mode}`
-    );
-    logs.push(
-      `${moment().format(
-        "DD/MM/YYYY HH:mm:ss.SSS"
-      )} : initiate merchantOrderModel.add`
-    );
-    logs.push(
-      `${moment().format(
-        "DD/MM/YYYY HH:mm:ss.SSS"
-      )} : initiate merchantOrderModel.add with data ${JSON.stringify(
-        ins_body
-      )}`
-    );
-
-    merchantOrderModel
-      .add(ins_body, mode)
-      .then(async (result) => {
-        let res_order_details = {
-          status: status,
-          message: "Order created",
-          token: token,
-          order_id: order_id,
-          amount: order_details.currency + " " + order_details.amount,
-          payment_link:
-            process.env.PAYMENT_URL + "initiate/" + order_id + "/" + token,
-          iframe_link:
-            process.env.PAYMENT_URL +
-            "initiate/" +
-            order_id +
-            "/" +
-            token +
-            "?origin=iframe",
-        };
-        logs.push(
-          `${moment().format(
-            "DD/MM/YYYY HH:mm:ss.SSS"
-          )} : response received ${JSON.stringify(res_order_details)}`
-        );
-        let logs_payload = {
-          activity: JSON.stringify(logs),
-          updated_at: updated_at,
-        };
-
-        let log_is = await order_logs.update_logs_data(
-          {
-            order_id: order_details.order_id,
-          },
-          logs_payload
-        );
-        res.status(statusCode.ok).send(res_order_details);
-      })
-      .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
-
-        res
-          .status(statusCode.internalError)
-          .send(response.errormsg(error.message));
+      let client = {
+        os: req.headers.os,
+        browser: req.headers.browser ? req.headers.browser : "",
+        ip: req.headers.ip ? req.headers.ip : "",
+        browser_version: req.headers["x-browser-version"],
+      };
+      let created_at = moment().format("YYYY-MM-DD HH:mm:ss");
+      let updated_at = moment().format("YYYY-MM-DD HH:mm:ss");
+      let customer_details = req.body.data.customer_details;
+      let order_details = req.body.data.order_details;
+      let billing_details = req.body.data.billing_details;
+      let shipping_details = req.body.data.shipping_details;
+      let urls = req.body?.data.urls;
+      let mid_data = await helpers.get_mid_by_merchant_id(
+        req?.credentials?.merchant_id
+      );
+      const uid = new ShortUniqueId({
+        length: 10,
       });
+      let order_id = await helpers.make_sequential_no("ORD");
 
-    let logs_payload = {
-      order_id: order_id,
-      activity: JSON.stringify(logs),
-    };
-    let log_is = await order_logs
-      .add(logs_payload, "order_logs")
-      .then((result) => {})
-      .catch((err) => {
-       logger.error(500,{message: err,stack: err.stack}); 
-      });
-    }catch(error){
-      logger.error(500,{message: error,stack: error.stack}); 
-      res.status(statusCode.internalError).send(response.errorMsg("Something went wrong"));
+      logs.push(
+        `${moment().format(
+          "DD/MM/YYYY HH:mm:ss.SSS"
+        )} : helpers.make_sequential_no ${order_id}`
+      );
+
+      let status = "PENDING";
+      let token_payload = {
+        order_id: order_id,
+        amount: order_details.amount,
+        currency: order_details.currency,
+        return_url: order_details.return_url,
+        env: req.credentials.type,
+        merchant_id: req.credentials.merchant_id,
+        email: customer_details.email,
+      };
+      let mode = "";
+      if (req.credentials.type == "test") {
+        mode = "live";
+      } else {
+        mode = "live";
+      }
+      let token = accessToken(token_payload);
+
+      logs.push(
+        `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : accessToken ${token}`
+      );
+
+      let ins_body = {
+        merchant_id: req.credentials.merchant_id,
+        mcc: req.credentials.mcc_id,
+        mcc_category: req.credentials.mcc_cat_id,
+        super_merchant: req.credentials.super_merchant_id,
+        customer_name: customer_details.name,
+        customer_email: customer_details.email,
+        customer_code: customer_details.code,
+        customer_mobile: customer_details.mobile,
+        billing_address_line_1: billing_details.address_line1
+          ? billing_details.address_line1
+          : "",
+        billing_address_line_2: billing_details.address_line2
+          ? billing_details.address_line2
+          : "",
+        billing_city: billing_details.city ? billing_details.city : "",
+        billing_pincode: billing_details.pin ? billing_details.pin : "",
+        billing_province: billing_details.province
+          ? billing_details.province
+          : "",
+        billing_country: billing_details.country ? billing_details.country : "",
+        shipping_address_line_1: shipping_details.address_line1
+          ? shipping_details.address_line1
+          : "",
+        shipping_address_line_2: shipping_details.address_line2
+          ? shipping_details.address_line2
+          : "",
+        shipping_city: shipping_details.city ? shipping_details.city : "",
+        shipping_country: shipping_details.country
+          ? shipping_details.country
+          : "",
+        shipping_province: shipping_details.province
+          ? shipping_details.province
+          : "",
+        shipping_pincode: shipping_details.pin ? shipping_details.pin : "",
+        amount: order_details.amount,
+        amount_left: order_details.amount,
+        currency: order_details.currency,
+        return_url: order_details.return_url,
+        description: order_details?.description
+          ? order_details?.description
+          : "",
+        other_description: order_details?.description
+          ? order_details?.description
+          : "",
+        status: status,
+        origin: "API",
+        order_id: order_id,
+        browser: client.browser,
+        browser_version: client.browser_version,
+        ip: client.ip,
+        os: client.os,
+        created_at: created_at,
+        updated_at: updated_at,
+        action: req.body.data.action,
+        merchant_order_id: order_details?.m_order_id
+          ? order_details?.m_order_id
+          : "",
+        success_url: urls?.success ? urls?.success : mid_data[0]?.success_url,
+        cancel_url: urls?.cancel ? urls?.cancel : mid_data[0]?.cancel_url,
+        failure_url: urls?.failure ? urls?.failure : mid_data[0]?.failure_url,
+      };
+      logs.push(
+        `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : initiate mode ${mode}`
+      );
+      logs.push(
+        `${moment().format(
+          "DD/MM/YYYY HH:mm:ss.SSS"
+        )} : initiate merchantOrderModel.add`
+      );
+      logs.push(
+        `${moment().format(
+          "DD/MM/YYYY HH:mm:ss.SSS"
+        )} : initiate merchantOrderModel.add with data ${JSON.stringify(
+          ins_body
+        )}`
+      );
+
+      merchantOrderModel
+        .add(ins_body, mode)
+        .then(async (result) => {
+          let res_order_details = {
+            status: status,
+            message: "Order created",
+            token: token,
+            order_id: order_id,
+            amount: order_details.currency + " " + order_details.amount,
+            payment_link:
+              process.env.PAYMENT_URL + "initiate/" + order_id + "/" + token,
+            iframe_link:
+              process.env.PAYMENT_URL +
+              "initiate/" +
+              order_id +
+              "/" +
+              token +
+              "?origin=iframe",
+          };
+          logs.push(
+            `${moment().format(
+              "DD/MM/YYYY HH:mm:ss.SSS"
+            )} : response received ${JSON.stringify(res_order_details)}`
+          );
+          let logs_payload = {
+            activity: JSON.stringify(logs),
+            updated_at: updated_at,
+          };
+
+          let log_is = await order_logs.update_logs_data(
+            {
+              order_id: order_details.order_id,
+            },
+            logs_payload
+          );
+          res.status(statusCode.ok).send(res_order_details);
+        })
+        .catch((error) => {
+          logger.error(500, { message: error, stack: error.stack });
+
+          res
+            .status(statusCode.internalError)
+            .send(response.errormsg(error.message));
+        });
+
+      let logs_payload = {
+        order_id: order_id,
+        activity: JSON.stringify(logs),
+      };
+      let log_is = await order_logs
+        .add(logs_payload, "order_logs")
+        .then((result) => {})
+        .catch((err) => {
+          logger.error(500, { message: err, stack: err.stack });
+        });
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+      res
+        .status(statusCode.internalError)
+        .send(response.errorMsg("Something went wrong"));
     }
   },
   open_create: async (req, res) => {
-    try{
-    let classType = req.body.data.class;
-    if (classType == "cont") {
-      return createContineousOrder(req, res);
-    }
+    try {
+      let classType = req.body.data.class;
+      if (classType == "cont") {
+        return createContineousOrder(req, res);
+      }
 
-    const logs = [];
-    logs.push(
-      `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : protocol type ${
-        req.protocol
-      }`
-    );
-    logs.push(
-      `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : httpMethod ${req.method}`
-    );
-    logs.push(
-      `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : requestedURL ${req.url}`
-    );
-    logs.push(
-      `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : Request content-type = ${
-        req.headers["content-type"]
-      }`
-    );
-    logs.push(
-      `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : Content length = ${
-        req.headers["content-length"]
-      }`
-    );
-    logs.push(
-      `${moment().format(
-        "DD/MM/YYYY HH:mm:ss.SSS"
-      )} : MerchantOrder.create initiated`
-    );
-    logs.push(
-      `${moment().format(
-        "DD/MM/YYYY HH:mm:ss.SSS"
-      )} : request with headers ${JSON.stringify(req.headers)}`
-    );
-    logs.push(
-      `${moment().format(
-        "DD/MM/YYYY HH:mm:ss.SSS"
-      )} : request with data ${JSON.stringify(req.body)}`
-    );
+      const logs = [];
+      logs.push(
+        `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : protocol type ${
+          req.protocol
+        }`
+      );
+      logs.push(
+        `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : httpMethod ${
+          req.method
+        }`
+      );
+      logs.push(
+        `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : requestedURL ${
+          req.url
+        }`
+      );
+      logs.push(
+        `${moment().format(
+          "DD/MM/YYYY HH:mm:ss.SSS"
+        )} : Request content-type = ${req.headers["content-type"]}`
+      );
+      logs.push(
+        `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : Content length = ${
+          req.headers["content-length"]
+        }`
+      );
+      logs.push(
+        `${moment().format(
+          "DD/MM/YYYY HH:mm:ss.SSS"
+        )} : MerchantOrder.create initiated`
+      );
+      logs.push(
+        `${moment().format(
+          "DD/MM/YYYY HH:mm:ss.SSS"
+        )} : request with headers ${JSON.stringify(req.headers)}`
+      );
+      logs.push(
+        `${moment().format(
+          "DD/MM/YYYY HH:mm:ss.SSS"
+        )} : request with data ${JSON.stringify(req.body)}`
+      );
 
-    let client = {
-      os: req.headers.os,
-      browser: req.headers.browser ? req.headers.browser : "",
-      ip: req.headers.ip ? req.headers.ip : "",
-      browser_version: req.headers["x-browser-version"],
-    };
-    let created_at = moment().format("YYYY-MM-DD HH:mm:ss");
-    let updated_at = moment().format("YYYY-MM-DD HH:mm:ss");
-    let customer_details = req.body.data.customer_details;
-    let order_details = req.body.data.order_details;
-    let billing_details = req.body.data.billing_details;
-    let shipping_details = req.body.data.shipping_details;
-    const uid = new ShortUniqueId({
-      length: 10,
-    });
-    let mode = "";
-    if (req.credentials.type == "test") {
-      mode = "test";
-    } else {
-      mode = "live";
-    }
-    let order_id = await helpers.make_sequential_no(
-      mode == "live" ? "ORD" : "TST_ORD"
-    );
-    let payment_token = req.body.data.payment_token;
-    let urls = req.body.data.urls;
-    let mid_data = await helpers.get_mid_by_merchant_id(
-      req?.credentials?.merchant_id,
-      order_details.currency,
-      mode
-    );
-    
-   
-
-
-    logs.push(
-      `${moment().format(
-        "DD/MM/YYYY HH:mm:ss.SSS"
-      )} : helpers.make_sequential_no ${order_id}`
-    );
-
-    let status = "PENDING";
-    let token_payload = {
-      order_id: order_id,
-      amount: order_details.amount,
-      currency: order_details.currency,
-      return_url: order_details.return_url,
-      env: req.credentials.type,
-      merchant_id: req.credentials.merchant_id,
-      email: customer_details.email,
-    };
-
-    let token = accessToken(token_payload);
-
-    logs.push(
-      `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : accessToken ${token}`
-    );
-   
-    let ins_body = {
-      merchant_id: req.credentials.merchant_id,
-      mcc: req.credentials.mcc_id,
-      mcc_category: req.credentials.mcc_cat_id,
-      super_merchant: req.credentials.super_merchant_id,
-      customer_name: customer_details.name,
-      customer_email: customer_details.email,
-      customer_code: customer_details.code,
-      customer_mobile: customer_details.mobile,
-      billing_address_line_1: billing_details.address_line1
-        ? billing_details.address_line1
-        : "",
-      billing_address_line_2: billing_details.address_line2
-        ? billing_details.address_line2
-        : "",
-      billing_city: billing_details.city ? billing_details.city : "",
-      billing_pincode: billing_details.pin ? billing_details.pin : "",
-      billing_province: billing_details.province
-        ? billing_details.province
-        : "",
-      billing_country: billing_details.country ? billing_details.country : "",
-      shipping_address_line_1: shipping_details.address_line1
-        ? shipping_details.address_line1
-        : "",
-      shipping_address_line_2: shipping_details.address_line2
-        ? shipping_details.address_line2
-        : "",
-      shipping_city: shipping_details.city ? shipping_details.city : "",
-      shipping_country: shipping_details.country
-        ? shipping_details.country
-        : "",
-      shipping_province: shipping_details.province
-        ? shipping_details.province
-        : "",
-      shipping_pincode: shipping_details.pin ? shipping_details.pin : "",
-      amount: order_details.amount,
-      amount_left: order_details.amount,
-      currency: order_details.currency,
-      order_amount:order_details.amount,
-      order_currency:order_details.currency,
-      // return_url: order_details.return_url,
-      description: order_details?.description,
-      other_description: order_details?.description,
-      status: status,
-      origin: "REMOTE",
-      order_id: order_id,
-      browser: client.browser,
-      ip: client.ip,
-      os: client.os,
-      browser_version: client.browser_version,
-      created_at: created_at,
-      updated_at: updated_at,
-      action: req.body.data.action,
-      capture_method: req.body.data.capture_method
-        ? req.body.data.capture_method
-        : "MANUAL",
-      merchant_order_id: order_details.m_order_id,
-      payment_token_id: payment_token,
-      success_url: urls?.success ? urls?.success : mid_data[0]?.success_url,
-      cancel_url: urls?.cancel ? urls?.cancel : mid_data[0]?.cancel_url,
-      failure_url: urls?.failure ? urls?.failure : mid_data[0]?.failure_url,
-      merchant_customer_id: customer_details.m_customer_id,
-    };
-
-    logs.push(
-      `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : initiate mode ${mode}`
-    );
-    logs.push(
-      `${moment().format(
-        "DD/MM/YYYY HH:mm:ss.SSS"
-      )} : initiate merchantOrderModel.add`
-    );
-    logs.push(
-      `${moment().format(
-        "DD/MM/YYYY HH:mm:ss.SSS"
-      )} : initiate merchantOrderModel.add with data ${JSON.stringify(
-        ins_body
-      )}`
-    );
-    merchantOrderModel
-      .add(ins_body, mode)
-      .then(async (result) => {
-        // now order is created call DCC 
-        let proccessed_amount =  order_details.currency + " " + order_details.amount;
-         let dcc_enabled = await helpers.fetchDccStatus();
-         if (
-           mid_data?.[0]?.code != order_details.currency &&
-          dcc_enabled
-         ) {
-           let rate = await DccService.fetchRate(
-             mode,
-             order_id,
-             mid_data?.[0]?.code,
-             order_details.currency,
-             order_details.amount
-           );
-           console.log(rate);
-           proccessed_amount = rate.data.currency +" "+rate.data.amount
-          
-         }
-        let p_request_id = await helpers.make_sequential_no("REQ");
-        let order_req = {
-          merchant_id: req.credentials.merchant_id,
-          order_id: order_id,
-          request_id: p_request_id,
-          request: JSON.stringify(req.body),
-        };
-        await helpers.common_add(order_req, "generate_request_id");
-
-        let res_order_details = {
-          status: "SUCCESS",
-          status_code: "00",
-          message: "Order created",
-          // token: token,
-          p_order_id: order_id,
-          m_order_id: order_details.m_order_id,
-          p_request_id: p_request_id,
-          order_creation_date: moment(created_at).format("DD/MM/YYYY HH:mm:ss"),
-          amount: order_details.currency + " " + order_details.amount,
-          proccessed_amount:proccessed_amount,
-          payment_link:
-            process.env.PAYMENT_URL +
-            "initiate/" +
-            order_id +
-            "/" +
-            token +
-            "/" +
-            mode,
-          iframe_link:
-            process.env.PAYMENT_URL +
-            "initiate/" +
-            order_id +
-            "/" +
-            token +
-            "/" +
-            mode +
-            "?origin=iframe",
-        };
-        logs.push(
-          `${moment().format(
-            "DD/MM/YYYY HH:mm:ss.SSS"
-          )} : response received ${JSON.stringify(res_order_details)}`
-        );
-        let logs_payload = {
-          order_id: order_id,
-          activity: JSON.stringify(logs),
-        };
-        let log_is = await order_logs.add(logs_payload, "order_logs");
-        res.status(statusCode.ok).send(res_order_details);
-      })
-      .catch(async (error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
-
-        let logs_payload = {
-          order_id: order_id,
-          activity: JSON.stringify(logs),
-        };
-        let log_is = await order_logs.add(logs_payload, "order_logs");
-        res
-          .status(statusCode.internalError)
-          .send(response.errormsg(error.message));
+      let client = {
+        os: req.headers.os,
+        browser: req.headers.browser ? req.headers.browser : "",
+        ip: req.headers.ip ? req.headers.ip : "",
+        browser_version: req.headers["x-browser-version"],
+      };
+      let created_at = moment().format("YYYY-MM-DD HH:mm:ss");
+      let updated_at = moment().format("YYYY-MM-DD HH:mm:ss");
+      let customer_details = req.body.data.customer_details;
+      let order_details = req.body.data.order_details;
+      let billing_details = req.body.data.billing_details;
+      let shipping_details = req.body.data.shipping_details;
+      const uid = new ShortUniqueId({
+        length: 10,
       });
-    }catch(error){
-      logger.error(500,{message: error,stack: error.stack}); 
-      res.status(statusCode.internalError).send(response.errorMsg("Something went wrong"));
+      let mode = "";
+      if (req.credentials.type == "test") {
+        mode = "test";
+      } else {
+        mode = "live";
+      }
+      let order_id = await helpers.make_sequential_no(
+        mode == "live" ? "ORD" : "TST_ORD"
+      );
+      let payment_token = req.body.data.payment_token;
+      let urls = req.body.data.urls;
+      let mid_data = await helpers.get_mid_by_merchant_id(
+        req?.credentials?.merchant_id,
+        order_details.currency,
+        mode
+      );
+
+      logs.push(
+        `${moment().format(
+          "DD/MM/YYYY HH:mm:ss.SSS"
+        )} : helpers.make_sequential_no ${order_id}`
+      );
+
+      let status = "PENDING";
+      let token_payload = {
+        order_id: order_id,
+        amount: order_details.amount,
+        currency: order_details.currency,
+        return_url: order_details.return_url,
+        env: req.credentials.type,
+        merchant_id: req.credentials.merchant_id,
+        email: customer_details.email,
+      };
+
+      let token = accessToken(token_payload);
+
+      logs.push(
+        `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : accessToken ${token}`
+      );
+
+      let ins_body = {
+        merchant_id: req.credentials.merchant_id,
+        mcc: req.credentials.mcc_id,
+        mcc_category: req.credentials.mcc_cat_id,
+        super_merchant: req.credentials.super_merchant_id,
+        customer_name: customer_details.name,
+        customer_email: customer_details.email,
+        customer_code: customer_details.code,
+        customer_mobile: customer_details.mobile,
+        billing_address_line_1: billing_details.address_line1
+          ? billing_details.address_line1
+          : "",
+        billing_address_line_2: billing_details.address_line2
+          ? billing_details.address_line2
+          : "",
+        billing_city: billing_details.city ? billing_details.city : "",
+        billing_pincode: billing_details.pin ? billing_details.pin : "",
+        billing_province: billing_details.province
+          ? billing_details.province
+          : "",
+        billing_country: billing_details.country ? billing_details.country : "",
+        shipping_address_line_1: shipping_details.address_line1
+          ? shipping_details.address_line1
+          : "",
+        shipping_address_line_2: shipping_details.address_line2
+          ? shipping_details.address_line2
+          : "",
+        shipping_city: shipping_details.city ? shipping_details.city : "",
+        shipping_country: shipping_details.country
+          ? shipping_details.country
+          : "",
+        shipping_province: shipping_details.province
+          ? shipping_details.province
+          : "",
+        shipping_pincode: shipping_details.pin ? shipping_details.pin : "",
+        amount: order_details.amount,
+        amount_left: order_details.amount,
+        currency: order_details.currency,
+        order_amount: order_details.amount,
+        order_currency: order_details.currency,
+        // return_url: order_details.return_url,
+        description: order_details?.statement_descriptor,
+        other_description: order_details?.description,
+        status: status,
+        origin: "REMOTE",
+        order_id: order_id,
+        browser: client.browser,
+        ip: client.ip,
+        os: client.os,
+        browser_version: client.browser_version,
+        created_at: created_at,
+        updated_at: updated_at,
+        action: req.body.data.action,
+        capture_method: req.body.data.capture_method
+          ? req.body.data.capture_method
+          : "MANUAL",
+        merchant_order_id: order_details.m_order_id,
+        payment_token_id: payment_token,
+        success_url: urls?.success ? urls?.success : mid_data[0]?.success_url,
+        cancel_url: urls?.cancel ? urls?.cancel : mid_data[0]?.cancel_url,
+        failure_url: urls?.failure ? urls?.failure : mid_data[0]?.failure_url,
+        merchant_customer_id: customer_details.m_customer_id,
+      };
+
+      logs.push(
+        `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : initiate mode ${mode}`
+      );
+      logs.push(
+        `${moment().format(
+          "DD/MM/YYYY HH:mm:ss.SSS"
+        )} : initiate merchantOrderModel.add`
+      );
+      logs.push(
+        `${moment().format(
+          "DD/MM/YYYY HH:mm:ss.SSS"
+        )} : initiate merchantOrderModel.add with data ${JSON.stringify(
+          ins_body
+        )}`
+      );
+      merchantOrderModel
+        .add(ins_body, mode)
+        .then(async (result) => {
+          // now order is created call DCC
+          let proccessed_amount =
+            order_details.currency + " " + order_details.amount;
+          let dcc_enabled = await helpers.fetchDccStatus();
+          if (mid_data?.[0]?.code != order_details.currency && dcc_enabled) {
+            let rate = await DccService.fetchRate(
+              mode,
+              order_id,
+              mid_data?.[0]?.code,
+              order_details.currency,
+              order_details.amount
+            );
+            console.log(rate);
+            proccessed_amount = rate.data.currency + " " + rate.data.amount;
+          }
+          let p_request_id = await helpers.make_sequential_no("REQ");
+          let order_req = {
+            merchant_id: req.credentials.merchant_id,
+            order_id: order_id,
+            request_id: p_request_id,
+            request: JSON.stringify(req.body),
+          };
+          await helpers.common_add(order_req, "generate_request_id");
+
+          let res_order_details = {
+            status: "SUCCESS",
+            status_code: "00",
+            message: "Order created",
+            // token: token,
+            p_order_id: order_id,
+            m_order_id: order_details.m_order_id,
+            p_request_id: p_request_id,
+            order_creation_date: moment(created_at).format(
+              "DD/MM/YYYY HH:mm:ss"
+            ),
+            amount: order_details.currency + " " + order_details.amount,
+            proccessed_amount: proccessed_amount,
+            payment_link:
+              process.env.PAYMENT_URL +
+              "initiate/" +
+              order_id +
+              "/" +
+              token +
+              "/" +
+              mode,
+            iframe_link:
+              process.env.PAYMENT_URL +
+              "initiate/" +
+              order_id +
+              "/" +
+              token +
+              "/" +
+              mode +
+              "?origin=iframe",
+          };
+          logs.push(
+            `${moment().format(
+              "DD/MM/YYYY HH:mm:ss.SSS"
+            )} : response received ${JSON.stringify(res_order_details)}`
+          );
+          let logs_payload = {
+            order_id: order_id,
+            activity: JSON.stringify(logs),
+          };
+          let log_is = await order_logs.add(logs_payload, "order_logs");
+          res.status(statusCode.ok).send(res_order_details);
+        })
+        .catch(async (error) => {
+          logger.error(500, { message: error, stack: error.stack });
+
+          let logs_payload = {
+            order_id: order_id,
+            activity: JSON.stringify(logs),
+          };
+          let log_is = await order_logs.add(logs_payload, "order_logs");
+          res
+            .status(statusCode.internalError)
+            .send(response.errormsg(error.message));
+        });
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+      res
+        .status(statusCode.internalError)
+        .send(response.errorMsg("Something went wrong"));
     }
   },
 
@@ -3018,7 +3037,7 @@ var MerchantOrder = {
         //res.status(statusCode.ok).send(res_order_details);
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -3073,15 +3092,17 @@ var MerchantOrder = {
             mode
           );
         let pspCountry = await helpers.getMTNMOMOCountry();
-        if(result?.icon){
-           result.icon = process.env.STATIC_URL + "/static/files/" + result?.icon;
-        }else{
-           result.icon = ``;
+        if (result?.icon) {
+          result.icon =
+            process.env.STATIC_URL + "/static/files/" + result?.icon;
+        } else {
+          result.icon = ``;
         }
-         if(result?.logo){
-           result.logo = process.env.STATIC_URL + "/static/files/" + result?.icon;
-        }else{
-           result.logo = ``;
+        if (result?.logo) {
+          result.logo =
+            process.env.STATIC_URL + "/static/files/" + result?.icon;
+        } else {
+          result.logo = ``;
         }
         result.we_accept_image =
           process.env.STATIC_URL + "/static/files/" + result?.we_accept_image;
@@ -3214,7 +3235,7 @@ var MerchantOrder = {
           })
           .catch((error) => {
             console.log("error in order details", error);
-           logger.error(500,{message: error,stack: error.stack}); 
+            logger.error(500, { message: error, stack: error.stack });
 
             res
               .status(statusCode.internalError)
@@ -3223,7 +3244,7 @@ var MerchantOrder = {
       })
       .catch((error) => {
         console.log("error in order details22", error);
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
 
         res
           .status(statusCode.internalError)
@@ -3377,7 +3398,7 @@ var MerchantOrder = {
               .send(successdatamsg(data, "Details fetch successfully."));
           })
           .catch((error) => {
-           logger.error(500,{message: error,stack: error.stack}); 
+            logger.error(500, { message: error, stack: error.stack });
 
             res
               .status(statusCode.internalError)
@@ -3385,7 +3406,7 @@ var MerchantOrder = {
           });
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
 
         res
           .status(statusCode.internalError)
@@ -3554,7 +3575,7 @@ var MerchantOrder = {
             );
         });
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       return res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -3675,14 +3696,14 @@ var MerchantOrder = {
           .send(successdatamsg(new_data, "Details fetch successfully."));
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
 
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
 
         res
           .status(statusCode.internalError)
@@ -4061,7 +4082,7 @@ var MerchantOrder = {
           console.log("ni_order_sale", ni_order_sale);
         } catch (error) {
           // console.log(error);
-         logger.error(500,{message: error,stack: error.stack}); 
+          logger.error(500, { message: error, stack: error.stack });
 
           let order_update_failed = {
             cardholderName: ni_sale_req.cardholderName,
@@ -5316,7 +5337,7 @@ var MerchantOrder = {
             )
             .then((result) => {})
             .catch((err) => {
-             logger.error(500,{message: err,stack: err.stack}); 
+              logger.error(500, { message: err, stack: err.stack });
             });
           if (
             ni_order_sale.state == "AUTHORISED" ||
@@ -5465,7 +5486,7 @@ var MerchantOrder = {
       })
       .catch(async (error) => {
         console.log("error_ni", error);
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
 
         logs.push(
           `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : error occurred`
@@ -6529,7 +6550,7 @@ var MerchantOrder = {
               )
               .then((result) => {})
               .catch((err) => {
-               logger.error(500,{message: err,stack: err.stack}); 
+                logger.error(500, { message: err, stack: err.stack });
               });
             // web  hook starting
             let hook_info = await helpers.get_data_list(
@@ -6758,7 +6779,7 @@ var MerchantOrder = {
               )
               .then((result) => {})
               .catch((err) => {
-               logger.error(500,{message: err,stack: err.stack}); 
+                logger.error(500, { message: err, stack: err.stack });
               });
 
             return res
@@ -6882,7 +6903,7 @@ var MerchantOrder = {
         return res.status(statusCode.ok).send(response.successansmsg(res_obj));
       }
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       let res_order_data = await merchantOrderModel.selectDynamicONE(
         "*",
         { order_id: req.bodyString("order_id") },
@@ -7030,7 +7051,7 @@ var MerchantOrder = {
           .status(statusCode.ok)
           .send(response.successdatamsg(res_obj, "Transaction Failed"));
       } catch (error) {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
       }
     }
   },
@@ -7081,7 +7102,7 @@ var MerchantOrder = {
               name: order_details.customer_name,
               dial_code: req.bodyString("dial_code"),
               mobile_no: req.bodyString("mobile_no"),
-              prefer_lang: enc_dec.cjs_decrypt(req.bodyString("prefer_lang")),
+              prefer_lang: 1,
               updated_at: updated_at,
             };
             merchantOrderModel
@@ -7097,7 +7118,7 @@ var MerchantOrder = {
                 next();
               })
               .catch((error) => {
-               logger.error(500,{message: error,stack: error.stack}); 
+                logger.error(500, { message: error, stack: error.stack });
                 res
                   .status(statusCode.internalError)
                   .send(response.errormsg(error.message));
@@ -7110,7 +7131,7 @@ var MerchantOrder = {
               email: req.bodyString("email"),
               dial_code: req.bodyString("dial_code"),
               mobile_no: req.bodyString("mobile_no"),
-              prefer_lang: enc_dec.cjs_decrypt(req.bodyString("prefer_lang")),
+              prefer_lang: 1,
               created_at: created_at,
               updated_at: updated_at,
             };
@@ -7122,7 +7143,7 @@ var MerchantOrder = {
               })
               .catch((error) => {
                 console.log("add_custoner", error);
-               logger.error(500,{message: error,stack: error.stack}); 
+                logger.error(500, { message: error, stack: error.stack });
 
                 res
                   .status(statusCode.internalError)
@@ -7132,7 +7153,7 @@ var MerchantOrder = {
         })
         .catch((error) => {
           console.log("add_custoner", error);
-         logger.error(500,{message: error,stack: error.stack}); 
+          logger.error(500, { message: error, stack: error.stack });
 
           res
             .status(statusCode.internalError)
@@ -7189,7 +7210,7 @@ var MerchantOrder = {
                 next();
               })
               .catch((error) => {
-               logger.error(500,{message: error,stack: error.stack}); 
+                logger.error(500, { message: error, stack: error.stack });
                 res
                   .status(statusCode.internalError)
                   .send(response.errormsg(error.message));
@@ -7215,7 +7236,7 @@ var MerchantOrder = {
                 next();
               })
               .catch((error) => {
-               logger.error(500,{message: error,stack: error.stack}); 
+                logger.error(500, { message: error, stack: error.stack });
 
                 res
                   .status(statusCode.internalError)
@@ -7224,7 +7245,7 @@ var MerchantOrder = {
           }
         })
         .catch((error) => {
-         logger.error(500,{message: error,stack: error.stack}); 
+          logger.error(500, { message: error, stack: error.stack });
 
           res
             .status(statusCode.internalError)
@@ -7233,249 +7254,261 @@ var MerchantOrder = {
     }
   },
   saveCard: async (req, res, next) => {
-   try{
-    let browser_token = {
-      os: req.headers.os,
-      browser: req.headers.browser,
-      browser_version: req.headers["x-browser-version"],
-      browser_fingerprint: req.headers.fp,
-    };
+    try {
+      let browser_token = {
+        os: req.headers.os,
+        browser: req.headers.browser,
+        browser_version: req.headers["x-browser-version"],
+        browser_fingerprint: req.headers.fp,
+      };
 
-    console.log(browser_token);
+      console.log(browser_token);
 
-    let browser_token_enc = enc_dec.cjs_encrypt(JSON.stringify(browser_token));
+      let browser_token_enc = enc_dec.cjs_encrypt(
+        JSON.stringify(browser_token)
+      );
 
-    let card_exits = await helpers.checkCardExistByCardNoAndCID(
-      {
-        browser_token: browser_token_enc,
-        email: req.bodyString("email"),
-        deleted: 0,
-      },
-      req.bodyString("card")
-    );
-
-    if (req.bodyString("card_id") == "") {
-      let save_card = req.bodyString("save_card");
-
-      if (!card_exits) {
-        let secret_key = await cipherModel.selectOne("id", {
-          ["expiry_date >= "]: moment().format("YYYY-MM-DD"),
-          is_active: 1,
-        });
-        let created_at = moment().format("YYYY-MM-DD HH:mm:ss");
-        let updated_at = moment().format("YYYY-MM-DD HH:mm:ss");
-        let card_number = await enc_dec.dynamic_encryption(
-          req.bodyString("card"),
-          secret_key.id,
-          ""
-        );
-        let cvv = await enc_dec.dynamic_encryption(
-          req.body.cvv,
-          secret_key.id,
-          ""
-        );
-        let card_proxy = enc_dec.encrypt_card(req.bodyString("card"));
-        let card = {
-          name_on_card: req.bodyString("name"),
-          email: req.bodyString("email"),
-          card_number: card_number,
-          card_expiry: req.bodyString("expiry_date"),
-          card_nw: req.card_details.card_brand,
-          last_4_digit: req.bodyString("card").slice(-4),
+      let card_exits = await helpers.checkCardExistByCardNoAndCID(
+        {
           browser_token: browser_token_enc,
-          cid: req.customer_id,
-          created_at: created_at,
-          updated_at: updated_at,
-          card_proxy: card_proxy,
-          cipher_id: secret_key.id,
-          is_save: save_card == "1" ? 1 : 0,
-        };
-        let temp_card_storage_data = {
-          order_id: req.bodyString("order_id"),
-          mode: req.bodyString("env"),
-          card: card_number,
-          expiry: req.bodyString("expiry_date"),
-          card_holder_name: req.bodyString("name"),
-          cipher_id: secret_key.id,
-          card_proxy: card_proxy,
-          cvv: cvv,
-        };
+          email: req.bodyString("email"),
+          deleted: 0,
+        },
+        req.bodyString("card")
+      );
 
-        let addTempCardRes = await helpers.addTempCard(temp_card_storage_data);
+      if (req.bodyString("card_id") == "") {
+        let save_card = req.bodyString("save_card");
 
-        req.browser_fingerprint = browser_token_enc;
-        merchantOrderModel
-          .addCustomerCards(card)
-          .then((result) => {
-            req.card_id = enc_dec.cjs_encrypt(result.insertId);
-            next();
-          })
-          .catch((error) => {
-           logger.error(500,{message: error,stack: error.stack}); 
-
-            res
-              .status(statusCode.internalError)
-              .send(response.errormsg(error.message));
-          });
-      } else {
-        if (card_exits) {
-          let is_save = save_card == "1" ? 1 : 0;
-          merchantOrderModel.updateDynamic(
-            { is_save: is_save },
-            { id: card_exits.id },
-            "customers_cards"
-          );
+        if (!card_exits) {
           let secret_key = await cipherModel.selectOne("id", {
             ["expiry_date >= "]: moment().format("YYYY-MM-DD"),
             is_active: 1,
           });
+          let created_at = moment().format("YYYY-MM-DD HH:mm:ss");
+          let updated_at = moment().format("YYYY-MM-DD HH:mm:ss");
+          let card_number = await enc_dec.dynamic_encryption(
+            req.bodyString("card"),
+            secret_key.id,
+            ""
+          );
           let cvv = await enc_dec.dynamic_encryption(
             req.body.cvv,
             secret_key.id,
             ""
           );
+          let card_proxy = enc_dec.encrypt_card(req.bodyString("card"));
+          let card = {
+            name_on_card: req.bodyString("name"),
+            email: req.bodyString("email"),
+            card_number: card_number,
+            card_expiry: req.bodyString("expiry_date"),
+            card_nw: req.card_details.card_brand,
+            last_4_digit: req.bodyString("card").slice(-4),
+            browser_token: browser_token_enc,
+            cid: req.customer_id,
+            created_at: created_at,
+            updated_at: updated_at,
+            card_proxy: card_proxy,
+            cipher_id: secret_key.id,
+            is_save: save_card == "1" ? 1 : 0,
+          };
           let temp_card_storage_data = {
             order_id: req.bodyString("order_id"),
             mode: req.bodyString("env"),
-            card: card_exits.card_number,
-            expiry: card_exits.card_expiry,
-            card_holder_name: card_exits.name_on_card,
-            cipher_id: card_exits.cipher_id,
-            card_proxy: card_exits.card_proxy,
+            card: card_number,
+            expiry: req.bodyString("expiry_date"),
+            card_holder_name: req.bodyString("name"),
+            cipher_id: secret_key.id,
+            card_proxy: card_proxy,
             cvv: cvv,
           };
 
           let addTempCardRes = await helpers.addTempCard(
             temp_card_storage_data
           );
-          req.card_id = enc_dec.cjs_encrypt(card_exits.id);
+
+          req.browser_fingerprint = browser_token_enc;
+          merchantOrderModel
+            .addCustomerCards(card)
+            .then((result) => {
+              req.card_id = enc_dec.cjs_encrypt(result.insertId);
+              next();
+            })
+            .catch((error) => {
+              logger.error(500, { message: error, stack: error.stack });
+
+              res
+                .status(statusCode.internalError)
+                .send(response.errormsg(error.message));
+            });
+        } else {
+          if (card_exits) {
+            let is_save = save_card == "1" ? 1 : 0;
+            merchantOrderModel.updateDynamic(
+              { is_save: is_save },
+              { id: card_exits.id },
+              "customers_cards"
+            );
+            let secret_key = await cipherModel.selectOne("id", {
+              ["expiry_date >= "]: moment().format("YYYY-MM-DD"),
+              is_active: 1,
+            });
+            let cvv = await enc_dec.dynamic_encryption(
+              req.body.cvv,
+              secret_key.id,
+              ""
+            );
+            let temp_card_storage_data = {
+              order_id: req.bodyString("order_id"),
+              mode: req.bodyString("env"),
+              card: card_exits.card_number,
+              expiry: card_exits.card_expiry,
+              card_holder_name: card_exits.name_on_card,
+              cipher_id: card_exits.cipher_id,
+              card_proxy: card_exits.card_proxy,
+              cvv: cvv,
+            };
+
+            let addTempCardRes = await helpers.addTempCard(
+              temp_card_storage_data
+            );
+            req.card_id = enc_dec.cjs_encrypt(card_exits.id);
+          }
+
+          next();
         }
-
-        next();
-      }
-    } else {
-      let card_id = enc_dec.cjs_decrypt(req.body.card_id);
-      req.card_id = req.body.card_id;
-      let card_details = await merchantOrderModel.selectDynamicONE(
-        "*",
-        { id: card_id },
-        "customers_cards"
-      );
-      let secret_key = await cipherModel.selectOne("id", {
-        ["expiry_date >= "]: moment().format("YYYY-MM-DD"),
-        is_active: 1,
-      });
-      let cvv = await enc_dec.dynamic_encryption(
-        req.body.cvv,
-        secret_key.id,
-        ""
-      );
-      let temp_card_storage_data = {
-        order_id: req.bodyString("order_id"),
-        mode: req.bodyString("env"),
-        card: card_details.card_number,
-        expiry: card_details.card_expiry,
-        card_holder_name: card_details.name_on_card,
-        cipher_id: card_details.cipher_id,
-        card_proxy: card_details.card_proxy,
-        cvv: cvv,
-      };
-
-      let addTempCardRes = await helpers.addTempCard(temp_card_storage_data);
-      next();
-    }
-  }catch(error){
-    logger.error(500,{message: error,stack: error.stack}); 
-    res.status(statusCode.internalError).send(response.errorMsg("Something went wrong"));
-  }
-  },
-
-  bin_saveCard: async (req, res, next) => {
-    try{
-    let browser_token = {
-      os: req.headers.os,
-      browser: req.headers.browser,
-      browser_version: req.headers["x-browser-version"],
-      browser_fingerprint: req.headers.fp,
-    };
-    let browser_token_enc = enc_dec.cjs_encrypt(JSON.stringify(browser_token));
-    let card_exits = await helpers.checkCardExistByCardNoAndCID(
-      {
-        browser_token: browser_token_enc,
-        email: req.bodyString("email"),
-        deleted: 0,
-      },
-      req.bodyString("card")
-    );
-
-    if (req.bodyString("card_id") == "") {
-      let save_card = req.bodyString("save_card");
-      if (save_card == "1" && !card_exits) {
-        const secret_key = await cipherModel.selectOne("id", {
+      } else {
+        console.log(`we are here in the card storage`);
+        let card_id = enc_dec.cjs_decrypt(req.body.card_id);
+        req.card_id = req.body.card_id;
+        let card_details = await merchantOrderModel.selectDynamicONE(
+          "*",
+          { id: card_id },
+          "customers_cards"
+        );
+        let secret_key = await cipherModel.selectOne("id", {
           ["expiry_date >= "]: moment().format("YYYY-MM-DD"),
           is_active: 1,
         });
-        const created_at = moment().format("YYYY-MM-DD HH:mm:ss");
-        const updated_at = moment().format("YYYY-MM-DD HH:mm:ss");
-        const recent_used = moment().format("YYYY-MM-DD HH:mm:ss");
-        let card = {
-          name_on_card: req.bodyString("name"),
-          email: req.bodyString("email"),
-          card_number: await enc_dec.dynamic_encryption(
-            req.bodyString("card"),
-            secret_key.id,
-            ""
-          ),
-          card_expiry: req.bodyString("expiry_date"),
-          card_nw: req?.card_details?.card_brand,
-          last_4_digit: req.bodyString("card").slice(-4),
-          browser_token: browser_token_enc,
-          cid: req.customer_id,
-          created_at: created_at,
-          updated_at: updated_at,
-          card_proxy: enc_dec.encrypt_card(req.bodyString("card")),
-          cipher_id: secret_key.id,
-          recent_used: recent_used,
+        let cvv = await enc_dec.dynamic_encryption(
+          req.body.cvv,
+          secret_key.id,
+          ""
+        );
+        let temp_card_storage_data = {
+          order_id: req.bodyString("order_id"),
+          mode: req.bodyString("env"),
+          card: card_details.card_number,
+          expiry: card_details.card_expiry,
+          card_holder_name: card_details.name_on_card,
+          cipher_id: card_details.cipher_id,
+          card_proxy: card_details.card_proxy,
+          cvv: cvv,
         };
-        req.browser_fingerprint = browser_token_enc;
-        merchantOrderModel
-          .addCustomerCards(card)
-          .then((result) => {
-            req.card_id = enc_dec.cjs_encrypt(result.insertId);
-            next();
-          })
-          .catch((error) => {
-            console.log(error);
-           logger.error(500,{message: error,stack: error.stack}); 
-
-            return res
-              .status(statusCode.internalError)
-              .send(response.errormsg(error.message));
-          });
-      } else {
-        if (card_exits) {
-          const _cardid = enc_dec.cjs_encrypt(card_exits.id);
-          req.card_id = _cardid;
-          const recent_used = moment().format("YYYY-MM-DD HH:mm:ss");
-          await merchantOrderModel.updateDynamic(
-            {
-              recent_used: recent_used,
-            },
-            {
-              id: recent_used,
-            },
-            "customers_cards"
-          );
-        }
+        console.log(temp_card_storage_data);
+        let addTempCardRes = await helpers.addTempCard(temp_card_storage_data);
         next();
       }
-    } else {
-      next();
+    } catch (error) {
+      console.log(error);
+      logger.error(500, { message: error, stack: error.stack });
+      res
+        .status(statusCode.internalError)
+        .send(response.errorMsg("Something went wrong"));
     }
-  }catch(error){
-    logger.error(500,{message: error,stack: error.stack}); 
-    res.status(statusCode.internalError).send(response.errorMsg("Something went wrong"));
-  }
+  },
+
+  bin_saveCard: async (req, res, next) => {
+    try {
+      let browser_token = {
+        os: req.headers.os,
+        browser: req.headers.browser,
+        browser_version: req.headers["x-browser-version"],
+        browser_fingerprint: req.headers.fp,
+      };
+      let browser_token_enc = enc_dec.cjs_encrypt(
+        JSON.stringify(browser_token)
+      );
+      let card_exits = await helpers.checkCardExistByCardNoAndCID(
+        {
+          browser_token: browser_token_enc,
+          email: req.bodyString("email"),
+          deleted: 0,
+        },
+        req.bodyString("card")
+      );
+
+      if (req.bodyString("card_id") == "") {
+        let save_card = req.bodyString("save_card");
+        if (save_card == "1" && !card_exits) {
+          const secret_key = await cipherModel.selectOne("id", {
+            ["expiry_date >= "]: moment().format("YYYY-MM-DD"),
+            is_active: 1,
+          });
+          const created_at = moment().format("YYYY-MM-DD HH:mm:ss");
+          const updated_at = moment().format("YYYY-MM-DD HH:mm:ss");
+          const recent_used = moment().format("YYYY-MM-DD HH:mm:ss");
+          let card = {
+            name_on_card: req.bodyString("name"),
+            email: req.bodyString("email"),
+            card_number: await enc_dec.dynamic_encryption(
+              req.bodyString("card"),
+              secret_key.id,
+              ""
+            ),
+            card_expiry: req.bodyString("expiry_date"),
+            card_nw: req?.card_details?.card_brand,
+            last_4_digit: req.bodyString("card").slice(-4),
+            browser_token: browser_token_enc,
+            cid: req.customer_id,
+            created_at: created_at,
+            updated_at: updated_at,
+            card_proxy: enc_dec.encrypt_card(req.bodyString("card")),
+            cipher_id: secret_key.id,
+            recent_used: recent_used,
+          };
+          req.browser_fingerprint = browser_token_enc;
+          merchantOrderModel
+            .addCustomerCards(card)
+            .then((result) => {
+              req.card_id = enc_dec.cjs_encrypt(result.insertId);
+              next();
+            })
+            .catch((error) => {
+              console.log(error);
+              logger.error(500, { message: error, stack: error.stack });
+
+              return res
+                .status(statusCode.internalError)
+                .send(response.errormsg(error.message));
+            });
+        } else {
+          if (card_exits) {
+            const _cardid = enc_dec.cjs_encrypt(card_exits.id);
+            req.card_id = _cardid;
+            const recent_used = moment().format("YYYY-MM-DD HH:mm:ss");
+            await merchantOrderModel.updateDynamic(
+              {
+                recent_used: recent_used,
+              },
+              {
+                id: recent_used,
+              },
+              "customers_cards"
+            );
+          }
+          next();
+        }
+      } else {
+        next();
+      }
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+      res
+        .status(statusCode.internalError)
+        .send(response.errorMsg("Something went wrong"));
+    }
   },
 
   cardList: async (req, res, next) => {
@@ -7692,7 +7725,7 @@ var MerchantOrder = {
       })
       .catch((error) => {
         console.log(error);
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         return res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -7728,7 +7761,7 @@ var MerchantOrder = {
           .send(successdatamsg(order_res, "Cancelled successfully."));
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -7844,7 +7877,7 @@ var MerchantOrder = {
           .send(successdatamsg(order_res, "Order failed."));
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         console.log(error);
         res
           .status(statusCode.internalError)
@@ -7881,7 +7914,7 @@ var MerchantOrder = {
           .send(successdatamsg(order_res, "Order failed."));
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -7903,7 +7936,7 @@ var MerchantOrder = {
           .send(successmsg("Card deleted successfully."));
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -8052,7 +8085,7 @@ var MerchantOrder = {
           .send(successdatamsg(res_obj, "Paid successfully."));
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
 
         res
           .status(statusCode.internalError)
@@ -8126,7 +8159,7 @@ var MerchantOrder = {
           .send(successdatamsg(new_res, "Details fetch successfully."));
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
 
         res
           .status(statusCode.internalError)
@@ -8231,7 +8264,7 @@ var MerchantOrder = {
           );
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
 
         res
           .status(statusCode.internalError)
@@ -8453,14 +8486,14 @@ var MerchantOrder = {
           .then((result) => {})
           .catch((err) => {
             console.log(err);
-           logger.error(500,{message: err,stack: err.stack}); 
+            logger.error(500, { message: err, stack: err.stack });
           });
 
         res.status(statusCode.ok).send(res_order_details);
       })
       .catch(async (error) => {
         console.log(error);
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         logs.push(
           `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : response error ${
             error.message
@@ -8475,7 +8508,7 @@ var MerchantOrder = {
           .add(logs_payload, "order_logs")
           .then((result) => {})
           .catch((err) => {
-           logger.error(500,{message: err,stack: err.stack}); 
+            logger.error(500, { message: err, stack: err.stack });
           });
         res
           .status(statusCode.internalError)
@@ -8672,12 +8705,12 @@ var MerchantOrder = {
           .add(logs_payload, "order_logs")
           .then((result) => {})
           .catch((err) => {
-           logger.error(500,{message: err,stack: err.stack}); 
+            logger.error(500, { message: err, stack: err.stack });
           });
         res.status(statusCode.ok).send(res_order_details);
       })
       .catch(async (error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         logs.push(
           `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : error occurred ${
             error.message
@@ -8692,7 +8725,7 @@ var MerchantOrder = {
           .add(logs_payload, "order_logs")
           .then((result) => {})
           .catch((err) => {
-           logger.error(500,{message: err,stack: err.stack}); 
+            logger.error(500, { message: err, stack: err.stack });
           });
         res
           .status(statusCode.internalError)
@@ -8755,7 +8788,7 @@ var MerchantOrder = {
           });
         })
         .catch((error) => {
-         logger.error(500,{message: error,stack: error.stack}); 
+          logger.error(500, { message: error, stack: error.stack });
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
@@ -9042,12 +9075,12 @@ var MerchantOrder = {
           .add(logs_payload, "order_logs")
           .then((result) => {})
           .catch((err) => {
-           logger.error(500,{message: err,stack: err.stack}); 
+            logger.error(500, { message: err, stack: err.stack });
           });
         res.status(statusCode.ok).send(res_order_details);
       })
       .catch(async (error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         logs.push(
           `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : received error ${
             error.message
@@ -9062,7 +9095,7 @@ var MerchantOrder = {
           .add(logs_payload, "order_logs")
           .then((result) => {})
           .catch((err) => {
-           logger.error(500,{message: err,stack: err.stack}); 
+            logger.error(500, { message: err, stack: err.stack });
           });
         res
           .status(statusCode.internalError)
@@ -9237,7 +9270,7 @@ var MerchantOrder = {
             )
             .then((result) => {})
             .catch((err) => {
-             logger.error(500,{message: err,stack: err.stack}); 
+              logger.error(500, { message: err, stack: err.stack });
             });
           res
             .status(statusCode.ok)
@@ -9263,14 +9296,14 @@ var MerchantOrder = {
             )
             .then((result) => {})
             .catch((err) => {
-             logger.error(500,{message: err,stack: err.stack}); 
+              logger.error(500, { message: err, stack: err.stack });
             });
           res
             .status(statusCode.ok)
             .send(response.errormsg("Unable to initiate refund."));
         }
       } catch (error) {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         let resp_dump = {
           order_id: req.bodyString("order_id"),
           type: "VOID",
@@ -9304,7 +9337,7 @@ var MerchantOrder = {
           )
           .then((result) => {})
           .catch((err) => {
-           logger.error(500,{message: err,stack: err.stack}); 
+            logger.error(500, { message: err, stack: err.stack });
           });
         res
           .status(statusCode.ok)
@@ -9329,7 +9362,7 @@ var MerchantOrder = {
         )
         .then((result) => {})
         .catch((err) => {
-         logger.error(500,{message: err,stack: err.stack}); 
+          logger.error(500, { message: err, stack: err.stack });
         });
       res
         .status(statusCode.ok)
@@ -9484,7 +9517,7 @@ var MerchantOrder = {
             )
             .then((result) => {})
             .catch((err) => {
-             logger.error(500,{message: err,stack: err.stack}); 
+              logger.error(500, { message: err, stack: err.stack });
             });
           res
             .status(statusCode.ok)
@@ -9508,14 +9541,14 @@ var MerchantOrder = {
             )
             .then((result) => {})
             .catch((err) => {
-             logger.error(500,{message: err,stack: err.stack}); 
+              logger.error(500, { message: err, stack: err.stack });
             });
           res
             .status(statusCode.ok)
             .send(response.errormsg("Order is not at captured state!"));
         }
       } catch (error) {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         logs.push(
           `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : error occurred ${
             error.response.data.errors[0].message
@@ -9549,7 +9582,7 @@ var MerchantOrder = {
           )
           .then((result) => {})
           .catch((err) => {
-           logger.error(500,{message: err,stack: err.stack}); 
+            logger.error(500, { message: err, stack: err.stack });
           });
         res
           .status(statusCode.ok)
@@ -9574,7 +9607,7 @@ var MerchantOrder = {
         )
         .then((result) => {})
         .catch((err) => {
-         logger.error(500,{message: err,stack: err.stack}); 
+          logger.error(500, { message: err, stack: err.stack });
         });
       res
         .status(statusCode.ok)
@@ -10294,7 +10327,7 @@ var MerchantOrder = {
                 await ReferralBonusModel.addBonus(bonusData)
                   .then((result) => {})
                   .catch((error) => {
-                   logger.error(500,{message: error,stack: error.stack}); 
+                    logger.error(500, { message: error, stack: error.stack });
                   });
               }
 
@@ -10448,7 +10481,7 @@ var MerchantOrder = {
               }
             }
           } catch (error) {
-           logger.error(500,{message: error,stack: error.stack}); 
+            logger.error(500, { message: error, stack: error.stack });
             return error.response;
           }
         });
@@ -10471,7 +10504,7 @@ var MerchantOrder = {
           )
           .then((result) => {})
           .catch((err) => {
-           logger.error(500,{message: err,stack: err.stack}); 
+            logger.error(500, { message: err, stack: err.stack });
           });
         return res
           .status(statusCode.ok)
@@ -10553,14 +10586,14 @@ var MerchantOrder = {
           )
           .then((result) => {})
           .catch((err) => {
-           logger.error(500,{message: err,stack: err.stack}); 
+            logger.error(500, { message: err, stack: err.stack });
           });
         return res
           .status(statusCode.ok)
           .send(response.errorMsgWithData(sale_api_res.message, res_obj));
       }
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       return res.status(statusCode.ok).send(response.errormsg(error?.message));
     }
   },
@@ -11111,7 +11144,7 @@ var MerchantOrder = {
             )
             .then((result) => {})
             .catch((err) => {
-             logger.error(500,{message: err,stack: err.stack}); 
+              logger.error(500, { message: err, stack: err.stack });
             });
 
           // web  hook starting
@@ -11190,7 +11223,7 @@ var MerchantOrder = {
             .send(successdatamsg(res_obj, res_obj.message));
         })
         .catch(async (error) => {
-         logger.error(500,{message: error,stack: error.stack}); 
+          logger.error(500, { message: error, stack: error.stack });
           logs.push(
             `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : error occurred ${
               error.message
@@ -11210,7 +11243,7 @@ var MerchantOrder = {
             )
             .then((result) => {})
             .catch((err) => {
-             logger.error(500,{message: err,stack: err.stack}); 
+              logger.error(500, { message: err, stack: err.stack });
             });
           res
             .status(statusCode.internalError)
@@ -11236,7 +11269,7 @@ var MerchantOrder = {
         )
         .then((result) => {})
         .catch((err) => {
-         logger.error(500,{message: err,stack: err.stack}); 
+          logger.error(500, { message: err, stack: err.stack });
         });
       res
         .status(statusCode.ok)
@@ -12102,7 +12135,7 @@ var MerchantOrder = {
           })
           .catch(async (error) => {
             console.log(error);
-           logger.error(500,{message: error,stack: error.stack}); 
+            logger.error(500, { message: error, stack: error.stack });
             logs.push(
               `${moment().format("DD/MM/YYYY HH:mm:ss.SSS")} : error occurred ${
                 error.message
@@ -12130,7 +12163,7 @@ var MerchantOrder = {
               )
               .then((result) => {})
               .catch((err) => {
-               logger.error(500,{message: err,stack: err.stack}); 
+                logger.error(500, { message: err, stack: err.stack });
               });
             res
               .status(statusCode.internalError)
@@ -12156,7 +12189,7 @@ var MerchantOrder = {
           )
           .then((result) => {})
           .catch((err) => {
-           logger.error(500,{message: err,stack: err.stack}); 
+            logger.error(500, { message: err, stack: err.stack });
           });
         res
           .status(statusCode.ok)
@@ -12165,7 +12198,7 @@ var MerchantOrder = {
           );
       }
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     }
   },
   capture: async (req, res, next) => {
@@ -12289,7 +12322,7 @@ var MerchantOrder = {
           );
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
 
         res
           .status(statusCode.ok)
@@ -12437,7 +12470,7 @@ var MerchantOrder = {
           );
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         console.log(error);
         res
           .status(statusCode.ok)
@@ -12552,7 +12585,7 @@ var MerchantOrder = {
           );
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
 
         res
           .status(statusCode.internalError)
@@ -12581,7 +12614,7 @@ var MerchantOrder = {
           response.successdatamsg(res1, "Order request fetched successfully.")
         );
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
 
       res
         .status(statusCode.ok)
@@ -13530,7 +13563,7 @@ var MerchantOrder = {
           .then((result) => {})
           .catch((err) => {
             console.log(err);
-           logger.error(500,{message: err,stack: err.stack}); 
+            logger.error(500, { message: err, stack: err.stack });
           });
 
         return res
@@ -13538,7 +13571,7 @@ var MerchantOrder = {
           .send(response.successdatamsg(res_obj, sale_api_res.message));
       }
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
 
       console.log(error);
 
@@ -13621,7 +13654,7 @@ var MerchantOrder = {
           );
       }
     } catch (err) {
-     logger.error(500,{message: err,stack: err.stack}); 
+      logger.error(500, { message: err, stack: err.stack });
       res.status(statusCode.internalError).send(response.errormsg(err.message));
     }
   },
@@ -13821,7 +13854,7 @@ var MerchantOrder = {
           .send(response.errormsg("Invalid p_order_id"));
       }
     } catch (err) {
-     logger.error(500,{message: err,stack: err.stack}); 
+      logger.error(500, { message: err, stack: err.stack });
       res.status(statusCode.internalError).send(response.errormsg(err.message));
     }
   },
@@ -13891,7 +13924,7 @@ var MerchantOrder = {
   //         );
   //     }
   // },
- transaction_list: async (req, res) => {
+  transaction_list: async (req, res) => {
     try {
       let limit = {
         perpage: 0,
@@ -13919,7 +13952,8 @@ var MerchantOrder = {
       }
 
       // if (req?.user?.merchant_id) {
-        and_filter_obj.merchant_id = req?.user?.merchant_id || req.credentials.merchant_id;
+      and_filter_obj.merchant_id =
+        req?.user?.merchant_id || req.credentials.merchant_id;
       // }
       if (req.credentials.super_merchant_id) {
         and_filter_obj.super_merchant = req.credentials.super_merchant_id;
@@ -14139,7 +14173,7 @@ var MerchantOrder = {
         );
     } catch (err) {
       console.log(err);
-     logger.error(500,{message: err,stack: err.stack}); 
+      logger.error(500, { message: err, stack: err.stack });
       res.status(statusCode.internalError).send(response.errormsg(err.message));
     }
   },
@@ -14346,7 +14380,7 @@ var MerchantOrder = {
         res.status(statusCode.ok).send(res_order_details);
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
 
         res
           .status(statusCode.internalError)
@@ -14361,7 +14395,7 @@ var MerchantOrder = {
       .add(logs_payload, "order_logs")
       .then((result) => {})
       .catch((err) => {
-       logger.error(500,{message: err,stack: err.stack}); 
+        logger.error(500, { message: err, stack: err.stack });
       });
   },
   transaction_new: async (req, res) => {
@@ -14459,7 +14493,7 @@ var MerchantOrder = {
       }
     } catch (err) {
       console.log(err);
-     logger.error(500,{message: err,stack: err.stack}); 
+      logger.error(500, { message: err, stack: err.stack });
       res.status(statusCode.internalError).send(response.errormsg(err.message));
     }
   },
@@ -14473,7 +14507,7 @@ var MerchantOrder = {
           })
           .then((res) => {})
           .catch((error) => {
-           logger.error(500,{message: error,stack: error.stack}); 
+            logger.error(500, { message: error, stack: error.stack });
           });
       }
 
@@ -14481,7 +14515,7 @@ var MerchantOrder = {
         .status(statusCode.ok)
         .send(response.successansmsg("All email were sent."));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
 
       res
         .status(statusCode.internalError)
@@ -14560,7 +14594,7 @@ var MerchantOrder = {
           .send(response.errormsg("No authorised payment to capture"));
       }
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
 
       res
         .status(statusCode.internalError)
@@ -14637,19 +14671,17 @@ var MerchantOrder = {
     return res.status(200).send(response);
   },
   confirm_wallet_payment: async (req, res) => {
-    
-
     let order_id = req.bodyString("order_id");
     let mode = "";
     let invoke_type = "";
     let sub_merchant_id = "";
-    if (req?.credentials?.merchant_id>0) {
+    if (req?.credentials?.merchant_id > 0) {
       mode = req.credentials.type;
       invoke_type = "API";
       sub_merchant_id = req.credentials.merchant_id;
       order_id = req.bodyString("p_order_id");
     }
-    console.log(mode,order_id); 
+    console.log(mode, order_id);
 
     if (req.user) {
       if (req.user.type == "admin") {
@@ -14662,7 +14694,7 @@ var MerchantOrder = {
         mode = req.bodyString("mode");
       }
     }
-  
+
     try {
       let table_name = mode == "test" ? "test_orders" : "orders";
       let order_details_psp = "";
@@ -14718,7 +14750,7 @@ var MerchantOrder = {
                     "SUCCESS"
                   )
                 );
-              break;  
+              break;
             case "Orange Money":
               let orange_res = await confirmOrange(order_id, mode);
               res
@@ -14731,8 +14763,11 @@ var MerchantOrder = {
                   )
                 );
               break;
-             case "Orange":
-              let orange_sandbox_res = await confirmOrangeSandbox(order_id, mode);
+            case "Orange":
+              let orange_sandbox_res = await confirmOrangeSandbox(
+                order_id,
+                mode
+              );
               res
                 .status(statusCode.ok)
                 .send(
@@ -14742,7 +14777,7 @@ var MerchantOrder = {
                     "SUCCESS"
                   )
                 );
-              break;  
+              break;
             case "ALPAY":
               let alpay_response = await confirmALPAY(order_id, mode);
               res
@@ -14777,7 +14812,7 @@ var MerchantOrder = {
           .send(response.errormsg("Invalid order id or mode"));
       }
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -14814,7 +14849,7 @@ var MerchantOrder = {
         }
       }
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       return false;
     }
   },
@@ -14873,7 +14908,7 @@ var MerchantOrder = {
             ? moment(txn_data.created_at).format("DD-MM-YYYY hh:mm:ss")
             : moment(order_details?.created_at).format("DD-MM-YYYY hh:mm:ss"),
           amount: order_details?.amount.toFixed(2) || "",
-          m_customer_id: order_details?.m_customer_id || "",
+          m_customer_id: order_details?.merchant_customer_id || "",
           psp: order_details?.psp || "",
           payment_method: order_details?.payment_mode || "",
           m_payment_token: order_details?.m_payment_token || "",
@@ -14901,12 +14936,82 @@ var MerchantOrder = {
           )
         );
     } catch (error) {
-    logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       return res
         .status(statusCode.internalError)
         .send(response.errormsg("Something went wrong"));
     }
   },
+  addMobileCustomer: async (req, res, next) => {
+    try{
+      let tableName = req?.body?.mode == "test" ? "test_orders" : "orders";
+      let order_id = req?.body?.order_id;
+      let email = merchantOrderModel.selectOne(
+        "customer_email",
+        { order_id: order_id },
+        tableName
+      );
+      if (email) {
+        const result = await merchantOrderModel.selectOne(
+          "*",
+          { email: email },
+          "customers"
+        );
+        const now = moment().format("YYYY-MM-DD HH:mm:ss");
+
+        if (result) {
+          // ===== UPDATE CUSTOMER =====
+          const customer_id = result.id;
+          const enc_customer_id = enc_dec.cjs_encrypt(customer_id);
+
+          const customer = {
+            name: req.bodyString("account_name"),
+            dial_code: req.bodyString("country_code"),
+            mobile_no: req.bodyString("mobile_no"),
+            prefer_lang: 1,
+            updated_at: now,
+          };
+
+          await merchantOrderModel.updateDynamic(
+            customer,
+            { id: customer_id },
+            "customers"
+          );
+
+          req.customer_id = enc_customer_id;
+          return next();
+        } else {
+          // ===== CREATE CUSTOMER =====
+          const customer = {
+            name: req.bodyString("account_name"),
+            email: email,
+            dial_code: req.bodyString("country_code"),
+            mobile_no: req.bodyString("mobile_no"),
+            prefer_lang: 1,
+            created_at: now,
+            updated_at: now,
+          };
+
+          const insertResult = await merchantOrderModel.addDynamic(
+            customer,
+            "customers"
+          );
+
+          req.customer_id = enc_dec.cjs_encrypt(insertResult.insertId);
+          return next();
+        }
+      } else {
+        next();
+      }
+
+    }catch(error){
+
+    }
+    finally{
+      next();
+    }
+
+  }
 };
 
 async function telr_pay(req) {
@@ -15713,7 +15818,7 @@ async function confirmMTN(order_id, mode) {
         return_url: process.env.PAYMENT_URL + "/status", //process.env.PAYMENT_URL + "/status",
         transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
         amount: order_details?.amount.toFixed(2) || "",
-        m_customer_id: order_details?.m_customer_id || "",
+        m_customer_id: order_details?.merchant_customer_id || "",
         psp: order_details?.psp || "",
         payment_method: order_details?.payment_mode || "",
         m_payment_token: order_details?.m_payment_token || "",
@@ -16090,7 +16195,7 @@ async function confirmOrange(order_id, mode) {
         return_url: process.env.PAYMENT_URL + "/status", //process.env.PAYMENT_URL + "/status",
         transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
         amount: order_details?.amount.toFixed(2) || "",
-        m_customer_id: order_details?.m_customer_id || "",
+        m_customer_id: order_details?.merchant_customer_id || "",
         psp: order_details?.psp || "",
         payment_method: order_details?.payment_mode || "",
         m_payment_token: order_details?.m_payment_token || "",
@@ -16486,7 +16591,7 @@ async function confirmALPAY(order_id, mode) {
         return_url: process.env.PAYMENT_URL + "/status", //process.env.PAYMENT_URL + "/status",
         transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
         amount: order_details?.amount.toFixed(2) || "",
-        m_customer_id: order_details?.m_customer_id || "",
+        m_customer_id: order_details?.merchant_customer_id || "",
         psp: order_details?.psp || "",
         payment_method: order_details?.payment_mode || "",
         m_payment_token: order_details?.m_payment_token || "",
@@ -16875,7 +16980,7 @@ async function confirmMTNSandbox(order_id, mode) {
         return_url: process.env.PAYMENT_URL + "/status", //process.env.PAYMENT_URL + "/status",
         transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
         amount: order_details.amount.toFixed(2),
-        m_customer_id: order_details?.m_customer_id || "",
+        m_customer_id: order_details?.merchant_customer_id || "",
         psp: order_details?.psp || "",
         payment_method: order_details?.payment_mode || "",
         m_payment_token: order_details?.m_payment_token || "",
@@ -17253,7 +17358,7 @@ async function confirmOrangeSandbox(order_id, mode) {
         return_url: process.env.PAYMENT_URL + "/status", //process.env.PAYMENT_URL + "/status",
         transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
         amount: order_details?.amount.toFixed(2) || "",
-        m_customer_id: order_details?.m_customer_id || "",
+        m_customer_id: order_details?.merchant_customer_id || "",
         psp: order_details?.psp || "",
         payment_method: order_details?.payment_mode || "",
         m_payment_token: order_details?.m_payment_token || "",
