@@ -268,7 +268,7 @@ var dbModel = {
     );
 
     let select =
-      "s.super_merchant_id,s.id,m.id as rep_id,s.ekyc_done,s.email,m.legal_person_first_name,m.legal_person_last_name,s.onboarding_done,s.ekyc_required,s.psp_mail_send,s.status,s.live,m.register_business_country,m.type_of_business,m.company_name,m.business_phone_number,m.legal_person_email,m.company_registration_number,m.merchant_id,m.currency,m.last_updated as last_updated";
+      "s.super_merchant_id,s.id,m.id as rep_id,s.ekyc_done,s.email,m.legal_person_first_name,m.legal_person_last_name,s.onboarding_done,s.ekyc_required,s.psp_mail_send,s.status,s.live,m.register_business_country,m.type_of_business,m.company_name,m.business_phone_number,m.legal_person_email,m.company_registration_number,m.merchant_id,m.currency,m.last_updated as last_updated,s.allow_statement_descriptor as allow_statement_descriptor";
     let response;
     let qb = await pool.get_connection();
     if (limit.perpage) {

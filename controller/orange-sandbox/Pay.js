@@ -162,7 +162,7 @@ const Pay = async (req, res) => {
     console.log(JSON.stringify(final_response.data));
     // Call updateDynamic to store sessionId in the database
     await merchantOrderModel.updateDynamic(
-      { payment_id: payment_id,pan:`${req.bodyString("country_code")}${req.bodyString("mobile_no")}` },
+      { payment_id: payment_id,pan:`${req.bodyString("country_code")}${req.bodyString("mobile_no")}`,session: final_response.data?.resultset?.TXNID },
       { order_id: order_id },
       order_table
     );

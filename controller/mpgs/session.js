@@ -287,6 +287,7 @@ const createSession = async (req, res) => {
           page_language,
       },
     };
+    
     if (order_details.origin == "SUBSCRIPTION") {
       console.log(`inside if condition of`);
       console.log(order_details);

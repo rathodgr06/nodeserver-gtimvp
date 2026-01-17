@@ -124,7 +124,7 @@ const confirm_payment = async (req, res) => {
             remark: orangeTxnStatus.remark,
             capture_no: "",
             created_at: moment().format('YYYY-MM-DD HH:mm:ss') || "",
-            payment_id: "",
+            payment_id: order_details.session,
         };
         const insert_to_txn_table = mode == "live" ? await order_transactionModel.add(order_txn) : order_transactionModel.test_txn_add(order_txn);
         let paydart_req_id = await helpers.make_sequential_no(mode == 'test' ? 'TST_REQ' : 'REQ');
@@ -159,7 +159,7 @@ const confirm_payment = async (req, res) => {
                 return_url: process.env.PAYMENT_URL + "/status", //process.env.PAYMENT_URL + "/status",
                 transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
                 amount: order_details?.amount.toFixed(2) || "",
-                m_customer_id: order_details?.m_customer_id || "",
+                m_customer_id: order_details?.merchant_customer_id || "",
                 psp: order_details?.psp || "",
                 payment_method: order_details?.payment_mode || "",
                 m_payment_token: order_details?.m_payment_token || "",

@@ -1245,6 +1245,7 @@ var res_data = {
           case "MPGS-MEPSPAY":
           case "MPGS-PAYSHIFT":
           case "MPGS-GTI":
+          case "MPGS-KSA":  
             for (let val of order_txn) {
               let check_created_at = moment(
                 val.created_at,
@@ -1909,7 +1910,7 @@ var res_data = {
             val.block_for_suspicious_email +
             val.block_for_transaction_limit +
             val.high_risk_country,
-          remark: failed_remark ? failed_remark : "-",
+          remark: val.remark?val.remark: "",
           transaction_date: moment(val.created_at).format("DD-MM-YYYY H:mm:ss"),
           url: val?.return_url ? val?.return_url : "",
           browser: val?.browser ? val?.browser : "",

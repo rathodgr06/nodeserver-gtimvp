@@ -45,7 +45,7 @@ var lookup = {
         mode
       );
 
-      // console.log("mid_data", mid_data);
+      console.log("mid_data", mid_data);
 
       const uniquePaymentSchemes = Array.from(
         new Set(mid_data.flatMap((item) => item.payment_schemes.split(",")))
@@ -67,6 +67,7 @@ var lookup = {
       };
       const result = await axios(options);
       console.log(options);
+      console.log(`bin data`);
       console.log(result.data);
 
       const lookup_result = {
@@ -113,6 +114,9 @@ var lookup = {
       const supportsCardCheck = mid_data.some((mid) =>
         mid.payment_methods.includes(cardType)
       );
+      if(lookup_result.card_brand=='' || lookup_result.card_brand=='LOCAL BRAND'){
+        lookup_result.card_brand="MADA";
+      }
       const isSupportedScheme = uniquePaymentSchemes.some(
         (val) => val === lookup_result.card_brand
       );
@@ -526,6 +530,9 @@ var lookup = {
         card: card_no,
         type: "",
       };
+       if(lookup_result.card_brand=='' || lookup_result.card_brand=='LOCAL BRAND'){
+        lookup_result.card_brand="MADA";
+      }
       req.card_details = lookup_result;
 
       const cardType_show =

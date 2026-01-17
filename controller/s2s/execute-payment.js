@@ -287,7 +287,7 @@ async function createOrder(req) {
     order_amount: order_details.amount,
     order_currency:order_details.currency,
     // return_url: order_details.return_url,
-    description: order_details?.description,
+    description: order_details?.statement_descriptor,
     other_description: order_details?.description,
     status: status,
     origin: "REMOTE",
@@ -1847,10 +1847,7 @@ async function terminalRouting(req, order_id, payment_mode) {
         }
 
         const updateorder = {
-          description:
-            order_details.remark == ""
-              ? psp_name.toUpperCase()
-              : order_details.description,
+          description: order_details.description,
           remark:
             order_details.remark == ""
               ? psp_name.toUpperCase()
@@ -1882,9 +1879,9 @@ async function terminalRouting(req, order_id, payment_mode) {
         };
         console.log(`update order`);
         console.log(updateorder);
-        if (!orderData.description) {
-          updateorder.description = psp_name;
-        }
+        // if (!orderData.description) {
+        //   updateorder.description = psp_name;
+        // }
         console.log(getmid[0]?.terminal_id);
         console.log(`update order is here`);
         console.log(updateorder);
@@ -2102,9 +2099,7 @@ async function terminalRouting(req, order_id, payment_mode) {
 
         const updateorder = {
           description:
-            order_details.description == ""
-              ? maxObj.psp_name.toUpperCase()
-              : order_details.description,
+            order_details.description,
           remark:
             order_details.remark == ""
               ? maxObj.psp_name.toUpperCase()
@@ -2362,7 +2357,7 @@ async function mpgsSessionAndAuth(req, order_id, mode, psp_name) {
         amount: order_details.amount,
         currency: order_details.currency,
         id: order_id,
-         description: "Bluebird Online Purchase"
+         description: order_details.other_description
       },
       authentication: {
         channel: "PAYER_BROWSER",

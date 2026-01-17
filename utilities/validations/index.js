@@ -10568,7 +10568,6 @@ const Validator = {
         psp_response_details: "Request parameters not found",
       };
       let common_err = await helpers.get_common_response(payload);
-
       res
         .status(StatusCode.badRequest)
         .send(
