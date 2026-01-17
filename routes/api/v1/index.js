@@ -12,6 +12,8 @@ const multipleupload_branding = require("../../../uploads/multipleupload_brandin
 const multipleupload_owners = require("../../../uploads/multipleupload_owners");
 // const multipleupload_owners_indi = require("../../../uploads/multipleupload_indi");
 const uploadCustomerProfilePic = require("../../../uploads/uploadcustomerprofile");
+const uploadBanner = require("../../../uploads/uploadBanner.js");
+
 /*Validator Imported*/
 const invoice = require("../../../controller/invoice");
 const responseImport = require("../../../controller/response_import");
@@ -199,12 +201,16 @@ const walletRollout = require("../../../utilities/wallet-snap/index.js");
 const APIAuth = require("../../../utilities/API/Auth.js");
 const verifyOrangeSandbox = require("../../../controller/orange-sandbox/Verify.js");
 const payOrangeSandbox = require("../../../controller/orange-sandbox/Pay.js");
-const confirmOrangeSandbox =require("../../../controller/orange-sandbox/confirm.js");
-const verifyAlPay= require('../../../controller/AlPay/Verify.js');
+const confirmOrangeSandbox = require("../../../controller/orange-sandbox/confirm.js");
+const verifyAlPay = require('../../../controller/AlPay/Verify.js');
 const payAlPay = require("../../../controller/AlPay/Pay.js");
 const confirmAlpay = require("../../../controller/AlPay/confirm.js");
 const superMerchantLogoUpload = require("../../../uploads/merchantLogoUpload.js")
 const { apiRateLimiter } = require('../../../utilities/api-ratelimiter/index.js');
+const Banner = require("../../../controller/banner.js");
+const MailTemplate = require("../../../controller/mail_template.js");
+
+
 app.post("/login", CheckHeader, Validator.login, Auth.login);
 app.post("/generate-token", async function (req, res) {
   payload = {
@@ -1148,7 +1154,7 @@ app.post("/setting/header/login/info", CheckHeader, Setting.login_info);
 app.post(
   "/setting/company/details",
   CheckHeader,
-  CheckToken,
+  //CheckToken,
   Setting.company_info
 );
 app.post("/setting/smtp/details", CheckHeader, CheckToken, Setting.smtp_info);
@@ -3240,9 +3246,9 @@ app.post(
   "/merchant/add-user",
   CheckHeader,
   CheckMerchantToken,
-  (req,res,next)=>{
+  (req, res, next) => {
     let stores = req.body.stores;
-    let enc_id = encrypt_decrypt('encrypt',stores);
+    let enc_id = encrypt_decrypt('encrypt', stores);
     req.body.stores = enc_id;
     next();
   },
@@ -4008,7 +4014,7 @@ app.get(
   // payment_validation.transaction_details,
   MerchantOrder.transaction_details
 );
-app.get("/open/orders/transaction-list",Validator.checkRuleHeaders,checkOpenMerchantCred,MerchantOrder.transaction_list);
+app.get("/open/orders/transaction-list", Validator.checkRuleHeaders, checkOpenMerchantCred, MerchantOrder.transaction_list);
 app.post("/add-payment-method-to-all", async (req, res) => {
   const path = require("path");
   require("dotenv").config({ path: "../../.env" });
@@ -4826,8 +4832,8 @@ app.post(
 app.post(
   "/merchant/onboard-submerchant",
   CheckHeader,
-  (req,res,next)=>{
-    req.body.super_merchant_id = encrypt_decrypt('decrypt',req.body.super_merchant_id);
+  (req, res, next) => {
+    req.body.super_merchant_id = encrypt_decrypt('decrypt', req.body.super_merchant_id);
     next();
   },
   MerchantRegisterValidator.api_register_submerchant,
@@ -4896,22 +4902,22 @@ app.post(
   WalletValidator.validate_user,
   charges_invoice_controller.walletBalance
 );
-app.post('/update-funding-details',APIAuth,fundingDetials.update,submerchant.updateFundingMethod);
-app.post('/add-funding-details',APIAuth,fundingDetials.add,submerchant.addFundingMethod);
-app.post('/verify-funding-details',APIAuth,fundingDetials.verify,submerchant.verifyFundingDetails);
-app.post('/manage-funding-details',APIAuth,fundingDetials.manage_funding,submerchant.manageFundingDetails);
-app.post('/update-payout-status',CheckHeader,payoutValidator.add,charges_invoice_controller.addPayout)
-app.post('/fetch-payers',APIAuth,submerchant.fetchPayer);
-app.post('/fetch-payer-details',APIAuth,submerchant.fetchPayerDetails);
-app.post('/funding-details',APIAuth,fundingDetials.get, submerchant.getFundingDetails);
-app.post('/funding-details-list',APIAuth,fundingDetials.list,submerchant.getFundingDetailsList);
-app.post('/delete-funding-details',CheckHeader,submerchant.deleteFundingDetails);
+app.post('/update-funding-details', APIAuth, fundingDetials.update, submerchant.updateFundingMethod);
+app.post('/add-funding-details', APIAuth, fundingDetials.add, submerchant.addFundingMethod);
+app.post('/verify-funding-details', APIAuth, fundingDetials.verify, submerchant.verifyFundingDetails);
+app.post('/manage-funding-details', APIAuth, fundingDetials.manage_funding, submerchant.manageFundingDetails);
+app.post('/update-payout-status', CheckHeader, payoutValidator.add, charges_invoice_controller.addPayout)
+app.post('/fetch-payers', APIAuth, submerchant.fetchPayer);
+app.post('/fetch-payer-details', APIAuth, submerchant.fetchPayerDetails);
+app.post('/funding-details', APIAuth, fundingDetials.get, submerchant.getFundingDetails);
+app.post('/funding-details-list', APIAuth, fundingDetials.list, submerchant.getFundingDetailsList);
+app.post('/delete-funding-details', CheckHeader, submerchant.deleteFundingDetails);
 
-app.get('/fetch-payout-countries',APIAuth,submerchant.getPayoutCountries);
-app.post('/fetch-currency-by-country',CheckHeader,submerchant.getCurrencyByCountry);
-app.post("/get-receiver-details",CheckHeader, MerchantRegister.get_receiver_details)
-app.post("/receiver-details-filter",CheckHeader, MerchantRegister.get_receivers_by_filters);
-app.post('/get-all-funding-details',CheckHeader,submerchant.getAllFundingDetails);
+app.get('/fetch-payout-countries', APIAuth, submerchant.getPayoutCountries);
+app.post('/fetch-currency-by-country', CheckHeader, submerchant.getCurrencyByCountry);
+app.post("/get-receiver-details", CheckHeader, MerchantRegister.get_receiver_details)
+app.post("/receiver-details-filter", CheckHeader, MerchantRegister.get_receivers_by_filters);
+app.post('/get-all-funding-details', CheckHeader, submerchant.getAllFundingDetails);
 app.post(
   "/set-order-expired",
   CheckHeader,
@@ -4919,23 +4925,23 @@ app.post(
   MerchantOrder.set_order_expired
 );
 app.post("/orange-verify", CheckHeader, orange_verify);
-app.post("/pay/orange-money",CheckHeader,MtnMomoValidator.pay,orange_pay);
-app.post("/confirm/orange-money",CheckHeader, MtnMomoValidator.confirm,orange_confirm);
-app.post('/fetch-ip',CheckHeader,CheckToken,submerchant.fetchIPList);
-app.post('/update-ip-list',CheckHeader,CheckToken,submerchant.updateIp);
-app.post('/pricing-plan/view-sale-rate',CheckHeader,CheckToken,pricing_plan.view_sale_rate);
-app.post("/fetch-wallet-list",CheckHeader,WalletValidator.list,charges_invoice_controller.fetchWalletList);
+app.post("/pay/orange-money", CheckHeader, MtnMomoValidator.pay, orange_pay);
+app.post("/confirm/orange-money", CheckHeader, MtnMomoValidator.confirm, orange_confirm);
+app.post('/fetch-ip', CheckHeader, CheckToken, submerchant.fetchIPList);
+app.post('/update-ip-list', CheckHeader, CheckToken, submerchant.updateIp);
+app.post('/pricing-plan/view-sale-rate', CheckHeader, CheckToken, pricing_plan.view_sale_rate);
+app.post("/fetch-wallet-list", CheckHeader, WalletValidator.list, charges_invoice_controller.fetchWalletList);
 
-schedule.scheduleJob('0 9 * * *', async function(){
-    console.log("starting payout scheddule");
-    await PayoutController.check_payout_schedule();
-    console.log("end of payout schedule");
+schedule.scheduleJob('0 9 * * *', async function () {
+  console.log("starting payout scheddule");
+  await PayoutController.check_payout_schedule();
+  console.log("end of payout schedule");
 });
 app.get("/cron-schedule-test", PayoutController.check_payout_schedule);
-app.post('/merchant-wallets',CheckHeader,CheckToken,WalletValidator.wallets,charges_invoice_controller.merchantWalletList);
-app.post('/fetch-sub-merchant-list',CheckHeader,CheckToken,charges_invoice_controller.fetchSubMerchantList);
-app.post('/get-country-details-by-id',CheckHeader, countries.details_2);
-app.post('/get-country-details-by-iso',CheckHeader, countries.details_by_iso_code);
+app.post('/merchant-wallets', CheckHeader, CheckToken, WalletValidator.wallets, charges_invoice_controller.merchantWalletList);
+app.post('/fetch-sub-merchant-list', CheckHeader, CheckToken, charges_invoice_controller.fetchSubMerchantList);
+app.post('/get-country-details-by-id', CheckHeader, countries.details_2);
+app.post('/get-country-details-by-iso', CheckHeader, countries.details_by_iso_code);
 app.post(
   "/create-wallet",
   WalletValidator.create,
@@ -4952,15 +4958,15 @@ app.post('/roll-out-wallet', wallet.rollout_wallets);
 //   await walletRollout();
 //   console.log("✅ Wallet Snapshot Job Completed");
 // });
-app.get('/roll-out',walletRollout);
+app.get('/roll-out', walletRollout);
 app.post("/get-wallet", WalletValidator.get_wallet, wallet.get_wallet);
 app.post("/load-wallet", WalletValidator.load_wallet, wallet.load_wallet);
-app.post('/add-bulk-funding-details',APIAuth,fundingDetials.add_bulk,submerchant.addBulkFundingMethod);
-app.post('/verify-bulk-funding-details',APIAuth,CheckHeader,fundingDetials.verify_bulk,submerchant.verifyBulkFundingDetails);
-app.post("/confirm-payment",CheckMerchantCred,MerchantOrder.confirm_wallet_payment);
-app.post("/orders/expire-details",MerchantOrder.fetchOrderDetails);
+app.post('/add-bulk-funding-details', APIAuth, fundingDetials.add_bulk, submerchant.addBulkFundingMethod);
+app.post('/verify-bulk-funding-details', APIAuth, CheckHeader, fundingDetials.verify_bulk, submerchant.verifyBulkFundingDetails);
+app.post("/confirm-payment", CheckMerchantCred, MerchantOrder.confirm_wallet_payment);
+app.post("/orders/expire-details", MerchantOrder.fetchOrderDetails);
 app.post("/unload-wallet", WalletValidator.unload_wallet, wallet.unload_wallet);
-app.post("/get-wallet-statement",apiRateLimiter, WalletValidator.get_wallet_statement, wallet.get_wallet_statement);
+app.post("/get-wallet-statement", apiRateLimiter, WalletValidator.get_wallet_statement, wallet.get_wallet_statement);
 app.post("/get-snapshot-balance", WalletValidator.get_wallet_snapshots, wallet.get_snapshot_balance);
 app.post("/merchant-webhook-details", CheckHeader, webHook.details);
 app.post("/get-submerchant-details", CheckHeader, submerchant.get_submerchant_details);
@@ -4971,32 +4977,32 @@ app.post("/update-wallet", CheckHeader, wallet.update);
 app.post("/mtn-sandbox-verify", CheckHeader, verifySandbox);
 app.post("pay/mtn-sandbox-mom", CheckHeader, MtnMomoValidator.pay, mtnPay);
 app.post("/pay/mtn-sandbox-momo", CheckHeader, MtnMomoValidator.pay, mtnSandboxPay);
-app.post("/confirm/mtn-sandbox",CheckHeader, MtnMomoValidator.confirm, confirm_sandbox_payment);
+app.post("/confirm/mtn-sandbox", CheckHeader, MtnMomoValidator.confirm, confirm_sandbox_payment);
 app.post("/orange-sandbox-verify", CheckHeader, verifyOrangeSandbox);
 app.post("/pay/orange-sandbox", CheckHeader, MtnMomoValidator.pay, payOrangeSandbox);
-app.post("/confirm/orange-sandbox", CheckHeader,confirmOrangeSandbox);
-app.post("/update_charges", CheckHeader,charges_invoice_controller.updateCharges);
-app.post("/alpay-verify",CheckHeader,verifyAlPay);
-app.post("/pay/alpay",CheckHeader,MtnMomoValidator.pay, payAlPay);
-app.post("/confirm/alpay",CheckHeader,confirmAlpay);
-app.post("/charges/analytics",CheckHeader,charges_invoice_controller.get_charges_analytics);
-app.post('/sub-merchant-count',CheckHeader,charges_invoice_controller.subMerchantCount);
-app.post('/wallet-count',CheckHeader,charges_invoice_controller.walletCount);
-app.post('/accounts-count',CheckHeader,charges_invoice_controller.accountCount);
-app.post('/ghana-payers-list',CheckHeader,submerchant.get_ghana_payers_list);
-app.post("/merchant/update-profile",CheckHeader,MerchantRegisterValidator.updateProfile,MerchantRegister.updateMrechantProfile);
-app.post('/fetch-super-merchant-logo',CheckHeader,CheckToken,MerchantEkyc.fetchSuperMerchantLogo);
-app.post('/upload-super-merchant-logo',CheckHeader,CheckToken,superMerchantLogoUpload,MerchantEkyc.uploadSuperMerchantLogo);
-app.post('/fetch-logo',CheckHeader,MerchantEkyc.fetchLogo);
-app.get('/roll-out-manually',walletRollout);
-app.post('/add-merchant-roles',CheckHeader,CheckToken,MerchantSetup.add);
-app.post('/update-merchant-roles',CheckHeader,CheckToken,MerchantSetup.update);
-app.post('/get-merchant-roles',CheckHeader,CheckToken,MerchantSetup.list);
-app.post('/delete-merchant-roles',CheckHeader,CheckToken,MerchantSetup.delete);
-app.post('/get-roles-by-country',CheckHeader,CheckToken,MerchantSetup.get_by_country);
-app.post('/update-alpay-status',function(req,res){
-    console.log(`This is log when we got webhook from ALPAY`);
-    console.log(req.body);
+app.post("/confirm/orange-sandbox", CheckHeader, confirmOrangeSandbox);
+app.post("/update_charges", CheckHeader, charges_invoice_controller.updateCharges);
+app.post("/alpay-verify", CheckHeader, verifyAlPay);
+app.post("/pay/alpay", CheckHeader, MtnMomoValidator.pay, payAlPay);
+app.post("/confirm/alpay", CheckHeader, confirmAlpay);
+app.post("/charges/analytics", CheckHeader, charges_invoice_controller.get_charges_analytics);
+app.post('/sub-merchant-count', CheckHeader, charges_invoice_controller.subMerchantCount);
+app.post('/wallet-count', CheckHeader, charges_invoice_controller.walletCount);
+app.post('/accounts-count', CheckHeader, charges_invoice_controller.accountCount);
+app.post('/ghana-payers-list', CheckHeader, submerchant.get_ghana_payers_list);
+app.post("/merchant/update-profile", CheckHeader, MerchantRegisterValidator.updateProfile, MerchantRegister.updateMrechantProfile);
+app.post('/fetch-super-merchant-logo', CheckHeader, CheckToken, MerchantEkyc.fetchSuperMerchantLogo);
+app.post('/upload-super-merchant-logo', CheckHeader, CheckToken, superMerchantLogoUpload, MerchantEkyc.uploadSuperMerchantLogo);
+app.post('/fetch-logo', CheckHeader, MerchantEkyc.fetchLogo);
+app.get('/roll-out-manually', walletRollout);
+app.post('/add-merchant-roles', CheckHeader, CheckToken, MerchantSetup.add);
+app.post('/update-merchant-roles', CheckHeader, CheckToken, MerchantSetup.update);
+app.post('/get-merchant-roles', CheckHeader, CheckToken, MerchantSetup.list);
+app.post('/delete-merchant-roles', CheckHeader, CheckToken, MerchantSetup.delete);
+app.post('/get-roles-by-country', CheckHeader, CheckToken, MerchantSetup.get_by_country);
+app.post('/update-alpay-status', function (req, res) {
+  console.log(`This is log when we got webhook from ALPAY`);
+  console.log(req.body);
 })
 app.post(
   "/currency/fetch-bump-up-rate",
@@ -5029,15 +5035,15 @@ const ValidateMerchant = require("../../../utilities/tokenmanager/ValidateMercha
 app.post('/admin/seed-wallets', async (req, res) => {
   try {
     const result = await seedWallets();
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: 'Wallets seeded successfully',
-      data: result 
+      data: result
     });
   } catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      error: error.message 
+    res.status(500).json({
+      success: false,
+      error: error.message
     });
   }
 });
@@ -5049,6 +5055,36 @@ app.get(
 );
 app.post("/merchant-droupdown-list", CheckHeader, CheckToken, merchant.dropdown_list);
 app.post("/mid-merchant-droupdown-list", CheckHeader, CheckToken, merchant.mid_dropdown_list);
+app.post("/store/list", CheckHeader, CheckMerchantToken, submerchant.storeList);
+app.post("/submerchant/list-export", CheckHeader, CheckMerchantToken, submerchant.listExport);
+
+// banner
+app.post("/banner/add", CheckHeader, CheckToken, uploadBanner, Validator.banner_add, Banner.add);
+app.post("/banner/list", CheckHeader, CheckToken, Banner.list);
+app.post("/banner/details", CheckHeader, CheckToken, Validator.banner_details, Banner.details);
+app.post("/banner/update", CheckHeader, CheckToken, uploadBanner, Validator.banner_update, Banner.update);
+app.post("/banner/delete", CheckHeader, CheckToken, Validator.banner_delete, Banner.delete);
+app.post("/banner/change-status", CheckHeader, CheckToken, Validator.banner_change_status, Banner.changeStatus);
+//mail-template
+app.post("/mail-template/add", CheckHeader, CheckToken, Validator.mail_template_add, MailTemplate.add);
+app.post("/mail-template/list", CheckHeader, CheckToken, MailTemplate.list);
+app.post("/mail-template/details", CheckHeader, CheckToken, Validator.mail_template_details, MailTemplate.details);
+app.post("/mail-template/preview", CheckHeader, CheckToken, Validator.mail_template_details, MailTemplate.preview);
+app.post("/mail-template/update", CheckHeader, CheckToken, Validator.mail_template_update, MailTemplate.update);
+app.post("/mail-template/delete", CheckHeader, CheckToken, Validator.mail_template_delete, MailTemplate.delete);
+app.post("/mail-template/change-status", CheckHeader, CheckToken, Validator.mail_template_change_status, MailTemplate.changeStatus);
+
+const apiDocument = require("../../../controller/ApiDocument.js");
+const uploadApiDoc = require("../../../uploads/uploadApiDoc.js");
+
+
+app.get("/api-documentation", apiDocument.getApiDocumentation);
+app.post("/api-documentation/add", CheckHeader, CheckToken, uploadApiDoc, Validator.api_document_add, apiDocument.add);
+app.post("/api-documentation/list", CheckHeader, CheckToken, apiDocument.list);
+app.post("/api-documentation/details", CheckHeader, CheckToken, apiDocument.details);
+app.post("/api-documentation/update", CheckHeader, CheckToken, uploadApiDoc, Validator.api_document_update, apiDocument.update);
+app.post("/api-documentation/delete", CheckHeader, CheckToken, apiDocument.delete);
+app.post("/api-documentation/change-status", CheckHeader, CheckToken, apiDocument.changeStatus);
 app.post("/store/list",CheckHeader,CheckMerchantToken,submerchant.storeList);
 app.post("/submerchant/list-export",CheckHeader,CheckMerchantToken,submerchant.listExport);
 

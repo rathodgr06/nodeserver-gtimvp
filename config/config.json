@@ -2,7 +2,7 @@
     "development": {
         "username": "root",
         "password": "",
-        "database": "uat_dcc",
+        "database": "paydart_db",
         "host": "localhost",
         "table_prefix": "pg_",
         "table_prefix1": "fds_",
@@ -11,7 +11,7 @@
     "test": {
         "username": "root",
         "password": "",
-        "database": "uat_dcc",
+        "database": "paydart_db",
         "host": "localhost",
         "table_prefix": "pg_",
          "table_prefix1": "fds_"
@@ -19,7 +19,7 @@
     "production": {
         "username": "root",
         "password": "",
-        "database": "uat_dcc",
+        "database": "paydart_db",
         "host": "localhost",
         "table_prefix": "pg_",
         "table_prefix1": "fds_"

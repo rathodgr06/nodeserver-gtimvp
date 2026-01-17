@@ -15,8 +15,9 @@ const { encrypt } = require("crypto-js/aes");
 const encrypt_decrypt = require("../utilities/decryptor/encrypt_decrypt");
 const moment = require("moment");
 require("dotenv").config({ path: "../.env" });
-const logger = require('../config/logger');
+const logger = require("../config/logger");
 const nodeCache = require("../utilities/helper/CacheManeger");
+const { banner_add } = require("../utilities/validations");
 
 var Setting = {
   change_language: async (req, res) => {
@@ -52,7 +53,7 @@ var Setting = {
         .status(statusCode.ok)
         .send(response.successmsg("Language changed successfully"));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -87,7 +88,7 @@ var Setting = {
         .status(statusCode.ok)
         .send(response.successmsg("Theme changed successfully"));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -96,7 +97,6 @@ var Setting = {
 
   header_info: async (req, res) => {
     try {
-      
       let image_path = process.env.STATIC_URL + "/static/images/";
       let file_path = process.env.STATIC_URL + "/static/language/";
       let user_details;
@@ -123,30 +123,29 @@ var Setting = {
           }
         );
         const today = moment();
-        if(supermerchant_live.user==0){
-        mer_list = await merchantModel.sub_merchant_list({
-          "mm.super_merchant_id":
-            user_details.super_merchant_id > 0
-              ? req.user.super_merchant_id
-              : req.user.id,
-          "mm.status": 0,
-          "mm.deleted": 0,
-          // "sm.super_merchant_id":0
-        });
-      }else{
-         mer_list = [
-          {
-            id:supermerchant_live.selected_submerchant,
-            company_name:supermerchant_live.name,
-            super_merchant_id:user_details.super_merchant_id > 0
-              ? req.user.super_merchant_id
-              : req.user.id,
-            live:supermerchant_live.live
-
-
-          }
-         ];
-      }
+        if (supermerchant_live.user == 0) {
+          mer_list = await merchantModel.sub_merchant_list({
+            "mm.super_merchant_id":
+              user_details.super_merchant_id > 0
+                ? req.user.super_merchant_id
+                : req.user.id,
+            "mm.status": 0,
+            "mm.deleted": 0,
+            // "sm.super_merchant_id":0
+          });
+        } else {
+          mer_list = [
+            {
+              id: supermerchant_live.selected_submerchant,
+              company_name: supermerchant_live.name,
+              super_merchant_id:
+                user_details.super_merchant_id > 0
+                  ? req.user.super_merchant_id
+                  : req.user.id,
+              live: supermerchant_live.live,
+            },
+          ];
+        }
         mer_meeting_list = await merchantModel.selectMeeting(
           {
             super_merchant_id:
@@ -268,34 +267,39 @@ var Setting = {
 
       if (req.user.type == "merchant") {
         let encriptedStoreID = enc_dec.cjs_encrypt(mer_details.id);
-        let isHaveAccessToSuperStore = await helpers.haveAccesstoSuperStore(encriptedStoreID,req.user.id);
+        let isHaveAccessToSuperStore = await helpers.haveAccesstoSuperStore(
+          encriptedStoreID,
+          req.user.id
+        );
         let isLiveMode = await helpers.checkMerchantLiveModeStatus(req.user);
         let allowMid = user_details.allow_mid;
-        if(user_details.super_merchant_id>0){
-          allowMid = await helpers.checkAllowMidOnSuperMerchant(user_details.super_merchant_id)
+        if (user_details.super_merchant_id > 0) {
+          allowMid = await helpers.checkAllowMidOnSuperMerchant(
+            user_details.super_merchant_id
+          );
         }
         console.log(`user details`);
         console.log(user_details);
         data.user_detail = {
-          is_user:supermerchant_live.user,
-          immediateSubmerchant:enc_dec.cjs_encrypt(mer_details.id),
-          isHaveAccessToSuperStore:isHaveAccessToSuperStore,
+          is_user: supermerchant_live.user,
+          immediateSubmerchant: enc_dec.cjs_encrypt(mer_details.id),
+          isHaveAccessToSuperStore: isHaveAccessToSuperStore,
           name: user_details.name
             ? user_details.name
             : mer_details.company_name
-            ? mer_details.company_name
-            : user_details.legal_business_name,
+              ? mer_details.company_name
+              : user_details.legal_business_name,
           roles: user_details.role,
           avatar: image_path + "default.jpg",
           mode:
             user_details.super_merchant_id == 0
               ? mer_details.mode
               : await helpers.main_super_merchant_mode({
-                  super_merchant_id: req.user.super_merchant_id,
-                }),
+                super_merchant_id: req.user.super_merchant_id,
+              }),
           live: supermerchant_live.live,
-          isLiveMode:isLiveMode,
-          allow_mid:allowMid,
+          isLiveMode: isLiveMode,
+          allow_mid: allowMid,
           allow_rules: user_details.allow_rules,
           supermerchant_id: enc_dec.cjs_encrypt(req?.user?.id),
           allow_payment_amount:
@@ -313,11 +317,11 @@ var Setting = {
           submerchant_name:
             user_details.selected_submerchant != 0
               ? (await helpers.get_submerchant_name_by_id(
-                  user_details.selected_submerchant
-                ))
+                user_details.selected_submerchant
+              ))
                 ? await helpers.get_submerchant_name_by_id(
-                    user_details.selected_submerchant
-                  )
+                  user_details.selected_submerchant
+                )
                 : user_details.legal_business_name
               : "All",
           user: user_details.super_merchant_id > 0 ? "user" : "super_merchant",
@@ -365,7 +369,7 @@ var Setting = {
         .send(response.successdatamsg(data, "Data fetched successfully", null));
     } catch (error) {
       console.log(error);
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -376,13 +380,13 @@ var Setting = {
     try {
       let image_path = process.env.STATIC_URL + "/static/images/";
       let company_details;
-      if (req.user.type == "partner") {
-        company_details = await helpers.company_details({
-          partner_id: req.user.id,
-        });
-      } else {
-        company_details = await helpers.company_details({ id: 1 });
-      }
+      //if (req.user.type == "partner") {
+      //company_details = await helpers.company_details({
+      //  partner_id: req.user.id,
+      //});
+      //} else {
+      company_details = await helpers.company_details({ id: 1 });
+      //}
 
       var data = {
         company_name: company_details.company_name,
@@ -395,8 +399,8 @@ var Setting = {
           : "",
         country_name: company_details.company_country
           ? await helpers.get_country_name_by_id(
-              company_details.company_country
-            )
+            company_details.company_country
+          )
           : "",
         state_id: company_details.company_state
           ? await enc_dec.cjs_encrypt(company_details.company_state)
@@ -437,8 +441,8 @@ var Setting = {
         ),
         currency_name: company_details.company_currency
           ? await helpers.get_currency_name_by_id(
-              company_details.company_currency
-            )
+            company_details.company_currency
+          )
           : "",
         batch_size: company_details.batch_size,
         android_link: company_details.android_link,
@@ -452,7 +456,7 @@ var Setting = {
         .status(statusCode.ok)
         .send(response.successdatamsg(data, "Dada fetched successfully", null));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -480,7 +484,7 @@ var Setting = {
         .status(statusCode.ok)
         .send(response.successdatamsg(data, "Dada fetched successfully", null));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -581,14 +585,14 @@ var Setting = {
         })
         .catch((error) => {
           console.log(error);
-         logger.error(500,{message: error,stack: error.stack}); 
+          logger.error(500, { message: error, stack: error.stack });
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     } catch (error) {
       console.log(error);
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -652,13 +656,13 @@ var Setting = {
             .send(response.successmsg("Record updated successfully"));
         })
         .catch((error) => {
-         logger.error(500,{message: error,stack: error.stack}); 
+          logger.error(500, { message: error, stack: error.stack });
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -683,8 +687,6 @@ var Setting = {
       //   console.log("🚀 ~ login_info: ~ language2:", language);
       // }
 
-      //------------------------------------------------------------------------
-
       let storedLanguageList = await nodeCache.getAllLanguageList();
       let language_list = [];
       let i = 0;
@@ -699,7 +701,6 @@ var Setting = {
         i++;
       }
 
-      //------------------------------------------------------------------------
 
       let language_id = 1;
       if (req.body.language_id) {
@@ -708,7 +709,32 @@ var Setting = {
       language_id = enc_dec.cjs_encrypt(language_id + "");
       let language = await nodeCache.getActiveLanguageById(language_id);
 
-      //------------------------------------------------------------------------
+
+      // banner
+      const slug = req.body.slug;
+
+      let storedBanner = await nodeCache.getActiveBannerBySlug(slug);
+      let banner = {};
+
+      if (storedBanner && storedBanner.id) {
+        banner = {
+          banner_id: enc_dec.cjs_encrypt(storedBanner.id + ""),
+          page_name: storedBanner.page_name,
+          slug: storedBanner.slug,
+          status: storedBanner.status,
+          image: storedBanner.file_name
+            ? image_path + storedBanner.file_name
+            : "",
+        };
+      } else {
+        banner = {
+          banner_id: null,
+          page_name: null,
+          slug: null,
+          status: 0,
+          image: "https://placehold.co/500X400",
+        };
+      }
 
       var data = {
         fav_icon: image_path + company_details.fav_icon,
@@ -719,6 +745,7 @@ var Setting = {
         title: title,
         language: language,
         language_list: language_list,
+        banner: banner,
       };
 
       res
@@ -726,7 +753,7 @@ var Setting = {
         .send(response.successdatamsg(data, "Data fetched successfully", null));
     } catch (error) {
       console.log(error);
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -769,7 +796,7 @@ var Setting = {
         .status(statusCode.ok)
         .send(response.successmsg("Environment changed successfully"));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -856,7 +883,7 @@ var Setting = {
         }
       }
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg("Something went wrong"));
@@ -891,7 +918,7 @@ var Setting = {
           );
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
 
         res
           .status(statusCode.internalError)
@@ -909,7 +936,7 @@ var Setting = {
         .status(statusCode.ok)
         .send(response.successmsg("Transaction limit deleted successfully"));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -946,7 +973,7 @@ var Setting = {
           );
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
 
         res
           .status(statusCode.internalError)
@@ -968,7 +995,7 @@ var Setting = {
         .status(statusCode.ok)
         .send(response.successmsg("Suspicious IP deleted successfully"));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1000,7 +1027,7 @@ var Setting = {
                     .send({ status: true, message: "Updated successfully" });
                 })
                 .catch((error) => {
-                 logger.error(500,{message: error,stack: error.stack}); 
+                  logger.error(500, { message: error, stack: error.stack });
                   res
                     .status(statusCode.internalError)
                     .send(response.errormsg(error.message));
@@ -1009,13 +1036,13 @@ var Setting = {
           }
         })
         .catch((error) => {
-         logger.error(500,{message: error,stack: error.stack}); 
+          logger.error(500, { message: error, stack: error.stack });
           res
             .status(statusCode.internalError)
             .send(response.errormsg(error.message));
         });
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg("Something went wrong"));
@@ -1035,7 +1062,7 @@ var Setting = {
           .send(response.successdatamsg(res1, "Details fetched successfully."));
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1057,7 +1084,7 @@ var Setting = {
           .send(response.successmsg("Details updated successfully."));
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1079,7 +1106,7 @@ var Setting = {
           .send(response.successmsg("Details updated successfully."));
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1109,7 +1136,7 @@ var Setting = {
         .status(statusCode.ok)
         .send(response.successmsg("Submerchant changed successfully"));
     } catch (error) {
-     logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -1129,7 +1156,7 @@ var Setting = {
           .send(response.successdatamsg(res1, "Details fetched successfully."));
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1148,6 +1175,7 @@ var Setting = {
           button_border_color: result.button_border_color,
           button_font_size: result.button_font_size,
           button_font_name: result.button_font_name,
+          button_text_color: result.button_text_color,
           fonts: await fontModel.select(),
         };
         res
@@ -1155,7 +1183,7 @@ var Setting = {
           .send(response.successdatamsg(res1, "Details fetched successfully."));
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -1173,6 +1201,7 @@ var Setting = {
           button_font_size: req.bodyString("button_font_size"),
           button_font_name: req.bodyString("button_font_name"),
           button_background_color: req.bodyString("button_background_color"),
+          button_text_color: req.bodyString("button_text_color"),
         },
         "css_setup"
       )
@@ -1183,20 +1212,20 @@ var Setting = {
       })
       .catch((error) => {
         console.log(error);
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
       });
   },
-   dccDetails: async (req, res) => {
+  dccDetails: async (req, res) => {
     settingModel
       .selectOneByTableAndCondition("*", { id: 1 }, "dcc_setup")
       .then(async (result) => {
         let res1 = {
           data_id: enc_dec.cjs_encrypt(result.id),
-          dcc_enabled:result.dcc_enabled,
-          provider:result.provider,
+          dcc_enabled: result.dcc_enabled,
+          provider: result.provider,
           apikey: result.apikey,
           secret: result.secret,
         };
@@ -1205,28 +1234,28 @@ var Setting = {
           .send(response.successdatamsg(res1, "Details fetched successfully."));
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
       });
   },
-   dccUpdate: async (req, res) => {
+  dccUpdate: async (req, res) => {
     let updateData = {
-      dcc_enabled:req.bodyString('dcc_enabled'),
-      provider:req.bodyString('provider'),
-      apikey:req.bodyString('apikey'),
-      secret:req.bodyString('secret')
+      dcc_enabled: req.bodyString("dcc_enabled"),
+      provider: req.bodyString("provider"),
+      apikey: req.bodyString("apikey"),
+      secret: req.bodyString("secret"),
     };
     settingModel
-      .updateDynamic( { id: 1 },updateData, "dcc_setup")
+      .updateDynamic({ id: 1 }, updateData, "dcc_setup")
       .then(async (result) => {
         res
           .status(statusCode.ok)
           .send(response.successmsg("DCC Details updated successfully."));
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));

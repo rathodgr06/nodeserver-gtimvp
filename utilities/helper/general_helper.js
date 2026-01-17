@@ -13,7 +13,8 @@ const moment = require("moment");
 //const merchantOrderModel = require("../models/merchantOrder");
 const generateUniqueId = require("generate-unique-id");
 const DBRun = require("../../models/DBRun");
-const logger = require('../../config/logger');
+const settingModel = require("../../models/settingModel");
+const logger = require("../../config/logger");
 
 // Function to generate all dates between two dates
 function getDateRange(startDate, endDate) {
@@ -7069,6 +7070,114 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       return 0;
     }
   },
+
+  getSingleMailTemplate: async (mail_template_slug) => {
+    const qb = await pool.get_connection();
+
+    try {
+      const result = await qb
+        .select("id, slug, subject, template, status, dynamic_vars")
+        .from("pg_mail_templates")
+        .where({
+          slug: mail_template_slug,
+          status: 0,
+          deleted: 0,
+        })
+        .limit(1)
+        .get();
+
+      return result?.[0] || null;
+    } catch (error) {
+      logger.error(500, { message: error, stack: error?.stack });
+      return null;
+    } finally {
+      qb.release();
+      console.log("🔌 DB connection released");
+    }
+  },
+
+  applyPreviewVars: async (content, vars = {}) => {
+    if (typeof content !== "string") {
+      console.warn("⚠️ Content is not a string");
+      return content;
+    }
+
+    const result = content.replace(/\$\{\s*([^}]+)\s*\}/g, (match, key) => {
+      const cleanKey = key.trim();
+      const value = vars[cleanKey];
+
+      if (Object.prototype.hasOwnProperty.call(vars, cleanKey)) {
+        return value;
+      }
+      return match;
+    });
+
+    return result;
+  },
+
+  replaceStaticAndDynamicVars: async (
+    content,
+    template,
+    staticVars = {},
+    dynamicVars = {}
+  ) => {
+    if (typeof content !== "string") return content;
+
+    let allowedDynamicVars = [];
+    try {
+      if (Array.isArray(template?.dynamic_vars)) {
+        allowedDynamicVars = template.dynamic_vars;
+      } else if (typeof template?.dynamic_vars === "string") {
+        allowedDynamicVars = JSON.parse(
+          template.dynamic_vars.replace(/[“”]/g, '"').replace(/[‘’]/g, "'")
+        );
+      }
+    } catch (err) {
+      console.error("❌ dynamic_vars parse failed:", err.message);
+      allowedDynamicVars = [];
+    }
+
+    let themeVars = {};
+    try {
+
+      if (settingModel?.selectOneByTableAndCondition) {
+        const cssSetup = await settingModel.selectOneByTableAndCondition(
+          "*",
+          { id: 1 },
+          "css_setup"
+        );
+
+        themeVars = {
+          button_background_color: cssSetup?.button_background_color ?? "",
+          button_border_color: cssSetup?.button_border_color ?? "",
+          button_text_color: cssSetup?.button_text_color ?? "",
+          button_font_name: cssSetup?.button_font_name ?? "",
+          button_font_size: cssSetup?.button_font_size ?? "",
+        };
+      }
+    } catch (err) {
+      console.warn("⚠️ css_setup not loaded:", err.message);
+    }
+
+    return content.replace(/\$\{\s*([^}]+)\s*\}/g, (match, key) => {
+      const varName = key.trim();
+
+      if (Object.prototype.hasOwnProperty.call(staticVars, varName)) {
+        return staticVars[varName] ?? "";
+      }
+      if (Object.prototype.hasOwnProperty.call(themeVars, varName)) {
+        return themeVars[varName] ?? "";
+      }
+      if (
+        Object.prototype.hasOwnProperty.call(dynamicVars, varName) &&
+        (allowedDynamicVars.length === 0 ||
+          allowedDynamicVars.includes(varName))
+      ) {
+        return dynamicVars[varName] ?? "";
+      }
+      return "";
+    });
+  },
   sanitizeDescriptor: (value) => {
     return value
       .toUpperCase()
@@ -7098,23 +7207,23 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
 
 module.exports = helpers;
 
- async function dccStatusFetch(){
-     let qb = await pool.get_connection();
-    let response;
-    try {
-      response = await qb
-        .select("dcc_enabled")
-        .where({ id: 1})
-        .get("pg_dcc_setup");
-    } catch (error) {
-      console.error("Database query failed:", error);
-      logger.error(500, { message: error, stack: error?.stack });
-    } finally {
-      qb.release();
-    }
-    if (response?.[0]) {
-      return response?.[0]?.dcc_enabled==1?true:false ;
-    } else {
-      return false;
-    }
-  };
+async function dccStatusFetch() {
+  let qb = await pool.get_connection();
+  let response;
+  try {
+    response = await qb
+      .select("dcc_enabled")
+      .where({ id: 1 })
+      .get("pg_dcc_setup");
+  } catch (error) {
+    console.error("Database query failed:", error);
+    logger.error(500, { message: error, stack: error?.stack });
+  } finally {
+    qb.release();
+  }
+  if (response?.[0]) {
+    return response?.[0]?.dcc_enabled == 1 ? true : false;
+  } else {
+    return false;
+  }
+}

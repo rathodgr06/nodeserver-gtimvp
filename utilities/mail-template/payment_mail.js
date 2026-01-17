@@ -17,9 +17,8 @@ module.exports = function (data, logo, title) {
           td,th,div,p,a,h1,h2,h3,h4,h5,h6 {font-family: "Segoe UI", sans-serif; mso-line-height-rule: exactly;}
         </style>
       <![endif]-->
-        <title>` +
-        title +
-        `</title>
+        <title>
+        ${title}</title>
         <link
             href="https://fonts.googleapis.com/css?family=Montserrat:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700"
             rel="stylesheet" media="screen">
@@ -153,10 +152,8 @@ module.exports = function (data, logo, title) {
     
     <body
         style="margin: 0; padding: 0; width: 100%; word-break: break-word; -webkit-font-smoothing: antialiased; --bg-opacity: 1; background-color: #eceff1; background-color: rgba(236, 239, 241, var(--bg-opacity));">
-    
-        <div role="article" aria-roledescription="email" aria-label="Welcome to ` +
-        title +
-        `" lang="en">
+
+        <div role="article" aria-roledescription="email" aria-label="Welcome to ${title}" lang="en">
             <table style="font-family: Montserrat, -apple-system, 'Segoe UI', sans-serif; width: 100%;" width="100%"
                 cellpadding="0" cellspacing="0" role="presentation">
                 <tbody>
@@ -203,9 +200,7 @@ module.exports = function (data, logo, title) {
     </div> 
         <div style="margin-top: 10px;color: black;">
             Powered by <br>
-            <img src="` +
-        logo +
-        `" alt="logo" style="height: 36px; margin-top: 10px;">
+            <img src="${logo}" alt="logo" style="height: 36px; margin-top: 10px;">
         </div>
 
     </div>
@@ -250,9 +245,7 @@ module.exports = function (data, logo, title) {
                                                             <p style="margin: 0 0 16px;">
     
                                                             </p>
-                                                            <p style="margin: 0 0 16px;">Thanks, <br>` +
-        title +
-        ` Team</p>
+                                                            <p style="margin: 0 0 16px;">Thanks, <br>${title} Team</p>
                                                         </td>
                                                     </tr>
                                                     <tr>

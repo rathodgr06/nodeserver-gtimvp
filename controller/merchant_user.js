@@ -65,12 +65,9 @@ var referrer = {
                         process.env.FRONTEND_URL_MERCHANT +
                         "create-password/" +
                         token;
-                    let title = await helpers.get_title();
-                    let subject = "Welcome to " + title;
-
+                    
                     await mailSender.welcomeMail(
                         req.bodyString("email"),
-                        subject,
                         verify_url
                     );
                     res.status(statusCode.ok).send(
@@ -377,12 +374,8 @@ var referrer = {
                                     process.env.FRONTEND_URL_MERCHANT +
                                     "reset-password-merchant/" +
                                     token;
-                                let title = await helpers.get_title();
-                                let subject =
-                                    "Reset your " + title + " password";
                                 await mailSender.forgotMail(
                                     req.bodyString("email"),
-                                    subject,
                                     verify_url
                                 );
                                 res.status(statusCode.ok).send(

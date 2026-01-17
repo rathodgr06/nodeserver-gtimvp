@@ -363,12 +363,8 @@ var admin_user = {
             };
             CustomerModel.add(ins_data)
               .then(async (result_add_reset) => {
-                let title = await helpers.get_title();
-                let subject = " Verify email account";
-
                 let mail_response = await mailSender.otpMail(
                   req.bodyString("email"),
-                  subject,
                   otp
                 );
 
@@ -420,7 +416,7 @@ var admin_user = {
                 let title = await helpers.get_title();
                 let subject = " Verify email account";
 
-                await mailSender.otpMail(req.bodyString("email"), subject, otp);
+                await mailSender.otpMail(req.bodyString("email"), otp);
                 res.status(statusCode.ok).send(
                     response.successansmsg(
                         { otp_token: token },
