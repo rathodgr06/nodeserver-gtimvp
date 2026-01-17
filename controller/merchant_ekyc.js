@@ -2119,11 +2119,8 @@ var MerchantEkyc = {
                   process.env.MERCHANT_KYC_URL +
                   "?ekyc_token=" +
                   encrypt_decrypt("encrypt", submerchant_id);
-                let title = await helpers.get_title();
-                let subject = "Welcome to " + title;
                 await mailSender.ekycOwnersMail(
                   merchant_details.legal_person_email,
-                  subject,
                   verify_url_repre
                 );
               }
@@ -2302,11 +2299,9 @@ var MerchantEkyc = {
 
                         let verify_url =
                           process.env.MERCHANT_KYC_URL + "?token=" + owners_id;
-                        let title = await helpers.get_title();
-                        let subject = "Welcome to " + title;
+                        
                         await mailSender.ekycOwnersMail(
                           owners_result[i].email,
-                          subject,
                           verify_url
                         );
 
@@ -2736,11 +2731,8 @@ var MerchantEkyc = {
 
                     let verify_url =
                       process.env.MERCHANT_KYC_URL + "?token=" + token;
-                    let title = await helpers.get_title();
-                    let subject = "Welcome to " + title;
                     await mailSender.ekycOwnersMail(
                       result[i].email,
-                      subject,
                       verify_url
                     );
                   }
@@ -3650,9 +3642,8 @@ var MerchantEkyc = {
         reference +
         ``;
 
-      let subject = "Merchant KYC documents - " + reference;
       ee.once("email", async (arguments) => {
-        await mailSender.PSPMail(mail, mail_cc, subject, table, para);
+        await mailSender.PSPMail(mail, mail_cc, reference, table, para);
       });
       ee.emit("email", { merchant_id: submerchant_id });
     }
@@ -4041,9 +4032,8 @@ var MerchantEkyc = {
         reference +
         ``;
 
-      let subject = "Merchant KYC documents - " + reference;
       ee.once("email", async (arguments) => {
-        await mailSender.PSPMail(mail, mail_cc, subject, table, para);
+        await mailSender.PSPMail(mail, mail_cc, reference, table, para);
       });
       ee.emit("email", { merchant_id: submerchant_id });
     }
@@ -4306,9 +4296,8 @@ var MerchantEkyc = {
         reference +
         ``;
 
-      let subject = "Merchant KYC documents - " + reference;
       ee.once("email", async (arguments) => {
-        await mailSender.PSPMail(mail, mail_cc, subject, table, para);
+        await mailSender.PSPMail(mail, mail_cc, reference, table, para);
       });
       ee.emit("email", { merchant_id: submerchant_id });
     }
@@ -5196,9 +5185,8 @@ var MerchantEkyc = {
         reference +
         ``;
 
-      let subject = "Merchant KYC documents - " + reference;
       ee.once("email", async (arguments) => {
-        await mailSender.PSPMail(mail, mail_cc, subject, table, para);
+        await mailSender.PSPMail(mail, mail_cc, reference, table, para);
       });
       ee.emit("email", { merchant_id: submerchant_id });
     }

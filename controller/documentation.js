@@ -86,6 +86,7 @@ var resp = {
     },
     details: async(req, res) => {
         let tc_id = await enc_dec.cjs_decrypt(req.bodyString("tc_id"));
+        console.log("tc_id",tc_id);
         DocumentModel.selectOne('id,tc,type,version',{ id:tc_id })
             .then((result) => {
                 

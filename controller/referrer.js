@@ -1130,12 +1130,9 @@ var referrer = {
                     process.env.FRONTEND_URL_MERCHANT +
                     "referrer/reset-password/" +
                     token;
-                  let title = await helpers.get_title();
-                  let subject = "Reset your " + title + " password";
 
                   await mailSender.forgotMail(
                     req.bodyString("email"),
-                    subject,
                     verify_url
                   );
                   res
@@ -1196,11 +1193,9 @@ var referrer = {
                   process.env.FRONTEND_URL_MERCHANT +
                   "referrer-2fa/" +
                   two_fa_token;
-                let title = await helpers.get_title();
-                let subject = "Reset your " + title + " 2FA";
+                
                 await mailSender.forgot2fa(
                   req.bodyString("email"),
-                  subject,
                   verify_url
                 );
                 res
@@ -1237,11 +1232,9 @@ var referrer = {
                   process.env.FRONTEND_URL_MERCHANT +
                   "referrer/reset-password/" +
                   token;
-                let title = await helpers.get_title();
-                let subject = "Reset your " + title + " 2FA";
+                
                 await mailSender.forgotMail(
                   req.bodyString("email"),
-                  subject,
                   verify_url
                 );
                 res
@@ -1341,11 +1334,9 @@ var referrer = {
                   process.env.FRONTEND_URL_MERCHANT +
                   "referrer/reset-password/" +
                   token;
-                let title = await helpers.get_title();
-                let subject = "Reset your " + title + " 2FA";
+                
                 await mailSender.forgotMail(
                   req.bodyString("email"),
-                  subject,
                   verify_url
                 );
                 res

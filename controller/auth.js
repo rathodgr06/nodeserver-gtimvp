@@ -583,7 +583,7 @@ var Auth = {
         token: aToken,
       });
 
-      mailSender.forgotAdminMail(email, "Forgot Password", {
+      mailSender.forgotAdminMail(email, {
         url: user.link,
         name: user.name,
         time: await date_formatter.convert_date_by_seconds(900),

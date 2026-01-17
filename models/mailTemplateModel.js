@@ -6,7 +6,7 @@ const config = require("../config/config.json")[env];
 const pool = require("../config/database");
 const helpers = require("../utilities/helper/general_helper");
 
-const tctable = config.table_prefix + "banners";
+const tctable = config.table_prefix + "mail_templates";
 
 const dbModel = {
   add: async (data) => {
@@ -21,22 +21,30 @@ const dbModel = {
     }
   },
 
-  select: async (condition, limit) => {
+  select: async (condition = {}, limit = {}) => {
     const qb = await pool.get_connection();
+
     try {
-      let query = qb.select("*").order_by("id", "asc");
+      qb.select("*").from(tctable).order_by("id", "asc");
 
-      if (condition && Object.keys(condition).length > 0) {
-        query = query.where(condition);
+      if (condition.template_name) {
+        qb.where("template_name", condition.template_name);
       }
 
-      if (limit && limit.perpage) {
-        query = query.limit(limit.perpage, limit.start);
+      if (condition.subject) {
+        qb.where("subject", condition.subject);
       }
 
-      return await query.get(tctable);
+      if (Number.isInteger(limit.perpage) && limit.perpage > 0) {
+        qb.limit(limit.perpage, limit.start || 0);
+      }
+
+      return await qb.get();
     } catch (error) {
-      logger.error(500, { message: error.message, stack: error.stack });
+      logger.error(500, {
+        message: error.message,
+        stack: error.stack,
+      });
       throw error;
     } finally {
       qb.release();
@@ -63,21 +71,20 @@ const dbModel = {
 
   selectOne: async (selection, condition) => {
     const qb = await pool.get_connection();
-
     try {
       let query = qb.select(selection).order_by("id", "asc");
 
       if (condition && Object.keys(condition).length > 0) {
         for (const key in condition) {
           const value = condition[key];
+
           if (
             typeof value === "object" &&
             value !== null &&
             value.ne !== undefined
           ) {
             query = query.where(`${key} !=`, value.ne);
-          }
-          else {
+          } else {
             query = query.where(key, value);
           }
         }
@@ -128,35 +135,33 @@ const dbModel = {
     }
   },
 
-  get_count: async (condition_obj = {}) => {
+  get_count: async (condition = {}) => {
     const qb = await pool.get_connection();
 
     try {
-      qb.select("COUNT(id) AS count", false) 
-        .from(tctable);
+      qb.select("COUNT(id) AS count", false).from(tctable);
 
-      if (
-        condition_obj.page_name !== undefined &&
-        condition_obj.page_name !== ""
-      ) {
-        qb.where("page_name", condition_obj.page_name);
+      if (condition.template_name) {
+        qb.where("template_name", condition.template_name);
       }
 
-      if (Object.prototype.hasOwnProperty.call(condition_obj, "actor")) {
-        qb.where("actor", condition_obj.actor);
+      if (condition.subject) {
+        qb.where("subject", condition.subject);
       }
 
       const result = await qb.get();
       return result?.[0]?.count || 0;
     } catch (error) {
-      logger.error(500, { message: error.message, stack: error.stack });
+      logger.error(500, {
+        message: error.message,
+        stack: error.stack,
+      });
       throw error;
     } finally {
       qb.release();
     }
   },
 
-  // HARD DELETE
   deleteById: async (condition) => {
     const qb = await pool.get_connection();
     try {
@@ -172,6 +177,7 @@ const dbModel = {
       qb.release();
     }
   },
+
   changeStatus: async (condition, status) => {
     return await dbModel.updateDetails(condition, { status });
   },

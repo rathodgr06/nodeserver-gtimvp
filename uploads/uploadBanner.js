@@ -1,45 +1,45 @@
-const multer = require('multer');
-const path = require('path');
+const multer = require("multer");
+const path = require("path");
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-      cb(null, 'public/images');
+    cb(null, "public/images");
   },
-  filename: (req, file, cb) => { 
-    let filename = file.fieldname+"-"+Date.now() + '-' + Math.round(Math.random() * 1E9)+path.extname(file.originalname);
-    console.log("Filename:",file);
-    if(req.all_files){
-      req.all_files[file.fieldname] = filename
-    }else{
-      req.all_files = {}
-      req.all_files[file.fieldname] = filename
-    }
-    
+
+  filename: (req, file, cb) => {
+    const filename =
+      file.fieldname +
+      "-" +
+      Date.now() +
+      "-" +
+      Math.round(Math.random() * 1e9) +
+      path.extname(file.originalname);
+
+    req.uploadedFile = filename;
+
     cb(null, filename);
-   
-  }
+  },
 });
 
 const fileFilter = (req, file, cb) => {
-  
-    if (
-      file.mimetype === 'image/png' ||
-      file.mimetype === 'image/jpg' ||
-      file.mimetype === 'image/jpeg'
-    ) { // check file type to be png, jpeg, or jpg
-      cb(null, true);
-    } else {
-      cb(null, false); // else fails
-    }
-  
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg" ||
+    file.mimetype === "image/svg+xml"
+  ) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only SVG, PNG, JPG, JPEG allowed"), false);
+  }
 };
 
-let upload = multer({storage: fileStorage, limits:{fileSize:1024*1024*1}, fileFilter: fileFilter}).fields([
-    { 
-      name: 'banner_image', 
-      maxCount: 1 
-    }
-  ]
-)
+const upload = multer({
+  storage: fileStorage,
+  limits: {
+    fileSize: 1024 * 1024 * 5, // 5MB
+  },
+  fileFilter: fileFilter,
+}).single("banner_image");
 
-module.exports = upload
+module.exports = upload;

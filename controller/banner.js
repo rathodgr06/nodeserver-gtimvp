@@ -7,74 +7,69 @@ const admin_activity_logger = require("../utilities/activity-logger/admin_activi
 const logger = require("../config/logger");
 
 var resp = {
-
   add: async (req, res) => {
     try {
-      const pageName = req.bodyString("page_name");
-      const slug = req.bodyString("slug");
-
-      if (!pageName || !slug) {
-        return res
-          .status(statusCode.badRequest)
-          .send(response.errormsg("page_name and slug are required"));
-      }
-
-      if (!req.all_files || !req.all_files.banner_image) {
-        return res
-          .status(statusCode.badRequest)
-          .send(response.errormsg("Banner image is required"));
-      }
-
       const ins_body = {
-        page_name: pageName,
-        slug: slug,
+        page_name: req.bodyString("page_name"),
+        slug: req.bodyString("slug"),
         status: req.bodyString("status") || "Active",
-        file_name: req.all_files.banner_image,
+        file_name: req.file.filename,
       };
 
       await helpers.common_add(ins_body, "banners");
-      const module_and_user = {
-        user: req.user.id,
-        admin_type: req.user.type,
-        module: "Settings",
-        sub_module: "Banner Management",
-      };
 
-      await admin_activity_logger.add(module_and_user, "Banner Management", req.headers);
+      await admin_activity_logger.add(
+        {
+          user: req.user.id,
+          admin_type: req.user.type,
+          module: "Settings",
+          sub_module: "Banner Management",
+        },
+        "Banner Management",
+        req.headers
+      );
+
       return res
         .status(statusCode.ok)
         .send(response.successmsg("Banner added successfully."));
     } catch (error) {
-      console.log(error);
-      logger.error(500, {
-        message: error.message || error,
-        stack: error.stack,
-      });
-
+      logger.error(500, { message: error.message, stack: error.stack });
       return res
         .status(statusCode.internalError)
-        .send(response.errormsg(error.message || "Internal server error"));
+        .send(response.errormsg("Internal server error"));
     }
   },
 
   list: async (req, res) => {
     try {
+      let image_path = process.env.STATIC_URL + "/static/images/";
+
       let limit = {
         perpage: 0,
         start: 0,
       };
 
-      if (req.bodyString("perpage") && req.bodyString("page")) {
-        let perpage = parseInt(req.bodyString("perpage"));
-        let start = parseInt(req.bodyString("page"));
+      const perpageRaw = req.bodyString("perpage");
+      const pageRaw = req.bodyString("page");
+
+      if (perpageRaw && pageRaw) {
+        let perpage = parseInt(perpageRaw);
+        let start = parseInt(pageRaw);
 
         limit.perpage = perpage;
         limit.start = (start - 1) * perpage;
       }
 
       let filter_arr = {};
+
       if (req.bodyString("page_name")) {
         filter_arr.page_name = req.bodyString("page_name");
+      }
+
+      const actorRaw = req.body?.actor;
+
+      if (actorRaw !== undefined && actorRaw !== null && actorRaw !== "") {
+        filter_arr.actor = Number(actorRaw);
       }
 
       BannerModel.select(filter_arr, limit)
@@ -85,16 +80,18 @@ var resp = {
             result.forEach((val) => {
               send_res.push({
                 banner_id: enc_dec.cjs_encrypt(val.id),
+                id: val.id,
                 page_name: val.page_name,
                 slug: val.slug,
-                file_name: val.file_name,
+                actor: val.actor,
+                banner_image: val.file_name ? image_path + val.file_name : "",
                 status: val.status,
+                updated_at: val.updated_at,
               });
             });
           }
 
           let total_count = await BannerModel.get_count(filter_arr);
-
           res
             .status(statusCode.ok)
             .send(
@@ -121,6 +118,7 @@ var resp = {
 
   details: async (req, res) => {
     try {
+      let image_path = process.env.STATIC_URL + "/static/images/";
       let banner_id = enc_dec.cjs_decrypt(req.bodyString("banner_id"));
 
       BannerModel.selectOne("id,page_name,slug,file_name,status", {
@@ -139,7 +137,10 @@ var resp = {
                 banner_id: enc_dec.cjs_encrypt(val.id),
                 page_name: val.page_name,
                 slug: val.slug,
-                file_name: val.file_name,
+
+                // ✅ FULL IMAGE URL
+                banner_image: val.file_name ? image_path + val.file_name : "",
+
                 status: val.status,
               },
               "Details fetched successfully."
@@ -162,42 +163,60 @@ var resp = {
 
   update: async (req, res) => {
     try {
-      let banner_id = enc_dec.cjs_decrypt(req.bodyString("banner_id"));
+      const banner_id = enc_dec.cjs_decrypt(req.bodyString("banner_id"));
+
+      // DB safety check (must stay)
+      const oldBanner = await BannerModel.selectOne("id,file_name", {
+        id: banner_id,
+      });
+      console.log(req);
+
+      if (!oldBanner) {
+        return res
+          .status(statusCode.badRequest)
+          .send(response.errormsg("Record not found"));
+      }
 
       let insdata = {
         page_name: req.bodyString("page_name"),
-        slug: req.bodyString("slug"),
-        status: req.bodyString("status"),
       };
 
-      // get updated banner file (same pattern as add)
-      if (req.all_files && req.all_files.banner_image) {
-        insdata.file_name = req.all_files.banner_image;
+      if (req.file) {
+        insdata.file_name = req.file.filename;
+
+        // delete old image
+        const fs = require("fs");
+        const path = require("path");
+        const oldPath = path.join(
+          process.cwd(),
+          "public/images",
+          oldBanner.file_name
+        );
+
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
       }
 
       await BannerModel.updateDetails({ id: banner_id }, insdata);
 
-      admin_activity_logger
-        .edit(
-          {
-            user: req.user.id,
-            admin_type: req.user.type,
-            module: "Banner Management",
-            sub_module: "Auth Pages",
-          },
-          banner_id,
-          req.headers
-        )
-        .then(() => {
-          res
-            .status(statusCode.ok)
-            .send(response.successmsg("Banner updated successfully"));
-        });
+      await admin_activity_logger.edit(
+        {
+          user: req.user.id,
+          admin_type: req.user.type,
+          module: "Settings",
+          sub_module: "Banner Management",
+        },
+        banner_id,
+        req.headers
+      );
+
+      return res
+        .status(statusCode.ok)
+        .send(response.successmsg("Banner updated successfully"));
     } catch (error) {
-      logger.error(500, { message: error, stack: error.stack });
-      res
+      logger.error(500, { message: error.message, stack: error.stack });
+      return res
         .status(statusCode.internalError)
-        .send(response.errormsg(error.message));
+        .send(response.errormsg("Internal server error"));
     }
   },
 
@@ -221,8 +240,8 @@ var resp = {
           {
             user: req.user.id,
             admin_type: req.user.type,
-            module: "Banner Management",
-            sub_module: "Auth Pages",
+            module: "Settings",
+            sub_module: "Banner Management",
           },
           banner_id,
           req.headers

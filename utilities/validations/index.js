@@ -19,6 +19,7 @@ const checkifrecordexistandexpiration = require("../../utilities/validations/che
 const checkifaccountblock = require("./checkifaccountblock");
 const checkifadminaccountblock = require("./checkifadminaccountblock");
 const logger = require("../../config/logger");
+const { console } = require("inspector");
 
 const Validator = {
   login: async (req, res, next) => {
@@ -2668,8 +2669,8 @@ const Validator = {
                   record_exist
                     ? "Country already exist."
                     : country_code_exist
-                    ? "Country code already exist."
-                    : ""
+                      ? "Country code already exist."
+                      : ""
                 )
               );
           }
@@ -2837,10 +2838,10 @@ const Validator = {
                   !record_exist
                     ? "Record not found"
                     : country_name
-                    ? "Country name already exist."
-                    : country_code
-                    ? "Country code already exist."
-                    : ""
+                      ? "Country name already exist."
+                      : country_code
+                        ? "Country code already exist."
+                        : ""
                 )
               );
           }
@@ -3082,8 +3083,8 @@ const Validator = {
                   record_exist
                     ? "Country already exist."
                     : country_code_exist
-                    ? "Country code already exist."
-                    : ""
+                      ? "Country code already exist."
+                      : ""
                 )
               );
           }
@@ -3251,10 +3252,10 @@ const Validator = {
                   !record_exist
                     ? "Record not found"
                     : country_name
-                    ? "Country name already exist."
-                    : country_code
-                    ? "Country code already exist."
-                    : ""
+                      ? "Country name already exist."
+                      : country_code
+                        ? "Country code already exist."
+                        : ""
                 )
               );
           }
@@ -3504,8 +3505,8 @@ const Validator = {
                   record_exist
                     ? "Country already exist."
                     : country_code_exist
-                    ? "Country code already exist."
-                    : ""
+                      ? "Country code already exist."
+                      : ""
                 )
               );
           }
@@ -3680,10 +3681,10 @@ const Validator = {
                   !record_exist
                     ? "Record not found"
                     : country_name
-                    ? "Country name already exist."
-                    : country_code
-                    ? "Country code already exist."
-                    : ""
+                      ? "Country name already exist."
+                      : country_code
+                        ? "Country code already exist."
+                        : ""
                 )
               );
           }
@@ -3899,10 +3900,10 @@ const Validator = {
                   !country_exist
                     ? "Country not found."
                     : record_exist
-                    ? "State already exist."
-                    : state_code_exist
-                    ? "State code already exist."
-                    : ""
+                      ? "State already exist."
+                      : state_code_exist
+                        ? "State code already exist."
+                        : ""
                 )
               );
           }
@@ -4144,10 +4145,10 @@ const Validator = {
                   state_name
                     ? "state name already exist."
                     : state_code
-                    ? "state code already exist."
-                    : !record_exist
-                    ? "Record not found"
-                    : ""
+                      ? "state code already exist."
+                      : !record_exist
+                        ? "Record not found"
+                        : ""
                 )
               );
           }
@@ -4365,10 +4366,10 @@ const Validator = {
                   !country_exist
                     ? "Country not found."
                     : !state_exist
-                    ? "State not found."
-                    : record_exist
-                    ? "Record already exist."
-                    : ""
+                      ? "State not found."
+                      : record_exist
+                        ? "Record already exist."
+                        : ""
                 )
               );
           }
@@ -4480,8 +4481,8 @@ const Validator = {
                   !country_exist
                     ? "Country not found"
                     : !state_exist
-                    ? "State not found"
-                    : ""
+                      ? "State not found"
+                      : ""
                 )
               );
           }
@@ -4617,12 +4618,12 @@ const Validator = {
                   !country_exist
                     ? "Country not found."
                     : !state_exist
-                    ? "State not found."
-                    : city_name
-                    ? "City name already exist."
-                    : !record_exist
-                    ? "Record not found"
-                    : ""
+                      ? "State not found."
+                      : city_name
+                        ? "City name already exist."
+                        : !record_exist
+                          ? "Record not found"
+                          : ""
                 )
               );
           }
@@ -4867,8 +4868,8 @@ const Validator = {
                   language_exist
                     ? "Language already exist."
                     : error
-                    ? error
-                    : "Error in data."
+                      ? error
+                      : "Error in data."
                 )
               );
           }
@@ -5379,12 +5380,12 @@ const Validator = {
                   email_exist
                     ? "Email already exist."
                     : mobile_exist
-                    ? "Mobile already exist."
-                    : username_exist
-                    ? "Username already exist."
-                    : error
-                    ? error
-                    : "Error in data"
+                      ? "Mobile already exist."
+                      : username_exist
+                        ? "Username already exist."
+                        : error
+                          ? error
+                          : "Error in data"
                 )
               );
           }
@@ -5645,12 +5646,12 @@ const Validator = {
                   !user_exist
                     ? "Record not found."
                     : email_exist
-                    ? "Email already exist."
-                    : mobile_exist
-                    ? "Mobile already exist."
-                    : username_exist
-                    ? "Username already exist."
-                    : "Error in data"
+                      ? "Email already exist."
+                      : mobile_exist
+                        ? "Mobile already exist."
+                        : username_exist
+                          ? "Username already exist."
+                          : "Error in data"
                 )
               );
           }
@@ -6657,14 +6658,14 @@ const Validator = {
                   email_exist
                     ? "Email already exist."
                     : mobile_exist
-                    ? "Mobile already exist."
-                    : username_exist
-                    ? "Username already exist."
-                    : api_key_exist
-                    ? "API key already exist."
-                    : error
-                    ? error
-                    : "Error in data"
+                      ? "Mobile already exist."
+                      : username_exist
+                        ? "Username already exist."
+                        : api_key_exist
+                          ? "API key already exist."
+                          : error
+                            ? error
+                            : "Error in data"
                 )
               );
           }
@@ -6955,14 +6956,14 @@ const Validator = {
                   !user_exist
                     ? "Record not found."
                     : email_exist
-                    ? "Email already exist."
-                    : mobile_exist
-                    ? "Mobile already exist."
-                    : username_exist
-                    ? "Username already exist."
-                    : api_key_exist
-                    ? "API key already exist."
-                    : "Error in data"
+                      ? "Email already exist."
+                      : mobile_exist
+                        ? "Mobile already exist."
+                        : username_exist
+                          ? "Username already exist."
+                          : api_key_exist
+                            ? "API key already exist."
+                            : "Error in data"
                 )
               );
           }
@@ -7832,8 +7833,8 @@ const Validator = {
                   !details_exist
                     ? "Record not found."
                     : error
-                    ? error
-                    : "Error in data"
+                      ? error
+                      : "Error in data"
                 )
               );
           }
@@ -9672,6 +9673,7 @@ const Validator = {
     }
   },
   tc_details: async (req, res, next) => {
+    console.log("tc_details middleware");
     if (checkEmpty(req.body, ["tc_id"])) {
       const schema = Joi.object().keys({
         tc_id: Joi.string()
@@ -9968,8 +9970,8 @@ const Validator = {
                   record_exist
                     ? "Nationality already exist."
                     : nationality_code_exist
-                    ? "Nationality code already exist."
-                    : ""
+                      ? "Nationality code already exist."
+                      : ""
                 )
               );
           }
@@ -10096,10 +10098,10 @@ const Validator = {
                   !record_exist
                     ? "Record not found"
                     : nationality
-                    ? "Nationality already exist."
-                    : nationality_code
-                    ? "Nationality code already exist."
-                    : ""
+                      ? "Nationality already exist."
+                      : nationality_code
+                        ? "Nationality code already exist."
+                        : ""
                 )
               );
           }
@@ -11848,68 +11850,98 @@ const Validator = {
     next();
   },
 
-  // Banner
+  // Banner Validations
   banner_add: async (req, res, next) => {
-    if (checkEmpty(req.body, ["page_name", "slug"])) {
-      try {
-        const page_name = req.bodyString("page_name");
-        const slug = req.bodyString("slug");
-        const status = req.bodyString("status");
+    if (!checkEmpty(req.body, ["page_name", "slug"])) {
+      return res.status(StatusCode.badRequest).send(ServerResponse.badRequest);
+    }
 
-        if (!page_name || page_name.length < 2 || page_name.length > 200) {
-          return res
-            .status(StatusCode.badRequest)
-            .send(
-              ServerResponse.validationResponse(
-                "Page name must be between 2 and 200 characters"
-              )
-            );
-        }
+    try {
+      const page_name = req.bodyString("page_name");
+      const slug = req.bodyString("slug");
+      const status = req.bodyString("status");
 
-        if (!slug || slug.length < 2 || slug.length > 200) {
-          return res
-            .status(StatusCode.badRequest)
-            .send(
-              ServerResponse.validationResponse(
-                "Slug must be between 2 and 200 characters"
-              )
-            );
-        }
-
-        if (!banner_type || banner_type.length < 2 || banner_type.length > 100) {
-          return res
-        }
-        if (status && !["Active", "Inactive"].includes(status)) {
-          return res
-            .status(StatusCode.badRequest)
-            .send(ServerResponse.validationResponse("Invalid status value"));
-        }
-
-        if (!req.all_files || !req.all_files.banner_image) {
-          return res
-            .status(StatusCode.badRequest)
-            .send(
-              ServerResponse.validationResponse("Banner image is required")
-            );
-        }
-
-        const rec_exist = await checkifrecordexist({ slug }, "banners");
-        if (rec_exist) {
-          return res
-            .status(StatusCode.badRequest)
-            .send(ServerResponse.validationResponse("Slug already exists"));
-        }
-
-        next();
-      } catch (error) {
-        console.log("xsdghfdgdfvdhvj",error);
-        logger.error(400, { message: error, stack: error?.stack });
+      if (!page_name || page_name.length < 2 || page_name.length > 200) {
         return res
           .status(StatusCode.badRequest)
-          .send(ServerResponse.validationResponse(error));
+          .send(
+            ServerResponse.validationResponse(
+              "Page name must be between 2 and 200 characters"
+            )
+          );
       }
-    } else {
-      return res.status(StatusCode.badRequest).send(ServerResponse.badRequest);
+
+      if (!slug || slug.length < 2 || slug.length > 200) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(
+            ServerResponse.validationResponse(
+              "Slug must be between 2 and 200 characters"
+            )
+          );
+      }
+
+      if (status && !["Active", "Inactive"].includes(status)) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Invalid status value"));
+      }
+
+      if (!req.file) {
+        console.log("❌ Banner image missing");
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Banner image is required"));
+      }
+
+      const bannerImage = req.file;
+      const allowedTypes = [
+        "image/png",
+        "image/jpg",
+        "image/jpeg",
+        "image/svg+xml",
+      ];
+
+      if (!allowedTypes.includes(bannerImage.mimetype)) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(
+            ServerResponse.validationResponse(
+              "Only SVG, PNG, JPG, JPEG allowed"
+            )
+          );
+      }
+      const MAX_SIZE = 5 * 1024 * 1024;
+      if (bannerImage.size > MAX_SIZE) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(
+            ServerResponse.validationResponse(
+              "Banner image must be less than 5MB"
+            )
+          );
+      }
+
+      const rec_exist = await checkifrecordexist({ slug }, "banners");
+      if (rec_exist) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Slug already exists"));
+      }
+      next();
+    } catch (error) {
+      logger.error(400, {
+        message: error?.message || error,
+        stack: error?.stack,
+      });
+
+      return res
+        .status(StatusCode.badRequest)
+        .send(
+          ServerResponse.validationResponse(
+            error?.message || "Something went wrong"
+          )
+        );
     }
   },
 
@@ -11953,64 +11985,72 @@ const Validator = {
   },
 
   banner_update: async (req, res, next) => {
-    if (
-      checkEmpty(req.body, [
+    try {
+      const requiredCheck = checkEmpty(req.body, [
         "banner_id",
         "page_name",
-        "slug",
-        "file_name",
-        "status",
-      ])
-    ) {
-      const schema = Joi.object({
-        banner_id: Joi.string().min(2).max(300).required(),
-        page_name: Joi.string().min(2).max(200).required(),
-        slug: Joi.string().min(2).max(200).required(),
-        file_name: Joi.string().min(2).max(200).required(),
-        status: Joi.string().valid("Active", "Inactive").required(),
-      });
+      ]);
 
-      try {
-        const { error } = schema.validate(req.body);
-        if (error) {
-          return res
-            .status(StatusCode.badRequest)
-            .send(ServerResponse.validationResponse(error.message));
-        }
-
-        const record_id = enc_dec.cjs_decrypt(req.bodyString("banner_id"));
-
-        const record_exist = await checkifrecordexist(
-          { id: record_id },
-          "banners"
-        );
-
-        if (!record_exist) {
-          return res
-            .status(StatusCode.badRequest)
-            .send(ServerResponse.validationResponse("Record not found."));
-        }
-
-        const slug_exist = await checkifrecordexist(
-          { slug: req.bodyString("slug"), "id !=": record_id },
-          "banners"
-        );
-
-        if (slug_exist) {
-          return res
-            .status(StatusCode.badRequest)
-            .send(ServerResponse.validationResponse("Slug already exists."));
-        }
-
-        next();
-      } catch (err) {
-        logger.error(400, { message: err.message, stack: err.stack });
+      if (!requiredCheck) {
         return res
           .status(StatusCode.badRequest)
-          .send(ServerResponse.validationResponse(err.message));
+          .send(
+            ServerResponse.validationResponse(
+              "banner_id, page_name and slug are required"
+            )
+          );
       }
-    } else {
-      return res.status(StatusCode.badRequest).send(ServerResponse.badRequest);
+
+      const encryptedBannerId = req.bodyString("banner_id");
+      const page_name = (req.bodyString("page_name") || "").trim();
+      if (!encryptedBannerId) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Banner id is required"));
+      }
+      let banner_id;
+      try {
+        banner_id = enc_dec.cjs_decrypt(encryptedBannerId);
+      } catch (err) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Invalid banner id"));
+      }
+
+      banner_id = Number(banner_id);
+
+      if (!Number.isInteger(banner_id) || banner_id <= 0) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Invalid banner id"));
+      }
+
+      if (page_name.length < 2 || page_name.length > 200) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(
+            ServerResponse.validationResponse(
+              "Page name must be between 2 and 200 characters"
+            )
+          );
+      }
+
+      next();
+    } catch (error) {
+      logger.error(400, {
+        route: "banner_update",
+        body: req.body,
+        message: error?.message,
+        stack: error?.stack,
+      });
+
+      return res
+        .status(StatusCode.badRequest)
+        .send(
+          ServerResponse.validationResponse(
+            error?.message || "Something went wrong"
+          )
+        );
     }
   },
 
@@ -12060,6 +12100,431 @@ const Validator = {
     }
     next();
   },
+
+  // mail template Validations
+  mail_template_add: async (req, res, next) => {
+    if (!checkEmpty(req.body, ["template_name", "slug", "subject", "template", "status"])) {
+      return res.status(StatusCode.badRequest).send(ServerResponse.badRequest);
+    }
+
+    try {
+      const template_name = req.bodyString("template_name");
+      const slug = req.bodyString("slug");
+      const subject = req.bodyString("subject");
+      const template = req.bodyString("template");
+      const status = req.bodyString("status");
+
+      if (!template_name) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(
+            ServerResponse.validationResponse(
+              "Template name must be between 2 and 50 characters"
+            )
+          );
+      }
+
+      if (!slug) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(
+            ServerResponse.validationResponse(
+              "Slug must be between 2 and 50 characters"
+            )
+          );
+      }
+
+      if (!subject || subject.length < 2 || subject.length > 100) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(
+            ServerResponse.validationResponse(
+              "Subject must be between 2 and 100 characters"
+            )
+          );
+      }
+
+      if (!template || template.length < 2) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Template is required"));
+      }
+
+      if (status && !["0", "1"].includes(status)) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Invalid status value"));
+      }
+
+      const rec_exist = await checkifrecordexist({ slug }, "mail_templates");
+      if (rec_exist) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Slug already exists"));
+      }
+      next();
+    } catch (error) {
+      logger.error(400, {
+        message: error?.message || error,
+        stack: error?.stack,
+      });
+
+      return res
+        .status(StatusCode.badRequest)
+        .send(
+          ServerResponse.validationResponse(
+            error?.message || "Something went wrong"
+          )
+        );
+    }
+  },
+
+  mail_template_details: async (req, res, next) => {
+    if (checkEmpty(req.body, ["mail_template_id"])) {
+      const schema = Joi.object({
+        mail_template_id: Joi.string().min(2).max(300).required(),
+      });
+
+      try {
+        const { error } = schema.validate(req.body);
+        if (error) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(ServerResponse.validationResponse(error.message));
+        }
+
+        const mail_template_id = enc_dec.cjs_decrypt(
+          req.bodyString("mail_template_id")
+        );
+
+        const record_exist = await checkifrecordexist(
+          { id: mail_template_id },
+          "mail_templates"
+        );
+
+        if (!record_exist) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(ServerResponse.validationResponse("Record not found."));
+        }
+
+        next();
+      } catch (err) {
+        logger.error(400, { message: err.message, stack: err.stack });
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse(err.message));
+      }
+    } else {
+      return res.status(StatusCode.badRequest).send(ServerResponse.badRequest);
+    }
+  },
+
+  mail_template_update: async (req, res, next) => {
+    try {
+      if (
+        !checkEmpty(req.body, [
+          "mail_template_id",
+          "template_name",
+          "subject",
+          "template",
+        ])
+      ) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.badRequest);
+      }
+
+      const template_name = req.bodyString("template_name");
+      const subject = req.bodyString("subject");
+      const template = req.bodyString("template");
+      const encryptedMailTemplateId = req.bodyString("mail_template_id");
+
+      if (!encryptedMailTemplateId) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(
+            ServerResponse.validationResponse("Mail Template id is required")
+          );
+      }
+
+      let mail_template_id;
+      try {
+        mail_template_id = enc_dec.cjs_decrypt(encryptedMailTemplateId);
+      } catch (err) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Invalid mail template id"));
+      }
+
+      mail_template_id = Number(mail_template_id);
+
+      if (!Number.isInteger(mail_template_id) || mail_template_id <= 0) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Invalid mail template id"));
+      }
+
+      if (!subject || subject.length < 2 || subject.length > 100) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(
+            ServerResponse.validationResponse(
+              "Subject must be between 2 and 100 characters"
+            )
+          );
+      }
+
+      if (!template || template.length < 2) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Template is required"));
+      }
+
+      next();
+    } catch (error) {
+      logger.error(400, {
+        route: "mail_template_update",
+        body: req.body,
+        message: error?.message,
+        stack: error?.stack,
+      });
+
+      return res
+        .status(StatusCode.badRequest)
+        .send(
+          ServerResponse.validationResponse(
+            error?.message || "Something went wrong"
+          )
+        );
+    }
+  },
+
+  mail_template_delete: async (req, res, next) => {
+    if (checkEmpty(req.body, ["mail_template_id"])) {
+      const schema = Joi.object({
+        mail_template_id: Joi.string().min(2).max(300).required(),
+      });
+
+      try {
+        const { error } = schema.validate(req.body);
+        if (error) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(ServerResponse.validationResponse(error.message));
+        }
+
+        const mail_template_id = enc_dec.cjs_decrypt(
+          req.bodyString("mail_template_id")
+        );
+
+        const record_exist = await checkifrecordexist(
+          { id: mail_template_id },
+          "mail_templates"
+        );
+
+        if (!record_exist) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(ServerResponse.validationResponse("Record not found."));
+        }
+
+        next();
+      } catch (err) {
+        logger.error(400, { message: err.message, stack: err.stack });
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse(err.message));
+      }
+    } else {
+      return res.status(StatusCode.badRequest).send(ServerResponse.badRequest);
+    }
+  },
+  mail_template_change_status: (req, res, next) => {
+    const mail_template_id = req.body.mail_template_id;
+    const status = req.body.status;
+
+    // Required field check
+    if (!mail_template_id || status === undefined) {
+      return res
+        .status(statusCode.badRequest)
+        .send(response.errormsg("mail_template_id and status are required"));
+    }
+
+    // Status validation (allow only 0 or 1)
+    if (!["0", "1", 0, 1].includes(status)) {
+      return res
+        .status(statusCode.badRequest)
+        .send(response.errormsg("Invalid status value"));
+    }
+
+    next();
+  },
+  /* api_document_add: async (req, res, next) => {
+    console.log("Validator: api_document_add called", req.body);
+    if (!checkEmpty(req.body, ["name", "title"])) {
+      console.log("Validator: checkEmpty failed for name or title");
+      return res.status(StatusCode.badRequest).send(ServerResponse.badRequest);
+    }
+
+    try {
+      const name = req.bodyString("name");
+      const title = req.bodyString("title");
+
+      if (!name) {
+        console.log("Validator: Name is missing");
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Name is required"));
+      }
+
+      if (!title) {
+        console.log("Validator: Title is missing");
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Title is required"));
+      }
+
+      if (req.file) {
+        const docFile = req.file;
+        const allowedTypes = [
+          "image/png",
+          "image/jpg",
+          "image/jpeg"
+        ];
+
+        if (!allowedTypes.includes(docFile.mimetype)) {
+          console.log("Validator: Invalid file type", docFile.mimetype);
+          return res
+            .status(StatusCode.badRequest)
+            .send(
+              ServerResponse.validationResponse(
+                "Only Images and Documents allowed!"
+              )
+            );
+        }
+        const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+        if (docFile.size > MAX_SIZE) {
+          console.log("Validator: File too large", docFile.size);
+          return res
+            .status(StatusCode.badRequest)
+            .send(
+              ServerResponse.validationResponse(
+                "File size must be less than 10MB"
+              )
+            );
+        }
+      }
+
+      console.log("Validator: Validation passed, proceeding to controller");
+      next();
+    } catch (error) {
+      console.error("Validator: Exception caught", error);
+      logger.error(400, {
+        message: error?.message || error,
+        stack: error?.stack,
+      });
+
+      return res
+        .status(StatusCode.badRequest)
+        .send(
+          ServerResponse.validationResponse(
+            error?.message || "Something went wrong"
+          )
+        );
+    }
+  },
+
+  api_document_update: async (req, res, next) => {
+    console.log("Validating API document update...");
+    if (!checkEmpty(req.body, ["id", "name", "title"])) {
+      return res.status(StatusCode.badRequest).send(ServerResponse.badRequest);
+    }
+
+    try {
+      const encryptedId = req.bodyString("id");
+      const name = req.bodyString("name");
+      const title = req.bodyString("title");
+
+      if (!encryptedId) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("ID is required"));
+      }
+
+      let id;
+      try {
+        id = enc_dec.cjs_decrypt(encryptedId);
+      } catch (err) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Invalid ID"));
+      }
+
+      if (!name) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Name is required"));
+      }
+
+      if (!title) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Title is required"));
+      }
+
+      let record_exist = await checkifrecordexist({ id: id }, "api_document");
+      if (!record_exist) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Record not found"));
+      }
+
+      if (req.file) {
+        const docFile = req.file;
+        const allowedTypes = [
+          "image/png",
+          "image/jpg",
+          "image/jpeg",
+        ];
+
+        if (!allowedTypes.includes(docFile.mimetype)) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(
+              ServerResponse.validationResponse(
+                "Only Images and Documents allowed!"
+              )
+            );
+        }
+        const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+        if (docFile.size > MAX_SIZE) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(
+              ServerResponse.validationResponse(
+                "File size must be less than 10MB"
+              )
+            );
+        }
+      }
+
+      next();
+    } catch (error) {
+      logger.error(400, {
+        message: error?.message || error,
+        stack: error?.stack,
+      });
+
+      return res
+        .status(StatusCode.badRequest)
+        .send(
+          ServerResponse.validationResponse(
+            error?.message || "Something went wrong"
+          )
+        );
+    }
+  }, */
 };
 
 module.exports = Validator;
