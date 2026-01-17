@@ -209,6 +209,8 @@ const superMerchantLogoUpload = require("../../../uploads/merchantLogoUpload.js"
 const { apiRateLimiter } = require('../../../utilities/api-ratelimiter/index.js');
 const Banner = require("../../../controller/banner.js");
 const MailTemplate = require("../../../controller/mail_template.js");
+const apiDocument = require("../../../controller/apidocumentController.js");
+const uploadApiDoc = require("../../../uploads/uploadApiDoc.js");
 
 
 app.post("/login", CheckHeader, Validator.login, Auth.login);
@@ -5074,11 +5076,10 @@ app.post("/mail-template/update", CheckHeader, CheckToken, Validator.mail_templa
 app.post("/mail-template/delete", CheckHeader, CheckToken, Validator.mail_template_delete, MailTemplate.delete);
 app.post("/mail-template/change-status", CheckHeader, CheckToken, Validator.mail_template_change_status, MailTemplate.changeStatus);
 
-const apiDocument = require("../../../controller/ApiDocument.js");
-const uploadApiDoc = require("../../../uploads/uploadApiDoc.js");
 
 
 
+app.get("/api-documentation", apiDocument.getApiDocumentation);
 app.post("/api-documentation/add", CheckHeader, CheckToken, uploadApiDoc, Validator.api_document_add, apiDocument.add);
 app.post("/api-documentation/list", CheckHeader, CheckToken, apiDocument.list);
 app.post("/api-documentation/details", CheckHeader, CheckToken, apiDocument.details);
