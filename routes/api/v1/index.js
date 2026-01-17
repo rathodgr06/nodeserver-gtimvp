@@ -5078,7 +5078,7 @@ const apiDocument = require("../../../controller/ApiDocument.js");
 const uploadApiDoc = require("../../../uploads/uploadApiDoc.js");
 
 
-app.get("/api-documentation", apiDocument.getApiDocumentation);
+
 app.post("/api-documentation/add", CheckHeader, CheckToken, uploadApiDoc, Validator.api_document_add, apiDocument.add);
 app.post("/api-documentation/list", CheckHeader, CheckToken, apiDocument.list);
 app.post("/api-documentation/details", CheckHeader, CheckToken, apiDocument.details);

@@ -3773,7 +3773,8 @@ var MerchantEkyc = {
       res
         .status(statusCode.ok)
         .send(response.successmsg("Mail send successfully"));
-    } catch (error) {
+    }
+   } catch (error) {
       logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
