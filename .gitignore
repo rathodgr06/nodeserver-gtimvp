@@ -3,4 +3,5 @@
 node_modules/
 .env
 public/
-logs/
+logs/*.json
+logs/.*.json

@@ -196,23 +196,47 @@ const S2SValidator = {
             });
 
             const order_details_schema = Joi.object().keys({
-                m_order_id: Joi.string().optional().max(50).allow(""),
-                amount: Joi.number()
-                    .positive()
-                    .precision(2)
-                    .required()
-                    .error(() => new Error("Amount not valid/not supplied (must be positive number)")),
-                currency: Joi.string()
-                    .currency()
-                    .length(3)
-                    .required()
-                    .error(() => new Error("Currency not valid/not supplied (3-letter ISO code)")),
-                return_url: Joi.string().uri().optional().allow(""),
-                description: Joi.string()
-                    .optional()
-                    .allow("")
-                    .max(200)
-                    .error(() => new Error("Description not valid/not supplied (max 200 characters)"))
+              m_order_id: Joi.string().optional().max(50).allow(""),
+              amount: Joi.number()
+                .positive()
+                .precision(2)
+                .required()
+                .error(
+                  () =>
+                    new Error(
+                      "Amount not valid/not supplied (must be positive number)"
+                    )
+                ),
+              currency: Joi.string()
+                .currency()
+                .length(3)
+                .required()
+                .error(
+                  () =>
+                    new Error(
+                      "Currency not valid/not supplied (3-letter ISO code)"
+                    )
+                ),
+              return_url: Joi.string().uri().optional().allow(""),
+              description: Joi.string()
+                .optional()
+                .allow("")
+                .max(200)
+                .error(
+                  () =>
+                    new Error(
+                      "Description not valid/not supplied (max 200 characters)"
+                    )
+                ),
+              statement_descriptor: Joi.string()
+                .optional()
+                .allow("")
+                .error(
+                  () =>
+                    new Error(
+                      "Statement descriptior not valid/not supplied (max 22 characters)"
+                    )
+                ),
             });
 
             const billingDetailsSchema = Joi.object({

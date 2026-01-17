@@ -35,6 +35,10 @@ module.exports = {
         "base_url": "https://eu-gateway.mastercard.com/api/rest/version/100/",
         "test_url": "https://eu-gateway.mastercard.com/api/rest/version/100/",
     },
+    mpgs_ksa: {
+        "base_url": "https://ksa.gateway.mastercard.com/api/rest/version/100/",
+        "test_url": "https://ksa.gateway.mastercard.com/api/rest/version/100/",
+    },
     myf: {
         "base_url": "https://api.myfatoorah.com/v2/",
         "test_url": "https://apitest.myfatoorah.com/v2/"

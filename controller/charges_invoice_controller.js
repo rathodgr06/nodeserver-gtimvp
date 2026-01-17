@@ -1689,6 +1689,7 @@ const charges_invoice_controller = {
     }
 
     charges_invoice_models.get_charges_analytics(condition, limit).then(async (result) => {
+      console.log(result);
         let total_row = 100;
 
         let formatted = result.map((row) => ({
@@ -1700,14 +1701,14 @@ const charges_invoice_controller = {
         res
           .status(statusCode.ok)
           .send(
-            response.successdatamsg(
-              formatted,
-              "List fetched successfully.",
-              total_row
-            )
-          );
+            response.sendSuccess({
+              data:formatted,
+              message:"List fetched successfully.",
+              status:'success'
+            }));
       })
       .catch((error) => {
+        console.log(error);
         logger.error(500,{message: error,stack: error.stack}); 
         res
           .status(statusCode.internalError)

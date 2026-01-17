@@ -7178,6 +7178,31 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
       return "";
     });
   },
+  sanitizeDescriptor: (value) => {
+    return value
+      .toUpperCase()
+      .replace(/[^A-Z0-9* ]/g, "")
+      .substring(0, 21);
+  },
+  checkAllowDescriptorOnMerchant: async (merchant_id) => {
+    let qb = await pool.get_connection();
+    let response;
+    try {
+      response = await qb.query(
+        `SELECT allow_statement_descriptor FROM pg_master_merchant WHERE id=${merchant_id}`
+      );
+    } catch (error) {
+      console.error("Database query failed:", error);
+      logger.error(500, { message: error, stack: error?.stack });
+    } finally {
+      qb.release();
+    }
+    if (response?.[0]) {
+      return response?.[0]?.allow_statement_descriptor;
+    } else {
+      return 1;
+    }
+  },
 };
 
 module.exports = helpers;

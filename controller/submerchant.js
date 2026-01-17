@@ -5190,6 +5190,7 @@ function transformResultItem(val, asyncData) {
     last_modified_date: val.last_updated 
       ? moment(val.last_updated).format("DD-MM-YYYY HH:mm:ss") 
       : " ",
+    allow_statement_descriptor:val.allow_statement_descriptor  
   };
 }
 

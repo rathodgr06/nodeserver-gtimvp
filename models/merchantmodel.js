@@ -235,6 +235,7 @@ var dbModel = {
         .select(selection)
         .where(condition)
         .get(super_merchant_table);
+        console.log(qb.last_query());
     } catch (error) {
       logger.error(500, { message: error, stack: error.stack });
     } finally {
@@ -1051,6 +1052,21 @@ var dbModel = {
     }
 
     return total;
+  },
+    selectOneSubMerchant: async (selection, condition) => {
+    let qb = await pool.get_connection();
+    let response;
+    try {
+      response = await qb
+        .select(selection)
+        .where(condition)
+        .get(config.table_prefix+"master_merchant");
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+    } finally {
+      qb.release();
+    }
+    return response?.[0];
   },
 };
 module.exports = dbModel;

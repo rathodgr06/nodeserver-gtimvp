@@ -125,7 +125,7 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -162,7 +162,7 @@ var MerchantEkyc = {
           .send(response.successdatamsg(tree, "mcc codes fetch successfully"));
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -184,15 +184,15 @@ var MerchantEkyc = {
             merchant_data.auth_2fa_token
           );
         }
-        
+
         let is_user = 1;
-        if(merchant_data.super_merchant_id==0){
-          is_user=0;
+        if (merchant_data.super_merchant_id == 0) {
+          is_user = 0;
         }
         // if (verification_result) {
         if (
           // verification_result ||
-          (req.bodyString("pin") == "123456" )
+          req.bodyString("pin") == "123456"
         ) {
           let condition = { token: token };
           let data = { is_expired: 1 };
@@ -206,11 +206,11 @@ var MerchantEkyc = {
             email: user.email,
             id: user.id,
             super_merchant_id:
-            user.super_merchant_id > 0 ? user.super_merchant_id : "",
+              user.super_merchant_id > 0 ? user.super_merchant_id : "",
             mode: user.super_merchant_id > 0 ? super_merchant_live.mode : "",
             name: user.name,
             type: "merchant",
-            is_user:is_user
+            is_user: is_user,
           };
           payload = encrypt_decrypt("encrypt", JSON.stringify(payload));
           const aToken = merchantToken(payload);
@@ -235,35 +235,81 @@ var MerchantEkyc = {
           let headers = req.headers;
           await admin_activity_logger.merchant_login_log_add(user.id, headers);
           let main_sub_merchant_data = await MerchantEkycModel.select_first(
-                "id",
-                {
-                  super_merchant_id: merchant_data.super_merchant_id||merchant_data.id,
-                }
+            "id",
+            {
+              super_merchant_id:
+                merchant_data.super_merchant_id || merchant_data.id,
+            }
           );
-          let businesCountryDetails = await MerchantModel.selectOneMerchantDetails('register_business_country',{merchant_id:main_sub_merchant_data.id});
+          let businesCountryDetails =
+            await MerchantModel.selectOneMerchantDetails(
+              "register_business_country",
+              { merchant_id: main_sub_merchant_data.id }
+            );
           console.log("businesCountryDetails", businesCountryDetails);
           let roles_payload = {
             country_id: businesCountryDetails?.register_business_country,
-            env_mode: 'test',
+            env_mode: "test",
             deleted: 0,
           };
-          let merchant_roles_test = await MerchantSetupModal.get_by_country(roles_payload);
+          let merchant_roles_test = await MerchantSetupModal.get_by_country(
+            roles_payload
+          );
           roles_payload = {
             country_id: businesCountryDetails?.register_business_country,
-            env_mode: 'live',
+            env_mode: "live",
             deleted: 0,
           };
-          let merchant_roles_live = await MerchantSetupModal.get_by_country(roles_payload);
-
+          let merchant_roles_live = await MerchantSetupModal.get_by_country(
+            roles_payload
+          );
 
           let default_roles = [];
           let default_test_roles = [];
-          if (process.env.CHARGES_MODE == 'live') {
-            default_roles = ['Dashboard', 'Ledger', 'PayIn', 'Payout', 'Accept payments', 'Merchant', 'Sender', 'Wallet', 'Account', 'Pricing', 'Scheduling', 'Developers'];
-            default_test_roles = ['Dashboard', 'PayIn', 'Accept payments', 'Merchant', 'Developers'];
+          if (process.env.CHARGES_MODE == "live") {
+            default_roles = [
+              "Dashboard",
+              "Ledger",
+              "PayIn",
+              "Payout",
+              "Accept payments",
+              "Merchant",
+              "Sender",
+              "Wallet",
+              "Account",
+              "Pricing",
+              "Scheduling",
+              "Developers",
+            ];
+            default_test_roles = [
+              "Dashboard",
+              "PayIn",
+              "Accept payments",
+              "Merchant",
+              "Developers",
+            ];
           } else {
-            default_roles = ['Dashboard', 'PayIn', 'Accept payments', 'Merchant', 'Developers'];
-            default_test_roles = ['Dashboard', 'Ledger', 'PayIn', 'Payout', 'Accept payments', 'Merchant', 'Sender', 'Wallet', 'Account', 'Pricing', 'Scheduling', 'Developers'];
+            default_roles = [
+              "Dashboard",
+              "PayIn",
+              "Accept payments",
+              "Merchant",
+              "Developers",
+            ];
+            default_test_roles = [
+              "Dashboard",
+              "Ledger",
+              "PayIn",
+              "Payout",
+              "Accept payments",
+              "Merchant",
+              "Sender",
+              "Wallet",
+              "Account",
+              "Pricing",
+              "Scheduling",
+              "Developers",
+            ];
           }
 
           res.status(statusCode.ok).send(
@@ -273,13 +319,25 @@ var MerchantEkyc = {
               language: language,
               theme: user.theme,
               type: "merchant",
-              phone_code:merchant_data.code,
-              business_register_country:businesCountryDetails.register_business_country,
-              enc_bus_reg_country:encrypt_decrypt('encrypt',businesCountryDetails.register_business_country?businesCountryDetails.register_business_country:'1'),
+              phone_code: merchant_data.code,
+              business_register_country:
+                businesCountryDetails.register_business_country,
+              enc_bus_reg_country: encrypt_decrypt(
+                "encrypt",
+                businesCountryDetails.register_business_country
+                  ? businesCountryDetails.register_business_country
+                  : "1"
+              ),
               merchant_roles: {
-                live: merchant_roles_live?.data?.[0]?.roles == undefined ? default_roles : merchant_roles_live?.data?.[0]?.roles,
-                test: merchant_roles_test?.data?.[0]?.roles == undefined ? default_test_roles : merchant_roles_test?.data?.[0]?.roles,
-              }
+                live:
+                  merchant_roles_live?.data?.[0]?.roles == undefined
+                    ? default_roles
+                    : merchant_roles_live?.data?.[0]?.roles,
+                test:
+                  merchant_roles_test?.data?.[0]?.roles == undefined
+                    ? default_test_roles
+                    : merchant_roles_test?.data?.[0]?.roles,
+              },
             })
           );
         } else {
@@ -289,7 +347,7 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -319,7 +377,7 @@ var MerchantEkyc = {
           .send(response.successdatamsg(send_res, "psp fetch successfully"));
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -336,7 +394,11 @@ var MerchantEkyc = {
         let last_updated = await date_formatter.created_date_time();
         if (result) {
           // let psp_ids = req.bodyString("psp_id").split(",");
-          let psp_ids = await MerchantRegistrationModel.selectAllDyn('id',{deleted:0,status:0},'psp');
+          let psp_ids = await MerchantRegistrationModel.selectAllDyn(
+            "id",
+            { deleted: 0, status: 0 },
+            "psp"
+          );
           let psp_cs = [];
           for (let i = 0; i < psp_ids.length; i++) {
             psp_cs.push(enc_dec.cjs_decrypt(psp_ids[i].id));
@@ -365,7 +427,7 @@ var MerchantEkyc = {
               await helpers.complete_kyc_step(submerchant_id, 1);
             })
             .catch((error) => {
-              logger.error(500,{message: error,stack: error.stack}); 
+              logger.error(500, { message: error, stack: error.stack });
               err = error;
             });
         } else {
@@ -401,7 +463,7 @@ var MerchantEkyc = {
               await helpers.complete_kyc_step(submerchant_id, 1);
             })
             .catch((error) => {
-             logger.error(500,{message: error,stack: error.stack}); 
+              logger.error(500, { message: error, stack: error.stack });
               err = error;
             });
         }
@@ -415,7 +477,7 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -452,7 +514,7 @@ var MerchantEkyc = {
               await helpers.complete_kyc_step(submerchant_id, 1);
             })
             .catch((error) => {
-              logger.error(500,{message: error,stack: error.stack}); 
+              logger.error(500, { message: error, stack: error.stack });
               err = error;
             });
         } else {
@@ -480,7 +542,7 @@ var MerchantEkyc = {
               await helpers.complete_kyc_step(submerchant_id, 1);
             })
             .catch((error) => {
-              logger.error(500,{message: error,stack: error.stack}); 
+              logger.error(500, { message: error, stack: error.stack });
               err = error;
             });
         }
@@ -621,7 +683,7 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -699,7 +761,7 @@ var MerchantEkyc = {
               await helpers.complete_kyc_step(submerchant_id, 2);
             })
             .catch((error) => {
-              logger.error(500,{message: error,stack: error.stack}); 
+              logger.error(500, { message: error, stack: error.stack });
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error));
@@ -780,7 +842,7 @@ var MerchantEkyc = {
                 .send(response.successmsg("Updated successfully"));
             })
             .catch((error) => {
-              logger.error(500,{message: error,stack: error.stack}); 
+              logger.error(500, { message: error, stack: error.stack });
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error));
@@ -910,276 +972,288 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
   representative_update: async (req, res) => {
-    try{
-    //step-3
-    let err = "";
-    let entity_id = encrypt_decrypt("decrypt", req.bodyString("entity_type"));
-    let submerchant_id = encrypt_decrypt(
-      "decrypt",
-      req.bodyString("submerchant_id")
-    );
-    let nationality_id = req.bodyString("nationality");
-    let country_id = enc_dec.cjs_decrypt(
-      req.bodyString("home_address_country")
-    );
-    let state_id = enc_dec.cjs_decrypt(req.bodyString("home_address_state"));
+    try {
+      //step-3
+      let err = "";
+      let entity_id = encrypt_decrypt("decrypt", req.bodyString("entity_type"));
+      let submerchant_id = encrypt_decrypt(
+        "decrypt",
+        req.bodyString("submerchant_id")
+      );
+      let nationality_id = req.bodyString("nationality");
+      let country_id = enc_dec.cjs_decrypt(
+        req.bodyString("home_address_country")
+      );
+      let state_id = enc_dec.cjs_decrypt(req.bodyString("home_address_state"));
 
-    let country_exits = await MerchantEkycModel.selectDynamicSingle(
-      "id",
-      { id: country_id },
-      "pg_country"
-    );
-    let nationality = await MerchantEkycModel.selectDynamicSingle(
-      "id",
-      { code: nationality_id },
-      "pg_nationality"
-    );
-    let state_exits = await MerchantEkycModel.selectDynamicSingle(
-      "id",
-      { id: state_id },
-      "pg_states"
-    );
+      let country_exits = await MerchantEkycModel.selectDynamicSingle(
+        "id",
+        { id: country_id },
+        "pg_country"
+      );
+      let nationality = await MerchantEkycModel.selectDynamicSingle(
+        "id",
+        { code: nationality_id },
+        "pg_nationality"
+      );
+      let state_exits = await MerchantEkycModel.selectDynamicSingle(
+        "id",
+        { id: state_id },
+        "pg_states"
+      );
 
-    if (!country_exits || !nationality || !state_exits) {
-      if (!country_exits) {
-        res
-          .status(statusCode.ok)
-          .send(response.validationResponse("Invalid Country "));
-      }
-      if (!nationality) {
-        res
-          .status(statusCode.ok)
-          .send(response.validationResponse("Invalid Nationality"));
-      }
-      if (!state_exits) {
-        res
-          .status(statusCode.ok)
-          .send(response.validationResponse("Invalid State"));
-      }
-    } else {
-      MerchantEkycModel.merchantDetais({ merchant_id: submerchant_id })
-        .then(async (result) => {
-          let last_updated = await date_formatter.created_date_time();
-          if (result) {
-            let condition = { merchant_id: submerchant_id };
-            let data = {
-              legal_person_first_name: req.bodyString(
-                "legal_person_first_name"
-              ),
-              legal_person_last_name: req.bodyString("legal_person_last_name"),
-              legal_person_email: req.bodyString("email_address"),
-              job_title: req.bodyString("job_title"),
-              nationality: req.bodyString("nationality"),
-              dob: req.bodyString("date_of_birth"),
-              home_address_country: enc_dec.cjs_decrypt(
-                req.bodyString("home_address_country")
-              ),
-              home_address_line_1: req.bodyString("home_address_line1"),
-              home_address_line_2: req.bodyString("home_address_line2") + "",
-              home_province: enc_dec.cjs_decrypt(
-                req.bodyString("home_address_state")
-              ),
-              home_phone_code: req.bodyString("home_address_phone_code"),
-              home_phone_number: req.bodyString("home_address_phone_number"),
-              // personal_id_number: req.bodyString('personal_id_number'),
-              // rep_expiry_date: req.bodyString('rep_expiry_date'),
-              last_updated: last_updated,
-            };
-            MerchantEkycModel.updateMerchantDetails(condition, data)
-              .then(async (result) => {
-                let condition = { id: submerchant_id };
-                let data = { main_step: 4 };
-                let updateResult = await MerchantEkycModel.update(
-                  condition,
-                  data
-                );
-                await helpers.complete_kyc_step(submerchant_id, 3);
-              })
-              .catch((error) => {
-                logger.error(500,{message: error,stack: error.stack}); 
-                res
-                  .status(statusCode.internalError)
-                  .send(response.errormsg(error));
-              });
-          } else {
-            let merchant_details = {
-              merchant_id: submerchant_id,
-              legal_person_first_name: req.bodyString(
-                "legal_person_first_name"
-              ),
-              legal_person_last_name: req.bodyString("legal_person_last_name"),
-              legal_person_email: req.bodyString("email_address"),
-              job_title: req.bodyString("job_title"),
-              nationality: enc_dec.cjs_decrypt(req.bodyString("nationality")),
-              dob: req.bodyString("date_of_birth"),
-              home_address_country: encrypt_decrypt(
-                req.bodyString("home_address_country")
-              ),
-              home_address_line_1: req.bodyString("home_address_line1"),
-              home_address_line_2: req.bodyString("home_address_line2") + "",
-              home_province: enc_dec.cjs_decrypt(
-                req.bodyString("home_address_state")
-              ),
-              home_phone_code: req.bodyString("home_address_phone_code"),
-              home_phone_number: req.bodyString("home_address_phone_number"),
-              //  personal_id_number: req.bodyString('personal_id_number'),
-              last_updated: last_updated,
-            };
-            MerchantEkycModel.insertMerchantDetails(merchant_details)
-              .then(async (result) => {
-                let condition = { id: submerchant_id };
-                let data = { main_step: 4 };
-                let updateResult = await MerchantEkycModel.update(
-                  condition,
-                  data
-                );
-                await helpers.complete_kyc_step(submerchant_id, 3);
-              })
-              .catch((error) => {
-                logger.error(500,{message: error,stack: error.stack}); 
-                res
-                  .status(statusCode.internalError)
-                  .send(response.errormsg(error));
-              });
-          }
-          if (err) {
-            res.status(statusCode.internalError).send(error);
-          } else {
-            let entity_id = enc_dec.cjs_decrypt(req.bodyString("entity_type"));
-            let entity_type_doc_exits = await helpers.get_data_list(
-              "*",
-              "master_entity_document",
-              {
-                entity_id: entity_id,
-                deleted: 0,
-                document_for: "representative",
-              }
-            );
-
-            let ins_docs_arr = [];
-            //let ip =  helpers.get_ip()
-            let removeDoc = await MerchantEkycModel.removeEntityDoc({
-              entity_id: entity_id,
-              document_for: "representative",
-              merchant_id: submerchant_id,
-            });
-            let seq_inp = req.bodyString("sequence");
-            let seq;
-            if (typeof seq_inp == "string" && seq_inp != "") {
-              seq = seq_inp.split(",");
+      if (!country_exits || !nationality || !state_exits) {
+        if (!country_exits) {
+          res
+            .status(statusCode.ok)
+            .send(response.validationResponse("Invalid Country "));
+        }
+        if (!nationality) {
+          res
+            .status(statusCode.ok)
+            .send(response.validationResponse("Invalid Nationality"));
+        }
+        if (!state_exits) {
+          res
+            .status(statusCode.ok)
+            .send(response.validationResponse("Invalid State"));
+        }
+      } else {
+        MerchantEkycModel.merchantDetais({ merchant_id: submerchant_id })
+          .then(async (result) => {
+            let last_updated = await date_formatter.created_date_time();
+            if (result) {
+              let condition = { merchant_id: submerchant_id };
+              let data = {
+                legal_person_first_name: req.bodyString(
+                  "legal_person_first_name"
+                ),
+                legal_person_last_name: req.bodyString(
+                  "legal_person_last_name"
+                ),
+                legal_person_email: req.bodyString("email_address"),
+                job_title: req.bodyString("job_title"),
+                nationality: req.bodyString("nationality"),
+                dob: req.bodyString("date_of_birth"),
+                home_address_country: enc_dec.cjs_decrypt(
+                  req.bodyString("home_address_country")
+                ),
+                home_address_line_1: req.bodyString("home_address_line1"),
+                home_address_line_2: req.bodyString("home_address_line2") + "",
+                home_province: enc_dec.cjs_decrypt(
+                  req.bodyString("home_address_state")
+                ),
+                home_phone_code: req.bodyString("home_address_phone_code"),
+                home_phone_number: req.bodyString("home_address_phone_number"),
+                // personal_id_number: req.bodyString('personal_id_number'),
+                // rep_expiry_date: req.bodyString('rep_expiry_date'),
+                last_updated: last_updated,
+              };
+              MerchantEkycModel.updateMerchantDetails(condition, data)
+                .then(async (result) => {
+                  let condition = { id: submerchant_id };
+                  let data = { main_step: 4 };
+                  let updateResult = await MerchantEkycModel.update(
+                    condition,
+                    data
+                  );
+                  await helpers.complete_kyc_step(submerchant_id, 3);
+                })
+                .catch((error) => {
+                  logger.error(500, { message: error, stack: error.stack });
+                  res
+                    .status(statusCode.internalError)
+                    .send(response.errormsg(error));
+                });
             } else {
-              seq = seq_inp;
+              let merchant_details = {
+                merchant_id: submerchant_id,
+                legal_person_first_name: req.bodyString(
+                  "legal_person_first_name"
+                ),
+                legal_person_last_name: req.bodyString(
+                  "legal_person_last_name"
+                ),
+                legal_person_email: req.bodyString("email_address"),
+                job_title: req.bodyString("job_title"),
+                nationality: enc_dec.cjs_decrypt(req.bodyString("nationality")),
+                dob: req.bodyString("date_of_birth"),
+                home_address_country: encrypt_decrypt(
+                  req.bodyString("home_address_country")
+                ),
+                home_address_line_1: req.bodyString("home_address_line1"),
+                home_address_line_2: req.bodyString("home_address_line2") + "",
+                home_province: enc_dec.cjs_decrypt(
+                  req.bodyString("home_address_state")
+                ),
+                home_phone_code: req.bodyString("home_address_phone_code"),
+                home_phone_number: req.bodyString("home_address_phone_number"),
+                //  personal_id_number: req.bodyString('personal_id_number'),
+                last_updated: last_updated,
+              };
+              MerchantEkycModel.insertMerchantDetails(merchant_details)
+                .then(async (result) => {
+                  let condition = { id: submerchant_id };
+                  let data = { main_step: 4 };
+                  let updateResult = await MerchantEkycModel.update(
+                    condition,
+                    data
+                  );
+                  await helpers.complete_kyc_step(submerchant_id, 3);
+                })
+                .catch((error) => {
+                  logger.error(500, { message: error, stack: error.stack });
+                  res
+                    .status(statusCode.internalError)
+                    .send(response.errormsg(error));
+                });
             }
-            if (seq.length >= 1) {
-              for (let k = 0; k < seq.length; k++) {
-                let i = seq[k];
+            if (err) {
+              res.status(statusCode.internalError).send(error);
+            } else {
+              let entity_id = enc_dec.cjs_decrypt(
+                req.bodyString("entity_type")
+              );
+              let entity_type_doc_exits = await helpers.get_data_list(
+                "*",
+                "master_entity_document",
+                {
+                  entity_id: entity_id,
+                  deleted: 0,
+                  document_for: "representative",
+                }
+              );
+
+              let ins_docs_arr = [];
+              //let ip =  helpers.get_ip()
+              let removeDoc = await MerchantEkycModel.removeEntityDoc({
+                entity_id: entity_id,
+                document_for: "representative",
+                merchant_id: submerchant_id,
+              });
+              let seq_inp = req.bodyString("sequence");
+              let seq;
+              if (typeof seq_inp == "string" && seq_inp != "") {
+                seq = seq_inp.split(",");
+              } else {
+                seq = seq_inp;
+              }
+              if (seq.length >= 1) {
+                for (let k = 0; k < seq.length; k++) {
+                  let i = seq[k];
+                  ins_docs = {
+                    entity_id: entity_id,
+
+                    document_for: "representative",
+                    sequence: enc_dec.cjs_decrypt(
+                      req.bodyString("document_" + i + "_type")
+                    ),
+                    merchant_id: submerchant_id,
+                    document_id: enc_dec.cjs_decrypt(
+                      req.bodyString("document_" + i + "_id")
+                    ),
+                    //ip:ip
+                  };
+                  if (req.bodyString("document_" + i + "_issue_date")) {
+                    ins_docs.issue_date = req.bodyString(
+                      "document_" + i + "_issue_date"
+                    );
+                  }
+                  if (req.bodyString("document_" + i + "_expiry_date")) {
+                    ins_docs.expiry_date = req.bodyString(
+                      "document_" + i + "_expiry_date"
+                    );
+                  }
+                  if (req.bodyString("document_" + i + "_number")) {
+                    ins_docs.document_num = req.bodyString(
+                      "document_" + i + "_number"
+                    );
+                  }
+                  if (req.all_files && req.all_files["document_" + i]) {
+                    ins_docs.document_name = req.all_files["document_" + i];
+                  } else {
+                    ins_docs.document_name = req.bodyString(
+                      "document_" + i + "_front"
+                    );
+                  }
+                  if (
+                    req.all_files &&
+                    req.all_files["document_" + i + "_back"]
+                  ) {
+                    ins_docs.document_name_back =
+                      req.all_files["document_" + i + "_back"];
+                  } else {
+                    ins_docs.document_name_back = req.bodyString(
+                      "document_" + i + "_back_"
+                    );
+                  }
+                  if (req.bodyString("document_" + i + "_type")) {
+                    await MerchantEkycModel.addMerchantDocs(ins_docs);
+                  }
+                  // let req_data_id = req.bodyString('data_id' + seq);
+
+                  // if (req_data_id) {
+                  //     await MerchantEkycModel.updateMerchantDocs({ 'id': enc_dec.cjs_decrypt(req_data_id) }, ins_docs)
+                  // } else {
+
+                  // }
+                }
+              } else {
                 ins_docs = {
                   entity_id: entity_id,
-
                   document_for: "representative",
                   sequence: enc_dec.cjs_decrypt(
-                    req.bodyString("document_" + i + "_type")
+                    req.bodyString("document_1_type")
                   ),
                   merchant_id: submerchant_id,
                   document_id: enc_dec.cjs_decrypt(
-                    req.bodyString("document_" + i + "_id")
+                    req.bodyString("document_1_id")
                   ),
                   //ip:ip
                 };
-                if (req.bodyString("document_" + i + "_issue_date")) {
-                  ins_docs.issue_date = req.bodyString(
-                    "document_" + i + "_issue_date"
-                  );
+                if (req.bodyString("document_1_issue_date")) {
+                  ins_docs.issue_date = req.bodyString("document_1_issue_date");
                 }
-                if (req.bodyString("document_" + i + "_expiry_date")) {
+                if (req.bodyString("document_1_expiry_date")) {
                   ins_docs.expiry_date = req.bodyString(
-                    "document_" + i + "_expiry_date"
+                    "document_1_expiry_date"
                   );
                 }
-                if (req.bodyString("document_" + i + "_number")) {
-                  ins_docs.document_num = req.bodyString(
-                    "document_" + i + "_number"
-                  );
+                if (req.bodyString("document_1_number")) {
+                  ins_docs.document_num = req.bodyString("document_1_number");
                 }
-                if (req.all_files && req.all_files["document_" + i]) {
-                  ins_docs.document_name = req.all_files["document_" + i];
+                if (req.all_files && req.all_files["document_1"]) {
+                  ins_docs.document_name = req.all_files["document_1"];
                 } else {
-                  ins_docs.document_name = req.bodyString(
-                    "document_" + i + "_front"
-                  );
+                  ins_docs.document_name = req.bodyString("document_1_front");
                 }
-                if (req.all_files && req.all_files["document_" + i + "_back"]) {
+                if (req.all_files && req.all_files["document_1_back"]) {
                   ins_docs.document_name_back =
-                    req.all_files["document_" + i + "_back"];
+                    req.all_files["document_1_back"];
                 } else {
-                  ins_docs.document_name_back = req.bodyString(
-                    "document_" + i + "_back_"
-                  );
+                  ins_docs.document_name_back =
+                    req.bodyString("document_1_back_");
                 }
-                if (req.bodyString("document_" + i + "_type")) {
-                  await MerchantEkycModel.addMerchantDocs(ins_docs);
-                }
-                // let req_data_id = req.bodyString('data_id' + seq);
-
-                // if (req_data_id) {
-                //     await MerchantEkycModel.updateMerchantDocs({ 'id': enc_dec.cjs_decrypt(req_data_id) }, ins_docs)
-                // } else {
-
-                // }
+                await MerchantEkycModel.addMerchantDocs(ins_docs);
               }
-            } else {
-              ins_docs = {
-                entity_id: entity_id,
-                document_for: "representative",
-                sequence: enc_dec.cjs_decrypt(
-                  req.bodyString("document_1_type")
-                ),
-                merchant_id: submerchant_id,
-                document_id: enc_dec.cjs_decrypt(
-                  req.bodyString("document_1_id")
-                ),
-                //ip:ip
-              };
-              if (req.bodyString("document_1_issue_date")) {
-                ins_docs.issue_date = req.bodyString("document_1_issue_date");
-              }
-              if (req.bodyString("document_1_expiry_date")) {
-                ins_docs.expiry_date = req.bodyString("document_1_expiry_date");
-              }
-              if (req.bodyString("document_1_number")) {
-                ins_docs.document_num = req.bodyString("document_1_number");
-              }
-              if (req.all_files && req.all_files["document_1"]) {
-                ins_docs.document_name = req.all_files["document_1"];
-              } else {
-                ins_docs.document_name = req.bodyString("document_1_front");
-              }
-              if (req.all_files && req.all_files["document_1_back"]) {
-                ins_docs.document_name_back = req.all_files["document_1_back"];
-              } else {
-                ins_docs.document_name_back =
-                  req.bodyString("document_1_back_");
-              }
-              await MerchantEkycModel.addMerchantDocs(ins_docs);
+              res
+                .status(statusCode.ok)
+                .send(response.successmsg("Updated successfully"));
             }
-            res
-              .status(statusCode.ok)
-              .send(response.successmsg("Updated successfully"));
-          }
-        })
-        .catch((error) => {
-          logger.error(500,{message: error,stack: error.stack}); 
-          res.status(statusCode.internalError).send(response.errormsg(error));
-        });
+          })
+          .catch((error) => {
+            logger.error(500, { message: error, stack: error.stack });
+            res.status(statusCode.internalError).send(response.errormsg(error));
+          });
+      }
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
     }
-  }catch(error){
-     logger.error(500,{message: error,stack: error.stack}); 
-  }
   },
   add_business_owner: async (req, res) => {
     //step-4
@@ -1448,7 +1522,7 @@ var MerchantEkyc = {
           );
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
     // }
@@ -1608,12 +1682,12 @@ var MerchantEkyc = {
               );
           })
           .catch((error) => {
-            logger.error(500,{message: error,stack: error.stack}); 
+            logger.error(500, { message: error, stack: error.stack });
             res.status(statusCode.internalError).send(response.errormsg(error));
           });
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -1755,7 +1829,7 @@ var MerchantEkyc = {
           );
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -1803,7 +1877,7 @@ var MerchantEkyc = {
                 .send(response.successmsg("Updated successfully"));
             })
             .catch((error) => {
-              logger.error(500,{message: error,stack: error.stack}); 
+              logger.error(500, { message: error, stack: error.stack });
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error));
@@ -1833,7 +1907,7 @@ var MerchantEkyc = {
                 .send(response.successmsg("Updated successfully"));
             })
             .catch((error) => {
-              logger.error(500,{message: error,stack: error.stack}); 
+              logger.error(500, { message: error, stack: error.stack });
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error));
@@ -1841,7 +1915,7 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -1896,7 +1970,7 @@ var MerchantEkyc = {
                 .send(response.successmsg("Updated successfully"));
             })
             .catch((error) => {
-              logger.error(500,{message: error,stack: error.stack}); 
+              logger.error(500, { message: error, stack: error.stack });
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error));
@@ -1934,7 +2008,7 @@ var MerchantEkyc = {
                 .send(response.successmsg("Updated successfully"));
             })
             .catch((error) => {
-              logger.error(500,{message: error,stack: error.stack}); 
+              logger.error(500, { message: error, stack: error.stack });
               res
                 .status(statusCode.internalError)
                 .send(response.errormsg(error));
@@ -1942,7 +2016,7 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -2027,8 +2101,8 @@ var MerchantEkyc = {
               kyc_link: process.env.MERCHANT_KYC_URL,
               match_link: match_selfie_document
                 ? process.env.STATIC_URL +
-                "/static/files/" +
-                match_selfie_document.document_name
+                  "/static/files/" +
+                  match_selfie_document.document_name
                 : "",
               merchant_id: encrypt_decrypt("encrypt", submerchant_id),
               merchant_name: merchant_details.company_name
@@ -2036,13 +2110,13 @@ var MerchantEkyc = {
                 : "",
               legal_person_name: merchant_details.legal_person_first_name
                 ? merchant_details.legal_person_first_name +
-                " " +
-                merchant_details.legal_person_last_name
+                  " " +
+                  merchant_details.legal_person_last_name
                 : "",
               doc_name: match_selfie_document.sequence
                 ? await helpers.get_document_type(
-                  match_selfie_document.sequence
-                )
+                    match_selfie_document.sequence
+                  )
                 : "",
               doc_number: match_selfie_document.document_num
                 ? match_selfie_document.document_num
@@ -2067,10 +2141,10 @@ var MerchantEkyc = {
 
               legal_person_name_email: merchant_details.legal_person_first_name
                 ? merchant_details.legal_person_first_name +
-                " " +
-                merchant_details.legal_person_last_name +
-                "-" +
-                merchant_details.legal_person_email
+                  " " +
+                  merchant_details.legal_person_last_name +
+                  "-" +
+                  merchant_details.legal_person_email
                 : "",
               ekyc_required_rep: ekyc_required_document_rep,
             };
@@ -2216,16 +2290,16 @@ var MerchantEkyc = {
                           file_name.push(ed.document_name);
                           original_name.push(
                             document_for +
-                            "front document of " +
-                            (await helpers.get_document_type(ed.sequence))
+                              "front document of " +
+                              (await helpers.get_document_type(ed.sequence))
                           );
                         }
                         if (ed.document_name_back) {
                           file_name.push(ed.document_name_back);
                           original_name.push(
                             document_for +
-                            "back document of " +
-                            (await helpers.get_document_type(ed.sequence))
+                              "back document of " +
+                              (await helpers.get_document_type(ed.sequence))
                           );
                         }
                       }
@@ -2248,8 +2322,8 @@ var MerchantEkyc = {
                       legal_person_name:
                         merchant_details.legal_person_first_name
                           ? merchant_details.legal_person_first_name +
-                          " " +
-                          merchant_details.legal_person_last_name
+                            " " +
+                            merchant_details.legal_person_last_name
                           : "",
                       name: merchant_details.company_name + "",
                       email: merchant_details.legal_person_email + "",
@@ -2312,8 +2386,8 @@ var MerchantEkyc = {
                           file_path: process.env.STATIC_URL + "/static/files/",
                           document: match_selfie_document.document_name
                             ? process.env.STATIC_URL +
-                            "/static/files/" +
-                            match_selfie_document.document_name
+                              "/static/files/" +
+                              match_selfie_document.document_name
                             : "",
                           enc_merchant_id: encrypt_decrypt(
                             "encrypt",
@@ -2352,7 +2426,7 @@ var MerchantEkyc = {
                     });
                   }
                 } catch (error) {
-                  logger.error(500,{message: error,stack: error.stack}); 
+                  logger.error(500, { message: error, stack: error.stack });
                   return error.response;
                 }
               });
@@ -2375,7 +2449,7 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -2595,8 +2669,8 @@ var MerchantEkyc = {
               kyc_link: process.env.MERCHANT_KYC_URL,
               match_link: match_selfie_document
                 ? process.env.STATIC_URL +
-                "/static/files/" +
-                match_selfie_document.document_name
+                  "/static/files/" +
+                  match_selfie_document.document_name
                 : "",
               merchant_id: encrypt_decrypt("encrypt", submerchant_id),
               merchant_name: merchant_details.company_name
@@ -2607,8 +2681,8 @@ var MerchantEkyc = {
                 : "",
               doc_name: match_selfie_document.sequence
                 ? await helpers.get_document_type(
-                  match_selfie_document.sequence
-                )
+                    match_selfie_document.sequence
+                  )
                 : "",
               doc_number: match_selfie_document.document_num
                 ? match_selfie_document.document_num
@@ -2629,8 +2703,8 @@ var MerchantEkyc = {
               ekyc_required: ekyc_required
                 ? ekyc_required
                 : owner_ekyc_required
-                  ? owner_ekyc_required
-                  : exe_ekyc_required,
+                ? owner_ekyc_required
+                : exe_ekyc_required,
             };
 
             let entity_document = await MerchantEkycModel.selectDynamicDocument(
@@ -2670,16 +2744,16 @@ var MerchantEkyc = {
                       file_name.push(ed.document_name);
                       original_name.push(
                         document_for +
-                        "front document of " +
-                        (await helpers.get_document_type(ed.sequence))
+                          "front document of " +
+                          (await helpers.get_document_type(ed.sequence))
                       );
                     }
                     if (ed.document_name_back) {
                       file_name.push(ed.document_name_back);
                       original_name.push(
                         document_for +
-                        "back document of " +
-                        (await helpers.get_document_type(ed.sequence))
+                          "back document of " +
+                          (await helpers.get_document_type(ed.sequence))
                       );
                     }
                   }
@@ -2750,8 +2824,8 @@ var MerchantEkyc = {
                     file_path: process.env.STATIC_URL + "/static/files/",
                     document: match_selfie_document.document_name
                       ? process.env.STATIC_URL +
-                      "/static/files/" +
-                      match_selfie_document.document_name
+                        "/static/files/" +
+                        match_selfie_document.document_name
                       : "",
                     enc_merchant_id: encrypt_decrypt("encrypt", submerchant_id),
                     merchant_id: submerchant_id,
@@ -2784,7 +2858,7 @@ var MerchantEkyc = {
                   );
                 }
               } catch (error) {
-                logger.error(500,{message: error,stack: error.stack}); 
+                logger.error(500, { message: error, stack: error.stack });
                 return error.response;
               }
             });
@@ -2806,7 +2880,7 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -2824,303 +2898,313 @@ var MerchantEkyc = {
           .send(response.successmsg("Video kyc status updated successfully."));
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
 
   send_psp_mail: async (req, res) => {
-    try{
-    let submerchant_id = encrypt_decrypt("decrypt", req.body.submerchant_id);
-    let merchant_details = await MerchantEkycModel.selectMerchantDetails("*", {
-      merchant_id: submerchant_id,
-    });
-    let psp_details_send = [];
-
-    let psp_kyc = 0;
-    if (merchant_details.psp_id) {
-      let psp_ids = merchant_details.psp_id.split(",");
-      for (let pi of psp_ids) {
-        let psp_details = await helpers.get_psp_details_by_id(
-          "id,name,email_to,cc,ekyc_required",
-          pi
-        );
-        psp_details_send.push({
-          email: psp_details.email_to,
-          cc: psp_details.cc,
-          name: psp_details.name,
-          id: psp_details.id,
-        });
-
-        if (psp_details.ekyc_required == 1) {
-          psp_kyc++;
-        }
-      }
-    }
-    let no_data_str = `<span style='color:#7C8386;font-style: italic;font-size:10px'>Not Available</span>`;
-    let reg_country = await helpers.get_country_name_by_id(
-      merchant_details.register_business_country
-    );
-
-    let merchant_details_mail_arr_detail_type = {
-      "Register business country": await helpers.get_country_name_by_id(
-        merchant_details.register_business_country
-      ),
-      "Type of business": await helpers.get_entity_type(
-        merchant_details.type_of_business
-      ),
-      "Free zone country":
-        merchant_details.is_business_register_in_free_zone == 0 ? "No" : "Yes",
-      "Registered email":
-        (await helpers.get_merchant_email(merchant_details.merchant_id)) == ""
-          ? merchant_details.legal_person_email
-            ? merchant_details.legal_person_email
-            : ""
-          : await helpers.get_merchant_email(merchant_details.merchant_id),
-      Industry: await helpers.get_mcc_code_description(
-        merchant_details.mcc_codes
-      ),
-    };
-    let merchant_details_mail_arr_detail = {
-      "Legal Business Name": merchant_details.company_name,
-      "Company Registration Number":
-        merchant_details.company_registration_number
-          ? merchant_details.company_registration_number
-          : no_data_str,
-      "VAT number": merchant_details.vat_number
-        ? merchant_details.vat_number
-        : no_data_str,
-      "I am going to use payment solution for":
-        merchant_details.doing_business_as
-          ? merchant_details.doing_business_as
-          : no_data_str,
-      "Register business address": merchant_details.register_business_country
-        ? await helpers.get_country_name_by_id(
-          merchant_details.register_business_country
-        )
-        : no_data_str,
-      "Address Line 1": merchant_details.address_line1
-        ? merchant_details.address_line1
-        : no_data_str,
-      "Address Line 2": merchant_details.address_line2
-        ? merchant_details.address_line2
-        : no_data_str,
-      Province: merchant_details.province
-        ? await helpers.get_state_name_by_id(merchant_details.province)
-        : "",
-      "Business phone code": merchant_details.business_phone_code
-        ? "+" + merchant_details.business_phone_code
-        : no_data_str,
-      "Business phone number": merchant_details.business_phone_number
-        ? merchant_details.business_phone_number
-        : no_data_str,
-
-      "Business website": merchant_details.business_website
-        ? merchant_details.business_website
-        : no_data_str,
-      "Product Description": merchant_details.product_description
-        ? merchant_details.product_description
-        : no_data_str,
-      Currency: merchant_details.currency_volume,
-      "Monthly business volume": merchant_details.monthly_business_volume,
-      "Average transaction volume": merchant_details.monthly_transaction_volume,
-
-      "URL for terms and conditions": merchant_details.link_tc,
-      "URL for privacy policy": merchant_details.link_pp,
-      "URL for refund": merchant_details.link_refund,
-      "URL for cancellation": merchant_details.link_cancellation,
-      "URL for delivery policy": merchant_details.link_delivery_policy,
-      "Transaction Success URL": merchant_details.link_success_url,
-      "Transaction Failed URL": merchant_details.link_failed_url,
-      "Transaction Cancelled URL": merchant_details.link_cancelled_url,
-    };
-    let merchant_details_represt = {
-      "Legal person first name": merchant_details.legal_person_first_name
-        ? merchant_details.legal_person_first_name
-        : no_data_str,
-      "Legal person last name": merchant_details.legal_person_last_name
-        ? merchant_details.legal_person_last_name
-        : no_data_str,
-      "Legal person email": merchant_details.legal_person_email
-        ? merchant_details.legal_person_email
-        : no_data_str,
-      "Job title": merchant_details.job_title
-        ? merchant_details.job_title
-        : no_data_str,
-      Nationality: merchant_details.nationality
-        ? merchant_details.nationality
-        : no_data_str,
-      DOB: merchant_details.dob
-        ? moment(merchant_details.dob).format("DD-MM-YYYY")
-        : no_data_str,
-      "Home address country": merchant_details.home_address_country
-        ? await helpers.get_country_name_by_id(
-          merchant_details.home_address_country
-        )
-        : no_data_str,
-      "Home address line-1": merchant_details.home_address_line_1
-        ? merchant_details.home_address_line_1
-        : no_data_str,
-      "Home address line-2": merchant_details.home_address_line_2
-        ? merchant_details.home_address_line_2
-        : no_data_str,
-      "Home province": merchant_details.home_province
-        ? await helpers.get_state_name_by_id(merchant_details.home_province)
-        : no_data_str,
-      "Home phone code": merchant_details.home_phone_code
-        ? "+" + merchant_details.home_phone_code
-        : no_data_str,
-      "Home phone number": merchant_details.home_phone_number
-        ? merchant_details.home_phone_number
-        : no_data_str,
-      // 'Personal ID number': merchant_details.personal_id_number,
-    };
-    let uploaded_document =
-      merchant_details.bank_document_name.charAt(0).toUpperCase() +
-      merchant_details.bank_document_name.slice(1);
-    let merchant_details_bank = {
-      "Bank Name": merchant_details.bank_name
-        ? merchant_details.bank_name
-        : no_data_str,
-      Currency: merchant_details.currency
-        ? merchant_details.currency
-        : no_data_str,
-
-      "Name on the  bank account": merchant_details.name_on_the_bank_account
-        ? merchant_details.name_on_the_bank_account
-        : no_data_str,
-
-      "Branch Name": merchant_details.branch_name
-        ? merchant_details.branch_name
-        : no_data_str,
-      IBAN: merchant_details.iban ? merchant_details.iban : no_data_str,
-      "BIC/SWIFT": merchant_details.bic_swift
-        ? merchant_details.bic_swift
-        : no_data_str,
-      Address: merchant_details.address
-        ? merchant_details.address
-        : no_data_str,
-      "Account Number": merchant_details.bank_account_no
-        ? merchant_details.bank_account_no
-        : no_data_str,
-      Country: (await helpers.get_country_name_by_id(merchant_details.country))
-        ? await helpers.get_country_name_by_id(merchant_details.country)
-        : no_data_str,
-      State: (await helpers.get_state_name_by_id(merchant_details.state))
-        ? await helpers.get_state_name_by_id(merchant_details.state)
-        : no_data_str,
-      City: (await helpers.get_city_name_by_id(merchant_details.city))
-        ? await helpers.get_city_name_by_id(merchant_details.city)
-        : no_data_str,
-      "Zip code": merchant_details.zip_code
-        ? merchant_details.zip_code
-        : no_data_str,
-      "Bank document name": merchant_details.bank_document_name
-        ? uploaded_document.replace(/_/g, " ")
-        : no_data_str,
-      "Uploaded document":
-        merchant_details.bank_document_file != ""
-          ? `<a href = "` +
-          process.env.STATIC_URL +
-          "/static/files/" +
-          merchant_details.bank_document_file +
-          `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px;text-align:center; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
-          : no_data_str,
-    };
-    let public_details = {
-      "Statement Descriptor": merchant_details.statement_descriptor,
-      "Shortened Descriptor": merchant_details.shortened_descriptor,
-      "Point of contact name": merchant_details.poc_name,
-      "Point of contact email": merchant_details.poc_email,
-      "Point of contact mobile code": merchant_details.poc_mobile_code
-        ? "+" + merchant_details.poc_mobile_code
-        : no_data_str,
-      "Point of contact mobile": merchant_details.poc_mobile,
-      "Compliance and risk officer name": merchant_details.cro_name,
-      "Compliance and risk officer email": merchant_details.cro_email,
-      "Compliance and risk officer mobile code":
-        merchant_details.cro_mobile_code
-          ? "+" + merchant_details.cro_mobile_code
-          : no_data_str,
-      "Compliance and risk officer mobile": merchant_details.cro_mobile,
-      "Customer support name": merchant_details.co_name,
-      "Customer support email": merchant_details.co_email,
-      "Customer support mobile code": merchant_details.co_mobile_code
-        ? "+" + merchant_details.co_mobile_code
-        : no_data_str,
-      "Customer support mobile": merchant_details.co_mobile,
-    };
-
-    let business_owners = await MerchantEkycModel.selectDynamic(
-      "*",
-      { merchant_id: submerchant_id, deleted: 0 },
-      config.table_prefix + "merchant_business_owners"
-    );
-    let business_executive = await MerchantEkycModel.selectDynamic(
-      "*",
-      { merchant_id: submerchant_id, deleted: 0 },
-      config.table_prefix + "merchant_business_executives"
-    );
-    let entity_document_for = await MerchantEkycModel.selectDynamicDocument(
-      "document_for",
-      { merchant_id: submerchant_id, deleted: 0 },
-      config.table_prefix + "merchant_entity_document"
-    );
-
-    var table = `
-        <table style="font-family: 'Montserrat',Arial,sans-serif; width: 100%;border:1px solid #ccc;border-radius:5px;" width="100%; background:#fff;" cellpadding="0" cellspacing="0">`;
-    table += `<tr ><th colspan=6 style = "padding: 8px;border:1px solid #ccc;background-color: #7367f0;color:#fff;width:200px;">Business Type</th></tr>`;
-    //for (val of merchant_details_mail_arr) {
-    Object.keys(merchant_details_mail_arr_detail_type).forEach(function (key) {
-      var val = merchant_details_mail_arr_detail_type[key];
-      table +=
-        `<tr>
-                <th style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">` +
-        key +
-        `</th>
-                <td style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-        val +
-        `</td>
-            </tr>
-        `;
-    });
-    table += `</table>`;
-    table += `
-        <table style="font-family: 'Montserrat',Arial,sans-serif; width: 100%;border:1px solid #ccc;border-radius:5px;" width="100%; background:#fff;" cellpadding="0" cellspacing="0">`;
-    for (document of entity_document_for) {
-      let entity_document = await MerchantEkycModel.selectDynamic(
+    try {
+      let submerchant_id = encrypt_decrypt("decrypt", req.body.submerchant_id);
+      let merchant_details = await MerchantEkycModel.selectMerchantDetails(
         "*",
         {
           merchant_id: submerchant_id,
-          deleted: 0,
-          document_for: document.document_for,
-        },
+        }
+      );
+      let psp_details_send = [];
+
+      let psp_kyc = 0;
+      if (merchant_details.psp_id) {
+        let psp_ids = merchant_details.psp_id.split(",");
+        for (let pi of psp_ids) {
+          let psp_details = await helpers.get_psp_details_by_id(
+            "id,name,email_to,cc,ekyc_required",
+            pi
+          );
+          psp_details_send.push({
+            email: psp_details.email_to,
+            cc: psp_details.cc,
+            name: psp_details.name,
+            id: psp_details.id,
+          });
+
+          if (psp_details.ekyc_required == 1) {
+            psp_kyc++;
+          }
+        }
+      }
+      let no_data_str = `<span style='color:#7C8386;font-style: italic;font-size:10px'>Not Available</span>`;
+      let reg_country = await helpers.get_country_name_by_id(
+        merchant_details.register_business_country
+      );
+
+      let merchant_details_mail_arr_detail_type = {
+        "Register business country": await helpers.get_country_name_by_id(
+          merchant_details.register_business_country
+        ),
+        "Type of business": await helpers.get_entity_type(
+          merchant_details.type_of_business
+        ),
+        "Free zone country":
+          merchant_details.is_business_register_in_free_zone == 0
+            ? "No"
+            : "Yes",
+        "Registered email":
+          (await helpers.get_merchant_email(merchant_details.merchant_id)) == ""
+            ? merchant_details.legal_person_email
+              ? merchant_details.legal_person_email
+              : ""
+            : await helpers.get_merchant_email(merchant_details.merchant_id),
+        Industry: await helpers.get_mcc_code_description(
+          merchant_details.mcc_codes
+        ),
+      };
+      let merchant_details_mail_arr_detail = {
+        "Legal Business Name": merchant_details.company_name,
+        "Company Registration Number":
+          merchant_details.company_registration_number
+            ? merchant_details.company_registration_number
+            : no_data_str,
+        "VAT number": merchant_details.vat_number
+          ? merchant_details.vat_number
+          : no_data_str,
+        "I am going to use payment solution for":
+          merchant_details.doing_business_as
+            ? merchant_details.doing_business_as
+            : no_data_str,
+        "Register business address": merchant_details.register_business_country
+          ? await helpers.get_country_name_by_id(
+              merchant_details.register_business_country
+            )
+          : no_data_str,
+        "Address Line 1": merchant_details.address_line1
+          ? merchant_details.address_line1
+          : no_data_str,
+        "Address Line 2": merchant_details.address_line2
+          ? merchant_details.address_line2
+          : no_data_str,
+        Province: merchant_details.province
+          ? await helpers.get_state_name_by_id(merchant_details.province)
+          : "",
+        "Business phone code": merchant_details.business_phone_code
+          ? "+" + merchant_details.business_phone_code
+          : no_data_str,
+        "Business phone number": merchant_details.business_phone_number
+          ? merchant_details.business_phone_number
+          : no_data_str,
+
+        "Business website": merchant_details.business_website
+          ? merchant_details.business_website
+          : no_data_str,
+        "Product Description": merchant_details.product_description
+          ? merchant_details.product_description
+          : no_data_str,
+        Currency: merchant_details.currency_volume,
+        "Monthly business volume": merchant_details.monthly_business_volume,
+        "Average transaction volume":
+          merchant_details.monthly_transaction_volume,
+
+        "URL for terms and conditions": merchant_details.link_tc,
+        "URL for privacy policy": merchant_details.link_pp,
+        "URL for refund": merchant_details.link_refund,
+        "URL for cancellation": merchant_details.link_cancellation,
+        "URL for delivery policy": merchant_details.link_delivery_policy,
+        "Transaction Success URL": merchant_details.link_success_url,
+        "Transaction Failed URL": merchant_details.link_failed_url,
+        "Transaction Cancelled URL": merchant_details.link_cancelled_url,
+      };
+      let merchant_details_represt = {
+        "Legal person first name": merchant_details.legal_person_first_name
+          ? merchant_details.legal_person_first_name
+          : no_data_str,
+        "Legal person last name": merchant_details.legal_person_last_name
+          ? merchant_details.legal_person_last_name
+          : no_data_str,
+        "Legal person email": merchant_details.legal_person_email
+          ? merchant_details.legal_person_email
+          : no_data_str,
+        "Job title": merchant_details.job_title
+          ? merchant_details.job_title
+          : no_data_str,
+        Nationality: merchant_details.nationality
+          ? merchant_details.nationality
+          : no_data_str,
+        DOB: merchant_details.dob
+          ? moment(merchant_details.dob).format("DD-MM-YYYY")
+          : no_data_str,
+        "Home address country": merchant_details.home_address_country
+          ? await helpers.get_country_name_by_id(
+              merchant_details.home_address_country
+            )
+          : no_data_str,
+        "Home address line-1": merchant_details.home_address_line_1
+          ? merchant_details.home_address_line_1
+          : no_data_str,
+        "Home address line-2": merchant_details.home_address_line_2
+          ? merchant_details.home_address_line_2
+          : no_data_str,
+        "Home province": merchant_details.home_province
+          ? await helpers.get_state_name_by_id(merchant_details.home_province)
+          : no_data_str,
+        "Home phone code": merchant_details.home_phone_code
+          ? "+" + merchant_details.home_phone_code
+          : no_data_str,
+        "Home phone number": merchant_details.home_phone_number
+          ? merchant_details.home_phone_number
+          : no_data_str,
+        // 'Personal ID number': merchant_details.personal_id_number,
+      };
+      let uploaded_document =
+        merchant_details.bank_document_name.charAt(0).toUpperCase() +
+        merchant_details.bank_document_name.slice(1);
+      let merchant_details_bank = {
+        "Bank Name": merchant_details.bank_name
+          ? merchant_details.bank_name
+          : no_data_str,
+        Currency: merchant_details.currency
+          ? merchant_details.currency
+          : no_data_str,
+
+        "Name on the  bank account": merchant_details.name_on_the_bank_account
+          ? merchant_details.name_on_the_bank_account
+          : no_data_str,
+
+        "Branch Name": merchant_details.branch_name
+          ? merchant_details.branch_name
+          : no_data_str,
+        IBAN: merchant_details.iban ? merchant_details.iban : no_data_str,
+        "BIC/SWIFT": merchant_details.bic_swift
+          ? merchant_details.bic_swift
+          : no_data_str,
+        Address: merchant_details.address
+          ? merchant_details.address
+          : no_data_str,
+        "Account Number": merchant_details.bank_account_no
+          ? merchant_details.bank_account_no
+          : no_data_str,
+        Country: (await helpers.get_country_name_by_id(
+          merchant_details.country
+        ))
+          ? await helpers.get_country_name_by_id(merchant_details.country)
+          : no_data_str,
+        State: (await helpers.get_state_name_by_id(merchant_details.state))
+          ? await helpers.get_state_name_by_id(merchant_details.state)
+          : no_data_str,
+        City: (await helpers.get_city_name_by_id(merchant_details.city))
+          ? await helpers.get_city_name_by_id(merchant_details.city)
+          : no_data_str,
+        "Zip code": merchant_details.zip_code
+          ? merchant_details.zip_code
+          : no_data_str,
+        "Bank document name": merchant_details.bank_document_name
+          ? uploaded_document.replace(/_/g, " ")
+          : no_data_str,
+        "Uploaded document":
+          merchant_details.bank_document_file != ""
+            ? `<a href = "` +
+              process.env.STATIC_URL +
+              "/static/files/" +
+              merchant_details.bank_document_file +
+              `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px;text-align:center; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
+            : no_data_str,
+      };
+      let public_details = {
+        "Statement Descriptor": merchant_details.statement_descriptor,
+        "Shortened Descriptor": merchant_details.shortened_descriptor,
+        "Point of contact name": merchant_details.poc_name,
+        "Point of contact email": merchant_details.poc_email,
+        "Point of contact mobile code": merchant_details.poc_mobile_code
+          ? "+" + merchant_details.poc_mobile_code
+          : no_data_str,
+        "Point of contact mobile": merchant_details.poc_mobile,
+        "Compliance and risk officer name": merchant_details.cro_name,
+        "Compliance and risk officer email": merchant_details.cro_email,
+        "Compliance and risk officer mobile code":
+          merchant_details.cro_mobile_code
+            ? "+" + merchant_details.cro_mobile_code
+            : no_data_str,
+        "Compliance and risk officer mobile": merchant_details.cro_mobile,
+        "Customer support name": merchant_details.co_name,
+        "Customer support email": merchant_details.co_email,
+        "Customer support mobile code": merchant_details.co_mobile_code
+          ? "+" + merchant_details.co_mobile_code
+          : no_data_str,
+        "Customer support mobile": merchant_details.co_mobile,
+      };
+
+      let business_owners = await MerchantEkycModel.selectDynamic(
+        "*",
+        { merchant_id: submerchant_id, deleted: 0 },
+        config.table_prefix + "merchant_business_owners"
+      );
+      let business_executive = await MerchantEkycModel.selectDynamic(
+        "*",
+        { merchant_id: submerchant_id, deleted: 0 },
+        config.table_prefix + "merchant_business_executives"
+      );
+      let entity_document_for = await MerchantEkycModel.selectDynamicDocument(
+        "document_for",
+        { merchant_id: submerchant_id, deleted: 0 },
         config.table_prefix + "merchant_entity_document"
       );
 
-      if (document.document_for == "company") {
-        var document_for = "Business Details";
-
+      var table = `
+        <table style="font-family: 'Montserrat',Arial,sans-serif; width: 100%;border:1px solid #ccc;border-radius:5px;" width="100%; background:#fff;" cellpadding="0" cellspacing="0">`;
+      table += `<tr ><th colspan=6 style = "padding: 8px;border:1px solid #ccc;background-color: #7367f0;color:#fff;width:200px;">Business Type</th></tr>`;
+      //for (val of merchant_details_mail_arr) {
+      Object.keys(merchant_details_mail_arr_detail_type).forEach(function (
+        key
+      ) {
+        var val = merchant_details_mail_arr_detail_type[key];
         table +=
-          `
-                <tr ><th colspan=6 style = "padding: 8px;border:1px solid #ccc;background-color: #7367f0;color:#fff;width:200px;">` +
-          document_for +
-          `</th></tr>`;
+          `<tr>
+                <th style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">` +
+          key +
+          `</th>
+                <td style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
+          val +
+          `</td>
+            </tr>
+        `;
+      });
+      table += `</table>`;
+      table += `
+        <table style="font-family: 'Montserrat',Arial,sans-serif; width: 100%;border:1px solid #ccc;border-radius:5px;" width="100%; background:#fff;" cellpadding="0" cellspacing="0">`;
+      for (document of entity_document_for) {
+        let entity_document = await MerchantEkycModel.selectDynamic(
+          "*",
+          {
+            merchant_id: submerchant_id,
+            deleted: 0,
+            document_for: document.document_for,
+          },
+          config.table_prefix + "merchant_entity_document"
+        );
 
-        Object.keys(merchant_details_mail_arr_detail).forEach(function (key) {
-          var val = merchant_details_mail_arr_detail[key];
+        if (document.document_for == "company") {
+          var document_for = "Business Details";
+
           table +=
-            `<tr>
+            `
+                <tr ><th colspan=6 style = "padding: 8px;border:1px solid #ccc;background-color: #7367f0;color:#fff;width:200px;">` +
+            document_for +
+            `</th></tr>`;
+
+          Object.keys(merchant_details_mail_arr_detail).forEach(function (key) {
+            var val = merchant_details_mail_arr_detail[key];
+            table +=
+              `<tr>
                                 <th colspan=2 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">` +
-            key +
-            `</th>
+              key +
+              `</th>
                                 <td colspan=3 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-            val +
-            `</td>
+              val +
+              `</td>
                             </tr>
                         `;
-        });
-        table += `       <tr>
+          });
+          table += `       <tr>
                         <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">Document</th>
                       
                         <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">Document Number</th>
@@ -3129,77 +3213,77 @@ var MerchantEkyc = {
                         <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">View</th>
                     </tr>
                 `;
-        for (val of entity_document) {
-          if (val.sequence != 0) {
-            let doc = await helpers.get_document_type(val.sequence);
-            let document_name = val.document_name
-              ? process.env.STATIC_URL + "/static/files/" + val.document_name
-              : no_data_str;
+          for (val of entity_document) {
+            if (val.sequence != 0) {
+              let doc = await helpers.get_document_type(val.sequence);
+              let document_name = val.document_name
+                ? process.env.STATIC_URL + "/static/files/" + val.document_name
+                : no_data_str;
 
-            var document_name_back = val.document_name_back
-              ? `<a href = "` +
-              process.env.STATIC_URL +
-              "/static/files/" +
-              val.document_name_back +
-              `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
-              : "";
+              var document_name_back = val.document_name_back
+                ? `<a href = "` +
+                  process.env.STATIC_URL +
+                  "/static/files/" +
+                  val.document_name_back +
+                  `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
+                : "";
 
-            let issue_date = val.issue_date
-              ? moment(val.issue_date).format("DD-MM-YYYY")
-              : no_data_str;
-            let expiry_date = val.expiry_date
-              ? moment(val.expiry_date).format("DD-MM-YYYY")
-              : no_data_str;
-            let document_num = val.document_num
-              ? val.document_num
-              : no_data_str;
+              let issue_date = val.issue_date
+                ? moment(val.issue_date).format("DD-MM-YYYY")
+                : no_data_str;
+              let expiry_date = val.expiry_date
+                ? moment(val.expiry_date).format("DD-MM-YYYY")
+                : no_data_str;
+              let document_num = val.document_num
+                ? val.document_num
+                : no_data_str;
 
-            table +=
-              `<tr >
+              table +=
+                `<tr >
                                 <td  style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-              doc +
-              ` </td>
+                doc +
+                ` </td>
                              
                                 <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-              document_num +
-              `</td>
+                document_num +
+                `</td>
                                 <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-              issue_date +
-              `</td>
+                issue_date +
+                `</td>
                                 <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-              expiry_date +
-              `</td>
+                expiry_date +
+                `</td>
                             <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;"> <a href = "` +
-              document_name +
-              `" style="display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>` +
-              document_name_back +
-              `</td>
+                document_name +
+                `" style="display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>` +
+                document_name_back +
+                `</td>
                             </tr>`;
+            }
           }
-        }
-      } else if (document.document_for == "representative") {
-        var document_for = "Business Representative";
+        } else if (document.document_for == "representative") {
+          var document_for = "Business Representative";
 
-        table +=
-          `
-                <tr ><th colspan=6 style = "padding: 8px;border:1px solid #ccc;background-color: #7367f0;color:#fff;width:200px;">` +
-          document_for +
-          `</th></tr>`;
-
-        Object.keys(merchant_details_represt).forEach(function (key) {
-          var val = merchant_details_represt[key];
           table +=
-            `<tr>
+            `
+                <tr ><th colspan=6 style = "padding: 8px;border:1px solid #ccc;background-color: #7367f0;color:#fff;width:200px;">` +
+            document_for +
+            `</th></tr>`;
+
+          Object.keys(merchant_details_represt).forEach(function (key) {
+            var val = merchant_details_represt[key];
+            table +=
+              `<tr>
                                 <th colspan=2 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">` +
-            key +
-            `</th>
+              key +
+              `</th>
                                 <td colspan=3 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-            val +
-            `</td>
+              val +
+              `</td>
                             </tr>
                         `;
-        });
-        table += `       <tr>
+          });
+          table += `       <tr>
                         <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">Document</th>
                       
                         <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">Document Number</th>
@@ -3208,21 +3292,173 @@ var MerchantEkyc = {
                         <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">View</th>
                     </tr>
                 `;
+          for (val of entity_document) {
+            if (
+              reg_country.toUpperCase() ==
+                (
+                  await helpers.get_nationalty_name_by_id(
+                    merchant_details.nationality
+                  )
+                ).toUpperCase() &&
+              (await helpers.get_document_type(val.sequence)).toUpperCase() ==
+                "VISA"
+            ) {
+              var show = "style='display:none'";
+            } else {
+              var show = "";
+            }
+            if (val.sequence != 0) {
+              let doc = await helpers.get_document_type(val.sequence);
+              let document_name = val.document_name
+                ? process.env.STATIC_URL + "/static/files/" + val.document_name
+                : no_data_str;
+
+              var document_name_back = val.document_name_back
+                ? `<a href = "` +
+                  process.env.STATIC_URL +
+                  "/static/files/" +
+                  val.document_name_back +
+                  `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
+                : "";
+
+              let issue_date = val.issue_date
+                ? moment(val.issue_date).format("DD-MM-YYYY")
+                : no_data_str;
+              let expiry_date = val.expiry_date
+                ? moment(val.expiry_date).format("DD-MM-YYYY")
+                : no_data_str;
+              let document_num = val.document_num
+                ? val.document_num
+                : no_data_str;
+
+              table +=
+                `<tr ` +
+                show +
+                `>
+                                <td  style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
+                doc +
+                ` </td>
+                             
+                                <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
+                document_num +
+                `</td>
+                                <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
+                issue_date +
+                `</td>
+                                <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
+                expiry_date +
+                `</td>
+                            <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;"> <a href = "` +
+                document_name +
+                `" style="display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>` +
+                document_name_back +
+                `</td>
+                            </tr>`;
+            }
+          }
+        }
+      }
+      table += `</table>`;
+
+      var owner = `<tr ><th colspan=6 style = "padding: 8px;border:1px solid #ccc;background-color: #7367f0;color:#fff;width:200px;">Business Owners</th></tr>`;
+      table +=
+        `<table style="font-family: 'Montserrat',Arial,sans-serif; width: 100%;border:1px solid #ccc;border-radius:5px;" width="100%; background:#fff;" cellpadding="0" cellspacing="0">
+        ` +
+        owner +
+        `
+        `;
+
+      var counter = 0;
+      for (val_business of business_owners) {
+        counter++;
+        let owner_docs =
+          val_business.business_owner == "entity"
+            ? "owner_company"
+            : "owner_individual";
+        let first_name = val_business.first_name
+          ? val_business.first_name + " " + val_business.last_name
+          : no_data_str;
+
+        let first_name_represent =
+          val_business.first_name_represent +
+          " " +
+          val_business.last_name_represent;
+
+        let nationality = val_business.nationality;
+        let email = val_business.email;
+        let mobile_no =
+          "+" + val_business.country_code + "-" + val_business.mobile;
+
+        table +=
+          ` <tr>
+                <th colspan=2 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">Sr.No.</th>
+            <td colspan=3 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
+          counter +
+          `</td></tr>
+                <tr>
+                <th colspan=2 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">Business name</th>
+            <td colspan=3 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
+          first_name +
+          `</td></tr>
+                <tr>
+                <th colspan=2  style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">Representative Name</th>
+                <td colspan=3 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
+          first_name_represent +
+          `</td>
+                </tr>
+                <tr>
+                <th colspan=2 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">Email</th>
+                <td  colspan=3 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
+          email +
+          `</td>
+                </tr>
+                <tr>
+                <th colspan=2 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">Mobile</th>
+                <td colspan=3 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
+          mobile_no +
+          `</td>
+                </tr>
+                <tr>
+                <th colspan=2 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">Nationality</th>
+                <td colspan=3  style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
+          nationality +
+          `</td>
+                </tr>
+               `;
+        table += `       <tr>
+                   <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">Document</th>
+                 
+                   <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">Document Number</th>
+                   <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">Issue Date</th>
+                   <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">Expiry Date</th>
+                   <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">View</th>
+               </tr>
+           `;
+        let entity_document = await MerchantEkycModel.selectDynamic(
+          "*",
+          {
+            merchant_id: submerchant_id,
+            deleted: 0,
+            document_for: owner_docs,
+            owners_id: val_business.id,
+          },
+          config.table_prefix + "merchant_entity_document"
+        );
+
         for (val of entity_document) {
           if (
             reg_country.toUpperCase() ==
-            (
-              await helpers.get_nationalty_name_by_id(
-                merchant_details.nationality
-              )
-            ).toUpperCase() &&
+              (
+                await helpers.get_nationalty_name_by_id(nationality)
+              ).toUpperCase() &&
             (await helpers.get_document_type(val.sequence)).toUpperCase() ==
-            "VISA"
+              "VISA"
           ) {
             var show = "style='display:none'";
           } else {
             var show = "";
           }
+
           if (val.sequence != 0) {
             let doc = await helpers.get_document_type(val.sequence);
             let document_name = val.document_name
@@ -3231,10 +3467,10 @@ var MerchantEkyc = {
 
             var document_name_back = val.document_name_back
               ? `<a href = "` +
-              process.env.STATIC_URL +
-              "/static/files/" +
-              val.document_name_back +
-              `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
+                process.env.STATIC_URL +
+                "/static/files/" +
+                val.document_name_back +
+                `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
               : "";
 
             let issue_date = val.issue_date
@@ -3251,240 +3487,90 @@ var MerchantEkyc = {
               `<tr ` +
               show +
               `>
-                                <td  style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
+                            <td  style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
               doc +
               ` </td>
-                             
-                                <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
+                         
+                            <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
               document_num +
               `</td>
-                                <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
+                            <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
               issue_date +
               `</td>
-                                <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
+                            <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
               expiry_date +
               `</td>
-                            <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;"> <a href = "` +
+                        <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;"> <a href = "` +
               document_name +
               `" style="display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>` +
               document_name_back +
               `</td>
-                            </tr>`;
+                        </tr>`;
           }
         }
       }
-    }
-    table += `</table>`;
-
-    var owner = `<tr ><th colspan=6 style = "padding: 8px;border:1px solid #ccc;background-color: #7367f0;color:#fff;width:200px;">Business Owners</th></tr>`;
-    table +=
-      `<table style="font-family: 'Montserrat',Arial,sans-serif; width: 100%;border:1px solid #ccc;border-radius:5px;" width="100%; background:#fff;" cellpadding="0" cellspacing="0">
-        ` +
-      owner +
-      `
-        `;
-
-    var counter = 0;
-    for (val_business of business_owners) {
-      counter++;
-      let owner_docs =
-        val_business.business_owner == "entity"
-          ? "owner_company"
-          : "owner_individual";
-      let first_name = val_business.first_name
-        ? val_business.first_name + " " + val_business.last_name
-        : no_data_str;
-
-      let first_name_represent =
-        val_business.first_name_represent +
-        " " +
-        val_business.last_name_represent;
-
-      let nationality = val_business.nationality;
-      let email = val_business.email;
-      let mobile_no =
-        "+" + val_business.country_code + "-" + val_business.mobile;
-
-      table +=
-        ` <tr>
-                <th colspan=2 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">Sr.No.</th>
-            <td colspan=3 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-        counter +
-        `</td></tr>
-                <tr>
-                <th colspan=2 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">Business name</th>
-            <td colspan=3 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-        first_name +
-        `</td></tr>
-                <tr>
-                <th colspan=2  style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">Representative Name</th>
-                <td colspan=3 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-        first_name_represent +
-        `</td>
-                </tr>
-                <tr>
-                <th colspan=2 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">Email</th>
-                <td  colspan=3 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-        email +
-        `</td>
-                </tr>
-                <tr>
-                <th colspan=2 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">Mobile</th>
-                <td colspan=3 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-        mobile_no +
-        `</td>
-                </tr>
-                <tr>
-                <th colspan=2 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">Nationality</th>
-                <td colspan=3  style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-        nationality +
-        `</td>
-                </tr>
-               `;
-      table += `       <tr>
-                   <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">Document</th>
-                 
-                   <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">Document Number</th>
-                   <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">Issue Date</th>
-                   <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">Expiry Date</th>
-                   <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">View</th>
-               </tr>
-           `;
-      let entity_document = await MerchantEkycModel.selectDynamic(
-        "*",
-        {
-          merchant_id: submerchant_id,
-          deleted: 0,
-          document_for: owner_docs,
-          owners_id: val_business.id,
-        },
-        config.table_prefix + "merchant_entity_document"
-      );
-
-      for (val of entity_document) {
-        if (
-          reg_country.toUpperCase() ==
-          (
-            await helpers.get_nationalty_name_by_id(nationality)
-          ).toUpperCase() &&
-          (await helpers.get_document_type(val.sequence)).toUpperCase() ==
-          "VISA"
-        ) {
-          var show = "style='display:none'";
-        } else {
-          var show = "";
-        }
-
-        if (val.sequence != 0) {
-          let doc = await helpers.get_document_type(val.sequence);
-          let document_name = val.document_name
-            ? process.env.STATIC_URL + "/static/files/" + val.document_name
-            : no_data_str;
-
-          var document_name_back = val.document_name_back
-            ? `<a href = "` +
-            process.env.STATIC_URL +
-            "/static/files/" +
-            val.document_name_back +
-            `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
-            : "";
-
-          let issue_date = val.issue_date
-            ? moment(val.issue_date).format("DD-MM-YYYY")
-            : no_data_str;
-          let expiry_date = val.expiry_date
-            ? moment(val.expiry_date).format("DD-MM-YYYY")
-            : no_data_str;
-          let document_num = val.document_num ? val.document_num : no_data_str;
-
-          table +=
-            `<tr ` +
-            show +
-            `>
-                            <td  style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-            doc +
-            ` </td>
-                         
-                            <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-            document_num +
-            `</td>
-                            <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-            issue_date +
-            `</td>
-                            <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-            expiry_date +
-            `</td>
-                        <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;"> <a href = "` +
-            document_name +
-            `" style="display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>` +
-            document_name_back +
-            `</td>
-                        </tr>`;
-        }
-      }
-    }
-    if (counter == 0) {
-      table +=
-        ` <tr>
+      if (counter == 0) {
+        table +=
+          ` <tr>
             <th colspan=6 style = "text-align:center;padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">` +
-        no_data_str +
-        `</th>
+          no_data_str +
+          `</th>
             </tr>`;
-    }
-    table += `</table>`;
+      }
+      table += `</table>`;
 
-    var exe = `<tr ><th colspan=6 style = "padding: 8px;border:1px solid #ccc;background-color: #7367f0;color:#fff;width:200px;">Business Executives</th></tr>`;
-    table +=
-      `<table style="font-family: 'Montserrat',Arial,sans-serif; width: 100%;border:1px solid #ccc;border-radius:5px;" width="100%; background:#fff;" cellpadding="0" cellspacing="0">
-        ` +
-      exe +
-      ``;
-
-    let count = 0;
-    for (val_business_exe of business_executive) {
-      count++;
-      let first_name = val_business_exe.first_name
-        ? val_business_exe.first_name + " " + val_business_exe.last_name
-        : no_data_str;
-      let email = val_business_exe.email;
-      let nationality = val_business_exe.nationality;
-      let mobile_no =
-        "+" + val_business_exe.mobile_code + "-" + val_business_exe.mobile_no;
-
+      var exe = `<tr ><th colspan=6 style = "padding: 8px;border:1px solid #ccc;background-color: #7367f0;color:#fff;width:200px;">Business Executives</th></tr>`;
       table +=
-        ` <tr>
+        `<table style="font-family: 'Montserrat',Arial,sans-serif; width: 100%;border:1px solid #ccc;border-radius:5px;" width="100%; background:#fff;" cellpadding="0" cellspacing="0">
+        ` +
+        exe +
+        ``;
+
+      let count = 0;
+      for (val_business_exe of business_executive) {
+        count++;
+        let first_name = val_business_exe.first_name
+          ? val_business_exe.first_name + " " + val_business_exe.last_name
+          : no_data_str;
+        let email = val_business_exe.email;
+        let nationality = val_business_exe.nationality;
+        let mobile_no =
+          "+" + val_business_exe.mobile_code + "-" + val_business_exe.mobile_no;
+
+        table +=
+          ` <tr>
                 <th colspan=2 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">Sr.No.</th>
             <td colspan=3 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-        count +
-        `</td></tr>
+          count +
+          `</td></tr>
               
                 <tr>
                 <tr>
                 <th colspan=2 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">Name</th>
             <td colspan=3 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-        first_name +
-        `</td></tr>
+          first_name +
+          `</td></tr>
               
                 <tr>
                 <th colspan=2 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">Email</th>
                 <td  colspan=3 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-        email +
-        `</td>
+          email +
+          `</td>
                 </tr>
                 <tr>
                 <th colspan=2 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">Mobile</th>
                 <td colspan=3 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-        mobile_no +
-        `</td>
+          mobile_no +
+          `</td>
                 </tr>
                 <tr>
                 <th colspan=2 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">Nationality</th>
                 <td colspan=3 style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-        nationality +
-        `</td>
+          nationality +
+          `</td>
                 </tr>
                `;
-      table += `       <tr>
+        table += `       <tr>
                    <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">Document</th>
                  
                    <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">Document Number</th>
@@ -3493,126 +3579,128 @@ var MerchantEkyc = {
                    <th style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">View</th>
                </tr>
            `;
-      let entity_document = await MerchantEkycModel.selectDynamic(
-        "*",
-        {
-          merchant_id: submerchant_id,
-          deleted: 0,
-          document_for: "executive",
-          owners_id: val_business_exe.id,
-        },
-        config.table_prefix + "merchant_entity_document"
-      );
+        let entity_document = await MerchantEkycModel.selectDynamic(
+          "*",
+          {
+            merchant_id: submerchant_id,
+            deleted: 0,
+            document_for: "executive",
+            owners_id: val_business_exe.id,
+          },
+          config.table_prefix + "merchant_entity_document"
+        );
 
-      for (val of entity_document) {
-        if (
-          reg_country.toUpperCase() ==
-          (
-            await helpers.get_nationalty_name_by_id(nationality)
-          ).toUpperCase() &&
-          (await helpers.get_document_type(val.sequence)).toUpperCase() ==
-          "VISA"
-        ) {
-          var show = "style='display:none'";
-        } else {
-          var show = "";
-        }
-        if (val.sequence != 0) {
-          let doc = await helpers.get_document_type(val.sequence);
-          let document_name = val.document_name
-            ? process.env.STATIC_URL + "/static/files/" + val.document_name
-            : no_data_str;
+        for (val of entity_document) {
+          if (
+            reg_country.toUpperCase() ==
+              (
+                await helpers.get_nationalty_name_by_id(nationality)
+              ).toUpperCase() &&
+            (await helpers.get_document_type(val.sequence)).toUpperCase() ==
+              "VISA"
+          ) {
+            var show = "style='display:none'";
+          } else {
+            var show = "";
+          }
+          if (val.sequence != 0) {
+            let doc = await helpers.get_document_type(val.sequence);
+            let document_name = val.document_name
+              ? process.env.STATIC_URL + "/static/files/" + val.document_name
+              : no_data_str;
 
-          var document_name_back = val.document_name_back
-            ? `<a href = "` +
-            process.env.STATIC_URL +
-            "/static/files/" +
-            val.document_name_back +
-            `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
-            : "";
-
-          let issue_date =
-            val.issue_date != "NULL" || val.issue_date != "0000-00-00"
-              ? moment(val.issue_date).format("DD-MM-YYYY")
+            var document_name_back = val.document_name_back
+              ? `<a href = "` +
+                process.env.STATIC_URL +
+                "/static/files/" +
+                val.document_name_back +
+                `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
               : "";
-          let issue_d =
-            issue_date == "Invalid date" || "" ? no_data_str : issue_date;
-          let expiry_date =
-            val.expiry_date != "NULL" || val.expiry_date != "0000-00-00"
-              ? moment(val.expiry_date).format("DD-MM-YYYY")
-              : "";
-          let ex_d =
-            expiry_date == "Invalid date" || "" ? no_data_str : expiry_date;
-          let document_num = val.document_num ? val.document_num : no_data_str;
 
-          table +=
-            `<tr ` +
-            show +
-            `>
+            let issue_date =
+              val.issue_date != "NULL" || val.issue_date != "0000-00-00"
+                ? moment(val.issue_date).format("DD-MM-YYYY")
+                : "";
+            let issue_d =
+              issue_date == "Invalid date" || "" ? no_data_str : issue_date;
+            let expiry_date =
+              val.expiry_date != "NULL" || val.expiry_date != "0000-00-00"
+                ? moment(val.expiry_date).format("DD-MM-YYYY")
+                : "";
+            let ex_d =
+              expiry_date == "Invalid date" || "" ? no_data_str : expiry_date;
+            let document_num = val.document_num
+              ? val.document_num
+              : no_data_str;
+
+            table +=
+              `<tr ` +
+              show +
+              `>
                             <td  style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-            doc +
-            ` </td>
+              doc +
+              ` </td>
                          
                             <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-            document_num +
-            `</td>
+              document_num +
+              `</td>
                             <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-            issue_d +
-            `</td>
+              issue_d +
+              `</td>
                             <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-            ex_d +
-            `</td>
+              ex_d +
+              `</td>
                         <td style = "width:20%;padding: 8px;border:1px solid #ccc;background-color: #fff;"> <a href = "` +
-            document_name +
-            `" style="display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>` +
-            document_name_back +
-            `</td>
+              document_name +
+              `" style="display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>` +
+              document_name_back +
+              `</td>
                         </tr>`;
+          }
         }
       }
-    }
-    if (count == 0) {
-      table +=
-        ` <tr>
+      if (count == 0) {
+        table +=
+          ` <tr>
             <th colspan=6 style = "text-align:center; padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">` +
-        no_data_str +
-        `</th></tr>`;
-    }
+          no_data_str +
+          `</th></tr>`;
+      }
 
-    table += `</table>`;
+      table += `</table>`;
 
-    table += `
+      table += `
     <table style="font-family: 'Montserrat',Arial,sans-serif; width: 100%;border:1px solid #ccc;border-radius:5px;" width="100%; background:#fff;" cellpadding="0" cellspacing="0">`;
-    table += `<tr ><th colspan=6 style = "padding: 8px;border:1px solid #ccc;background-color: #7367f0;color:#fff;width:200px;">Public Details</th></tr>`;
-    //for (val of merchant_details_mail_arr) {
-    Object.keys(public_details).forEach(function (key) {
-      var val = public_details[key];
-      table +=
-        `<tr>
+      table += `<tr ><th colspan=6 style = "padding: 8px;border:1px solid #ccc;background-color: #7367f0;color:#fff;width:200px;">Public Details</th></tr>`;
+      //for (val of merchant_details_mail_arr) {
+      Object.keys(public_details).forEach(function (key) {
+        var val = public_details[key];
+        table +=
+          `<tr>
             <th style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">` +
-        key +
-        `</th>
+          key +
+          `</th>
             <td style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-        val +
-        `</td>
+          val +
+          `</td>
         </tr>
     `;
-    });
-    table += `</table>`;
-    table += `
+      });
+      table += `</table>`;
+      table += `
 <table style="font-family: 'Montserrat',Arial,sans-serif; width: 100%;border:1px solid #ccc;border-radius:5px;" width="100%; background:#fff;" cellpadding="0" cellspacing="0">`;
-    table += `<tr ><th colspan=6 style = "padding: 8px;border:1px solid #ccc;background-color: #7367f0;color:#fff;width:200px;">Bank Details</th></tr>`;
-    //for (val of merchant_details_mail_arr) {
-    Object.keys(merchant_details_bank).forEach(function (key) {
-      var val = merchant_details_bank[key];
-      table +=
-        `<tr>
+      table += `<tr ><th colspan=6 style = "padding: 8px;border:1px solid #ccc;background-color: #7367f0;color:#fff;width:200px;">Bank Details</th></tr>`;
+      //for (val of merchant_details_mail_arr) {
+      Object.keys(merchant_details_bank).forEach(function (key) {
+        var val = merchant_details_bank[key];
+        table +=
+          `<tr>
         <th style = "padding: 8px;border:1px solid #ccc;background-color: #fff;width:200px;">` +
-        key +
-        `</th>
+          key +
+          `</th>
         <td style = "padding: 8px;border:1px solid #ccc;background-color: #fff;">` +
-        val +
-        `</td>
+          val +
+          `</td>
     </tr>
 `;
     });
@@ -3645,22 +3733,52 @@ var MerchantEkyc = {
       ee.once("email", async (arguments) => {
         await mailSender.PSPMail(mail, mail_cc, reference, table, para);
       });
-      ee.emit("email", { merchant_id: submerchant_id });
-    }
-    await MerchantEkycModel.updateDynamic(
-      { id: submerchant_id },
-      { psp_mail_send: 1 },
-      config.table_prefix + "master_merchant"
-    );
-    res
-      .status(statusCode.ok)
-      .send(response.successmsg("Mail send successfully"));
-  }catch(error){
-     logger.error(500,{message: error,stack: error.stack}); 
+      table += `</table>`;
+      for (let emails of psp_details_send) {
+        let mail = emails.email;
+        let mail_cc = emails.cc;
+        let psp_id = emails.id;
+        let reference = await helpers.make_reference_number("REF", 8);
+
+        await MerchantEkycModel.addDynamic(
+          {
+            submerchant_id: submerchant_id,
+            psp_id: psp_id,
+            email: mail,
+            cc: mail_cc,
+            reference: reference,
+          },
+          config.table_prefix + "psp_mail_log"
+        );
+
+        let para =
+          `Dear ` +
+          emails.name +
+          ` ,<br>
+             Please find the Merchant's details along with documents link with request reference no. ` +
+          reference +
+          ``;
+
+        let subject = "Merchant KYC documents - " + reference;
+        ee.once("email", async (arguments) => {
+          await mailSender.PSPMail(mail, mail_cc, subject, table, para);
+        });
+        ee.emit("email", { merchant_id: submerchant_id });
+      }
+      await MerchantEkycModel.updateDynamic(
+        { id: submerchant_id },
+        { psp_mail_send: 1 },
+        config.table_prefix + "master_merchant"
+      );
       res
-      .status(statusCode.internalError)
-      .send(response.errorMsg("Something went wrong"));
-  }
+        .status(statusCode.ok)
+        .send(response.successmsg("Mail send successfully"));
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+      res
+        .status(statusCode.internalError)
+        .send(response.errorMsg("Something went wrong"));
+    }
   },
   send_psp_mail_old: async (req, res) => {
     let submerchant_id = encrypt_decrypt("decrypt", req.body.submerchant_id);
@@ -3836,10 +3954,10 @@ var MerchantEkyc = {
 
           var document_name_back = val.document_name_back
             ? `<a href = "` +
-            process.env.STATIC_URL +
-            "/static/files/" +
-            val.document_name_back +
-            `">click here to view</a>`
+              process.env.STATIC_URL +
+              "/static/files/" +
+              val.document_name_back +
+              `">click here to view</a>`
             : "";
 
           let issue_date =
@@ -4392,8 +4510,8 @@ var MerchantEkyc = {
           : no_data_str,
       "Register business address": merchant_details.register_business_country
         ? await helpers.get_country_name_by_id(
-          merchant_details.register_business_country
-        )
+            merchant_details.register_business_country
+          )
         : no_data_str,
       "Address Line 1": merchant_details.address_line1
         ? merchant_details.address_line1
@@ -4451,8 +4569,8 @@ var MerchantEkyc = {
         : no_data_str,
       "Home address country": merchant_details.home_address_country
         ? await helpers.get_country_name_by_id(
-          merchant_details.home_address_country
-        )
+            merchant_details.home_address_country
+          )
         : no_data_str,
       "Home address line-1": merchant_details.home_address_line_1
         ? merchant_details.home_address_line_1
@@ -4517,10 +4635,10 @@ var MerchantEkyc = {
       "Uploaded document":
         merchant_details.bank_document_file != ""
           ? `<a href = "` +
-          process.env.STATIC_URL +
-          "/static/files/" +
-          merchant_details.bank_document_file +
-          `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px;text-align:center; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
+            process.env.STATIC_URL +
+            "/static/files/" +
+            merchant_details.bank_document_file +
+            `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px;text-align:center; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
           : no_data_str,
     };
     let public_details = {
@@ -4634,10 +4752,10 @@ var MerchantEkyc = {
 
             var document_name_back = val.document_name_back
               ? `<a href = "` +
-              process.env.STATIC_URL +
-              "/static/files/" +
-              val.document_name_back +
-              `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
+                process.env.STATIC_URL +
+                "/static/files/" +
+                val.document_name_back +
+                `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
               : "";
 
             let issue_date = val.issue_date
@@ -4707,13 +4825,13 @@ var MerchantEkyc = {
         for (val of entity_document) {
           if (
             reg_country.toUpperCase() ==
-            (
-              await helpers.get_nationalty_name_by_id(
-                merchant_details.nationality
-              )
-            ).toUpperCase() &&
+              (
+                await helpers.get_nationalty_name_by_id(
+                  merchant_details.nationality
+                )
+              ).toUpperCase() &&
             (await helpers.get_document_type(val.sequence)).toUpperCase() ==
-            "VISA"
+              "VISA"
           ) {
             var show = "style='display:none'";
           } else {
@@ -4728,10 +4846,10 @@ var MerchantEkyc = {
 
             var document_name_back = val.document_name_back
               ? `<a href = "` +
-              process.env.STATIC_URL +
-              "/static/files/" +
-              val.document_name_back +
-              `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
+                process.env.STATIC_URL +
+                "/static/files/" +
+                val.document_name_back +
+                `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
               : "";
 
             let issue_date = val.issue_date
@@ -4861,11 +4979,11 @@ var MerchantEkyc = {
       for (val of entity_document) {
         if (
           reg_country.toUpperCase() ==
-          (
-            await helpers.get_nationalty_name_by_id(nationality)
-          ).toUpperCase() &&
+            (
+              await helpers.get_nationalty_name_by_id(nationality)
+            ).toUpperCase() &&
           (await helpers.get_document_type(val.sequence)).toUpperCase() ==
-          "VISA"
+            "VISA"
         ) {
           var show = "style='display:none'";
         } else {
@@ -4880,10 +4998,10 @@ var MerchantEkyc = {
 
           var document_name_back = val.document_name_back
             ? `<a href = "` +
-            process.env.STATIC_URL +
-            "/static/files/" +
-            val.document_name_back +
-            `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
+              process.env.STATIC_URL +
+              "/static/files/" +
+              val.document_name_back +
+              `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
             : "";
 
           let issue_date = val.issue_date
@@ -5004,11 +5122,11 @@ var MerchantEkyc = {
       for (val of entity_document) {
         if (
           reg_country.toUpperCase() ==
-          (
-            await helpers.get_nationalty_name_by_id(nationality)
-          ).toUpperCase() &&
+            (
+              await helpers.get_nationalty_name_by_id(nationality)
+            ).toUpperCase() &&
           (await helpers.get_document_type(val.sequence)).toUpperCase() ==
-          "VISA"
+            "VISA"
         ) {
           var show = "style='display:none'";
         } else {
@@ -5023,10 +5141,10 @@ var MerchantEkyc = {
 
           var document_name_back = val.document_name_back
             ? `<a href = "` +
-            process.env.STATIC_URL +
-            "/static/files/" +
-            val.document_name_back +
-            `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
+              process.env.STATIC_URL +
+              "/static/files/" +
+              val.document_name_back +
+              `" style="margin-top:1px;display: block; font-weight: 500; font-size: 10px; line-height: 100%; --text-opacity: 1;  color: #FFF;border-radius:3px; text-decoration: none;padding: 0.5em 30px;border: 1px solid #ccc;background-color:#7367f0 ;">view</a>`
             : "";
 
           let issue_date =
@@ -5213,7 +5331,7 @@ var MerchantEkyc = {
           .send(response.successmsg("Business owner deleted successfully"));
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -5252,7 +5370,7 @@ var MerchantEkyc = {
           );
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -5290,7 +5408,7 @@ var MerchantEkyc = {
           );
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -5307,7 +5425,7 @@ var MerchantEkyc = {
           .send(response.successmsg("Business executive deleted successfully"));
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -5409,13 +5527,13 @@ var MerchantEkyc = {
                     : ""),
                   (res["document_file"] = val.document_name
                     ? process.env.STATIC_URL +
-                    "/static/files/" +
-                    val.document_name
+                      "/static/files/" +
+                      val.document_name
                     : ""),
                   (res["document_file_back"] = val.document_name
                     ? process.env.STATIC_URL +
-                    "/static/files/" +
-                    val.document_name_back
+                      "/static/files/" +
+                      val.document_name_back
                     : ""),
                   entity_documents.push(res);
               }
@@ -5433,8 +5551,8 @@ var MerchantEkyc = {
               kyc_link: process.env.MERCHANT_KYC_URL,
               match_link: match_selfie_document
                 ? process.env.STATIC_URL +
-                "/static/files/" +
-                match_selfie_document.document_name
+                  "/static/files/" +
+                  match_selfie_document.document_name
                 : "",
               merchant_id: encrypt_decrypt(
                 "encrypt",
@@ -5445,13 +5563,13 @@ var MerchantEkyc = {
                 : "",
               legal_person_name: merchant_details_result.legal_person_first_name
                 ? merchant_details_result.legal_person_first_name +
-                " " +
-                merchant_details_result.legal_person_last_name
+                  " " +
+                  merchant_details_result.legal_person_last_name
                 : "",
               doc_name: match_selfie_document.sequence
                 ? await helpers.get_document_type(
-                  match_selfie_document.sequence
-                )
+                    match_selfie_document.sequence
+                  )
                 : "",
 
               legal_person_email: merchant_details_result.legal_person_email
@@ -5468,7 +5586,7 @@ var MerchantEkyc = {
                 : "",
               address:
                 merchant_details_result.home_address_line_1 +
-                  merchant_details_result.home_address_line_2
+                merchant_details_result.home_address_line_2
                   ? " " + merchant_details_result.home_address_line_2
                   : "",
             };
@@ -5572,7 +5690,7 @@ var MerchantEkyc = {
               mobile_no: merchant_result.mobile_no,
               ekyc_done:
                 merchant_details_result.ekyc_done == 2 ||
-                  merchant_details_result.ekyc_done == 3
+                merchant_details_result.ekyc_done == 3
                   ? "Yes"
                   : "No",
               video_kyc_done:
@@ -5585,9 +5703,9 @@ var MerchantEkyc = {
               register_business_country:
                 merchant_details_result.register_business_country
                   ? encrypt_decrypt(
-                    "encrypt",
-                    merchant_details_result.register_business_country
-                  )
+                      "encrypt",
+                      merchant_details_result.register_business_country
+                    )
                   : "",
               //register_business_country_name: await helpers.get_country_name_by_id(merchant_details_result.register_business_country),
               register_business_country_name:
@@ -5595,9 +5713,9 @@ var MerchantEkyc = {
 
               type_of_business: merchant_details_result.type_of_business
                 ? encrypt_decrypt(
-                  "encrypt",
-                  merchant_details_result.type_of_business
-                )
+                    "encrypt",
+                    merchant_details_result.type_of_business
+                  )
                 : "",
               //type_of_business_name: await helpers.get_type_of_business(merchant_details_result.type_of_business),
               type_of_business_name:
@@ -5614,9 +5732,9 @@ var MerchantEkyc = {
               register_business_address_country:
                 merchant_details_result.register_business_country
                   ? encrypt_decrypt(
-                    "encrypt",
-                    merchant_details_result.register_business_country
-                  )
+                      "encrypt",
+                      merchant_details_result.register_business_country
+                    )
                   : "",
               //register_business_address_country_name: await helpers.get_country_name_by_id(merchant_details_result.register_business_address_country),
               register_business_address_country_name:
@@ -5641,13 +5759,13 @@ var MerchantEkyc = {
 
               psp_id: merchant_details_result.psp_id
                 ? helpers.get_multiple_ids_encrypt(
-                  merchant_details_result.psp_id
-                )
+                    merchant_details_result.psp_id
+                  )
                 : "",
               psp_name: merchant_details_result.psp_id
                 ? await PspModel.getPspName(
-                  String(merchant_details_result.psp_id)
-                )
+                    String(merchant_details_result.psp_id)
+                  )
                 : "",
               //psp_name: merchant_details_result.psp_name,
 
@@ -5664,34 +5782,34 @@ var MerchantEkyc = {
                 : "",
               nationality_name: merchant_details_result.nationality
                 ? await helpers.get_nationalty_name_by_id(
-                  merchant_details_result.nationality
-                )
+                    merchant_details_result.nationality
+                  )
                 : "",
               dob: merchant_details_result.dob,
               home_address_country: merchant_details_result.home_address_country
                 ? encrypt_decrypt(
-                  "encrypt",
-                  merchant_details_result.home_address_country
-                )
+                    "encrypt",
+                    merchant_details_result.home_address_country
+                  )
                 : "",
               home_address_country_name:
                 merchant_details_result.home_address_country
                   ? await helpers.get_country_name_by_id(
-                    merchant_details_result.home_address_country
-                  )
+                      merchant_details_result.home_address_country
+                    )
                   : "",
               home_address_line_1: merchant_details_result.home_address_line_1,
               home_address_line_2: merchant_details_result.home_address_line_2,
               home_province_id: merchant_details_result.home_province
                 ? encrypt_decrypt(
-                  "encrypt",
-                  merchant_details_result.home_province
-                )
+                    "encrypt",
+                    merchant_details_result.home_province
+                  )
                 : "",
               home_province: merchant_details_result.home_province
                 ? await helpers.get_state_name_by_id(
-                  merchant_details_result.home_province
-                )
+                    merchant_details_result.home_province
+                  )
                 : "",
               home_phone_code: merchant_details_result.home_phone_code,
               home_phone_number: merchant_details_result.home_phone_number,
@@ -5754,12 +5872,12 @@ var MerchantEkyc = {
           })
           .catch((error) => {
             console.log(error);
-            logger.error(500,{message: error,stack: error.stack}); 
+            logger.error(500, { message: error, stack: error.stack });
             res.status(statusCode.internalError).send(response.errormsg(error));
           });
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -5882,13 +6000,13 @@ var MerchantEkyc = {
                     : ""),
                   (res["document_file"] = val?.document_name
                     ? process.env.STATIC_URL +
-                    "/static/files/" +
-                    val?.document_name
+                      "/static/files/" +
+                      val?.document_name
                     : ""),
                   (res["document_file_back"] = val?.document_name
                     ? process.env.STATIC_URL +
-                    "/static/files/" +
-                    val?.document_name_back
+                      "/static/files/" +
+                      val?.document_name_back
                     : ""),
                   entity_documents.push(res);
               }
@@ -5905,8 +6023,8 @@ var MerchantEkyc = {
               kyc_link: process.env.MERCHANT_KYC_URL,
               match_link: match_selfie_document
                 ? process.env.STATIC_URL +
-                "/static/files/" +
-                match_selfie_document.document_name
+                  "/static/files/" +
+                  match_selfie_document.document_name
                 : "",
               merchant_id: encrypt_decrypt("encrypt", submerchant_id),
               merchant_name: merchant_details_result?.company_name
@@ -5915,8 +6033,8 @@ var MerchantEkyc = {
               legal_person_name:
                 merchant_details_result?.legal_person_first_name
                   ? merchant_details_result?.legal_person_first_name +
-                  " " +
-                  merchant_details_result?.legal_person_last_name
+                    " " +
+                    merchant_details_result?.legal_person_last_name
                   : "",
               doc_name: match_selfie_document?.document_num
                 ? helpers.doc_names(match_selfie_document?.sequence)
@@ -5929,7 +6047,7 @@ var MerchantEkyc = {
                 : "",
               address:
                 merchant_details_result?.home_address_line_1 +
-                  merchant_details_result?.home_address_line_2
+                merchant_details_result?.home_address_line_2
                   ? " " + merchant_details_result?.home_address_line_2
                   : "",
             };
@@ -6049,13 +6167,13 @@ var MerchantEkyc = {
                       : ""),
                     (res_["document_file"] = val.document_name
                       ? process.env.STATIC_URL +
-                      "/static/files/" +
-                      val.document_name
+                        "/static/files/" +
+                        val.document_name
                       : ""),
                     (res_["document_file_back"] = val.document_name
                       ? process.env.STATIC_URL +
-                      "/static/files/" +
-                      val.document_name_back
+                        "/static/files/" +
+                        val.document_name_back
                       : ""),
                     entity_documents_.push(res_);
                 }
@@ -6078,14 +6196,14 @@ var MerchantEkyc = {
                   merchant_result.onboarding_done != 1
                     ? "Onboarding Pending"
                     : val_.ekyc_required == 0 && val_.ekyc_status == 0
-                      ? "Onboarding Done"
-                      : val_.ekyc_required == 1 && val_.ekyc_status == 0
-                        ? "eKYC Pending"
-                        : val_.ekyc_required == 1 && val_.ekyc_status == 2
-                          ? "eKYC Done"
-                          : val_.ekyc_required == 1 && val_.ekyc_status == 3
-                            ? "eKYC Denied"
-                            : "",
+                    ? "Onboarding Done"
+                    : val_.ekyc_required == 1 && val_.ekyc_status == 0
+                    ? "eKYC Pending"
+                    : val_.ekyc_required == 1 && val_.ekyc_status == 2
+                    ? "eKYC Done"
+                    : val_.ekyc_required == 1 && val_.ekyc_status == 3
+                    ? "eKYC Denied"
+                    : "",
                 documents: entity_documents_,
                 nationality_name: val_.nationality
                   ? await helpers.get_nationalty_name_by_id(val_.nationality)
@@ -6188,13 +6306,13 @@ var MerchantEkyc = {
                       : ""),
                     (res_["document_file"] = val.document_name
                       ? process.env.STATIC_URL +
-                      "/static/files/" +
-                      val.document_name
+                        "/static/files/" +
+                        val.document_name
                       : ""),
                     (res_["document_file_back"] = val.document_name
                       ? process.env.STATIC_URL +
-                      "/static/files/" +
-                      val.document_name_back
+                        "/static/files/" +
+                        val.document_name_back
                       : ""),
                     entity_documents_.push(res_);
                 }
@@ -6218,14 +6336,14 @@ var MerchantEkyc = {
                   merchant_result.onboarding_done != 1
                     ? "Onboarding Pending"
                     : val_.ekyc_required == 0 && val_.ekyc_status == 0
-                      ? "Onboarding Done"
-                      : val_.ekyc_required == 1 && val_.ekyc_status == 0
-                        ? "eKYC Pending"
-                        : val_.ekyc_required == 1 && val_.ekyc_status == 2
-                          ? "eKYC Done"
-                          : val_.ekyc_required == 1 && val_.ekyc_status == 3
-                            ? "eKYC Denied"
-                            : "",
+                    ? "Onboarding Done"
+                    : val_.ekyc_required == 1 && val_.ekyc_status == 0
+                    ? "eKYC Pending"
+                    : val_.ekyc_required == 1 && val_.ekyc_status == 2
+                    ? "eKYC Done"
+                    : val_.ekyc_required == 1 && val_.ekyc_status == 3
+                    ? "eKYC Denied"
+                    : "",
               };
               business_executives.push(res);
             }
@@ -6243,13 +6361,13 @@ var MerchantEkyc = {
                 "encrypt",
                 merchant_details_result.id
               ),
-              dec_sub_merchant_id:merchant_details_result.id,
+              dec_sub_merchant_id: merchant_details_result.id,
               super_business_address:
                 super_merchant == merchant_details_result.id
                   ? encrypt_decrypt(
-                    "encrypt",
-                    merchant_details_result.business_address
-                  )
+                      "encrypt",
+                      merchant_details_result.business_address
+                    )
                   : "",
               super_business_address_name:
                 merchant_details_result.business_address
@@ -6284,9 +6402,9 @@ var MerchantEkyc = {
               register_business_country:
                 merchant_details_result.register_business_country
                   ? encrypt_decrypt(
-                    "encrypt",
-                    merchant_details_result.register_business_country
-                  )
+                      "encrypt",
+                      merchant_details_result.register_business_country
+                    )
                   : "",
               //register_business_country_name: await helpers.get_country_name_by_id(merchant_details_result.register_business_country),
               register_business_country_name:
@@ -6294,9 +6412,9 @@ var MerchantEkyc = {
 
               type_of_business: merchant_details_result.type_of_business
                 ? encrypt_decrypt(
-                  "encrypt",
-                  merchant_details_result.type_of_business
-                )
+                    "encrypt",
+                    merchant_details_result.type_of_business
+                  )
                 : "",
               type_of_business_name: await helpers.get_entity_type(
                 merchant_details_result.type_of_business
@@ -6314,9 +6432,9 @@ var MerchantEkyc = {
               register_business_address_country:
                 merchant_details_result.register_business_country
                   ? encrypt_decrypt(
-                    "encrypt",
-                    merchant_details_result.register_business_country
-                  )
+                      "encrypt",
+                      merchant_details_result.register_business_country
+                    )
                   : "",
               //register_business_address_country_name: await helpers.get_country_name_by_id(merchant_details_result.register_business_address_country),
               register_business_address_country_name:
@@ -6341,13 +6459,13 @@ var MerchantEkyc = {
 
               psp_id: merchant_details_result.psp_id
                 ? helpers.get_multiple_ids_encrypt(
-                  merchant_details_result.psp_id
-                )
+                    merchant_details_result.psp_id
+                  )
                 : "",
               psp_name: merchant_details_result.psp_id
                 ? await PspModel.getPspName(
-                  String(merchant_details_result.psp_id)
-                )
+                    String(merchant_details_result.psp_id)
+                  )
                 : "",
               //psp_name: merchant_details_result.psp_name,
 
@@ -6364,39 +6482,39 @@ var MerchantEkyc = {
                 : "",
               nationality_name: merchant_details_result.nationality
                 ? await helpers.get_nationalty_name_by_id(
-                  merchant_details_result.nationality
-                )
+                    merchant_details_result.nationality
+                  )
                 : "",
               dob: moment(merchant_details_result.dob).format("DD-MM-YYYY"),
               rep_expiry_date: merchant_details_result.rep_expiry_date
                 ? moment(merchant_details_result.rep_expiry_date).format(
-                  "DD-MM-YYYY"
-                )
+                    "DD-MM-YYYY"
+                  )
                 : "",
               home_address_country: merchant_details_result.home_address_country
                 ? encrypt_decrypt(
-                  "encrypt",
-                  merchant_details_result.home_address_country
-                )
+                    "encrypt",
+                    merchant_details_result.home_address_country
+                  )
                 : "",
               home_address_country_name:
                 merchant_details_result.home_address_country
                   ? await helpers.get_country_name_by_id(
-                    merchant_details_result.home_address_country
-                  )
+                      merchant_details_result.home_address_country
+                    )
                   : "",
               home_address_line_1: merchant_details_result.home_address_line_1,
               home_address_line_2: merchant_details_result.home_address_line_2,
               home_province_id: merchant_details_result.home_province
                 ? encrypt_decrypt(
-                  "encrypt",
-                  merchant_details_result.home_province
-                )
+                    "encrypt",
+                    merchant_details_result.home_province
+                  )
                 : "",
               home_province: merchant_details_result.home_province
                 ? await helpers.get_state_name_by_id(
-                  merchant_details_result.home_province
-                )
+                    merchant_details_result.home_province
+                  )
                 : "",
               home_phone_code: merchant_details_result.home_phone_code,
               home_phone_number: merchant_details_result.home_phone_number,
@@ -6483,17 +6601,17 @@ var MerchantEkyc = {
                   : merchant_result.ekyc_required == 1 &&
                     (merchant_result.ekyc_done == 1 ||
                       merchant_result.ekyc_done == 4)
-                    ? "eKYC Pending"
-                    : merchant_result.ekyc_required == 1 &&
-                      merchant_result.ekyc_done == 2
-                      ? "eKYC Done"
-                      : merchant_result.ekyc_required == 0 &&
-                        merchant_result.onboarding_done == 1
-                        ? "Onboarding Done"
-                        : merchant_result.ekyc_required == 1 &&
-                          merchant_result.ekyc_done == 3
-                          ? "eKYC Denied"
-                          : "",
+                  ? "eKYC Pending"
+                  : merchant_result.ekyc_required == 1 &&
+                    merchant_result.ekyc_done == 2
+                  ? "eKYC Done"
+                  : merchant_result.ekyc_required == 0 &&
+                    merchant_result.onboarding_done == 1
+                  ? "Onboarding Done"
+                  : merchant_result.ekyc_required == 1 &&
+                    merchant_result.ekyc_done == 3
+                  ? "eKYC Denied"
+                  : "",
               monthly_business_volume:
                 merchant_details_result.monthly_business_volume,
               monthly_transaction_volume:
@@ -6505,8 +6623,8 @@ var MerchantEkyc = {
 
               document_file_bank: merchant_details_result.bank_document_file
                 ? process.env.STATIC_URL +
-                "/static/files/" +
-                merchant_details_result.bank_document_file
+                  "/static/files/" +
+                  merchant_details_result.bank_document_file
                 : "",
               register_at: merchant_result?.register_at
                 ? merchant_result?.register_at
@@ -6551,12 +6669,12 @@ var MerchantEkyc = {
           })
           .catch((error) => {
             console.log(error);
-            logger.error(500,{message: error,stack: error.stack}); 
+            logger.error(500, { message: error, stack: error.stack });
             res.status(statusCode.internalError).send(response.errormsg(error));
           });
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -6688,7 +6806,7 @@ var MerchantEkyc = {
                 })
 
                 .catch((error) => {
-                 logger.error(500,{message: error,stack: error.stack}); 
+                  logger.error(500, { message: error, stack: error.stack });
                 });
 
             // event code here
@@ -6727,13 +6845,13 @@ var MerchantEkyc = {
                       // );
                     })
                     .catch((error) => {
-                      logger.error(500,{message: error,stack: error.stack}); 
+                      logger.error(500, { message: error, stack: error.stack });
                       res
                         .status(statusCode.internalError)
                         .send(response.errormsg(error.message));
                     });
                 } catch (error) {
-                  logger.error(500,{message: error,stack: error.stack}); 
+                  logger.error(500, { message: error, stack: error.stack });
                   referralEmitter.emit("registerReferralError", error);
                 }
               }
@@ -6753,7 +6871,7 @@ var MerchantEkyc = {
           .send(response.successmsg("Ekyc status updated successfully."));
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res.status(statusCode.internalError).send(response.errormsg(error));
       });
   },
@@ -6784,7 +6902,7 @@ var MerchantEkyc = {
           response.successmsg("Supermerchant profile updated successfully")
         );
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -6805,7 +6923,7 @@ var MerchantEkyc = {
         super_merchant_id: 0,
       };
     }
-    
+
     MerchantEkycModel.selectAll("*", condition)
       .then(async (result) => {
         let send_res = [];
@@ -6843,7 +6961,7 @@ var MerchantEkyc = {
           );
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -6917,8 +7035,8 @@ var MerchantEkyc = {
           match_link:
             val.document_name != ""
               ? process.env.STATIC_URL +
-              "/static/files/" +
-              match_selfie_document.document_name
+                "/static/files/" +
+                match_selfie_document.document_name
               : "",
           address: val.home_address_line_1
             ? val.home_address_line_1 + " " + val.home_address_line_2
@@ -6936,86 +7054,94 @@ var MerchantEkyc = {
           );
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
       });
   },
   update_owners_status: async (req, res) => {
-    try{
-    let owner_id =  enc_dec.cjs_decrypt(req.bodyString("owner_id"));
-    let status = req.bodyString("status");
+    try {
+      let owner_id = enc_dec.cjs_decrypt(req.bodyString("owner_id"));
+      let status = req.bodyString("status");
 
-    let common_email = await MerchantEkycModel.selectDynamicOwnerData(
-      "merchant_id,email",
-      { id: owner_id },
-      config.table_prefix + "merchant_business_owners"
-    );
-    let get_referrer_exist = await MerchantEkycModel.get_count_referrer({
-      submerchant_id: common_email.merchant_id,
-    });
-    if (get_referrer_exist == 0) {
-      await MerchantEkyc.referrer_register(common_email.merchant_id);
+      let common_email = await MerchantEkycModel.selectDynamicOwnerData(
+        "merchant_id,email",
+        { id: owner_id },
+        config.table_prefix + "merchant_business_owners"
+      );
+      let get_referrer_exist = await MerchantEkycModel.get_count_referrer({
+        submerchant_id: common_email.merchant_id,
+      });
+      if (get_referrer_exist == 0) {
+        await MerchantEkyc.referrer_register(common_email.merchant_id);
+      }
+
+      // update same email executives /owners
+      await MerchantEkycModel.updateDynamic(
+        { id: owner_id },
+        { ekyc_status: status },
+        config.table_prefix + "merchant_business_owners"
+      );
+
+      await MerchantEkycModel.updateDynamic(
+        { merchant_id: common_email.merchant_id, email: common_email.email },
+        { ekyc_status: status },
+        config.table_prefix + "merchant_business_executives"
+      );
+
+      res
+        .status(statusCode.ok)
+        .send(response.successmsg("Updated successfully"));
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+      res
+        .status(statusCode.internalError)
+        .send(response.errorMsg("Something went wrong"));
     }
-
-    // update same email executives /owners
-    await MerchantEkycModel.updateDynamic(
-      { id: owner_id },
-      { ekyc_status: status },
-      config.table_prefix + "merchant_business_owners"
-    );
-
-    await MerchantEkycModel.updateDynamic(
-      { merchant_id: common_email.merchant_id, email: common_email.email },
-      { ekyc_status: status },
-      config.table_prefix + "merchant_business_executives"
-    );
-
-    res.status(statusCode.ok).send(response.successmsg("Updated successfully"));
-  }catch(error){
-     logger.error(500,{message: error,stack: error.stack}); 
-     res.status(statusCode.internalError).send(response.errorMsg("Something went wrong"));
-  }
   },
   update_exe_status: async (req, res) => {
-    try{
-    let owner_id =  enc_dec.cjs_decrypt(req.bodyString("executive_id"));
+    try {
+      let owner_id = enc_dec.cjs_decrypt(req.bodyString("executive_id"));
 
-    let status = req.bodyString("status");
+      let status = req.bodyString("status");
 
-    let common_email = await MerchantEkycModel.selectDynamicOwnerData(
-      "merchant_id,email",
-      { id: owner_id },
-      config.table_prefix + "merchant_business_executives"
-    );
-    let get_referrer_exist = await MerchantEkycModel.get_count_referrer({
-      submerchant_id: common_email.merchant_id,
-    });
-    if (get_referrer_exist == 0) {
-      await MerchantEkyc.referrer_register(common_email.merchant_id);
+      let common_email = await MerchantEkycModel.selectDynamicOwnerData(
+        "merchant_id,email",
+        { id: owner_id },
+        config.table_prefix + "merchant_business_executives"
+      );
+      let get_referrer_exist = await MerchantEkycModel.get_count_referrer({
+        submerchant_id: common_email.merchant_id,
+      });
+      if (get_referrer_exist == 0) {
+        await MerchantEkyc.referrer_register(common_email.merchant_id);
+      }
+
+      await MerchantEkycModel.updateDynamic(
+        { id: owner_id },
+        { ekyc_status: status },
+        config.table_prefix + "merchant_business_executives"
+      );
+      // update owners
+      await MerchantEkycModel.updateDynamic(
+        { merchant_id: common_email.merchant_id, email: common_email.email },
+        { ekyc_status: status },
+        config.table_prefix + "merchant_business_owners"
+      );
+
+      res
+        .status(statusCode.ok)
+        .send(response.successmsg("Updated successfully"));
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+      res
+        .status(statusCode.internalError)
+        .send(response.errorMsg("Something went wrong"));
     }
-
-    await MerchantEkycModel.updateDynamic(
-      { id: owner_id },
-      { ekyc_status: status },
-      config.table_prefix + "merchant_business_executives"
-    );
-    // update owners
-    await MerchantEkycModel.updateDynamic(
-      { merchant_id: common_email.merchant_id, email: common_email.email },
-      { ekyc_status: status },
-      config.table_prefix + "merchant_business_owners"
-    );
-
-    res.status(statusCode.ok).send(response.successmsg("Updated successfully"));
-  }catch(error){
-     logger.error(500,{message: error,stack: error.stack}); 
-     res.status(statusCode.internalError).send(response.errorMsg("Something went wrong"));
-  }
   },
   merchant_data: async (req, res) => {
-    let submerchant_id =  enc_dec.cjs_decrypt(req.bodyString("token"));
+    let submerchant_id = enc_dec.cjs_decrypt(req.bodyString("token"));
     MerchantEkycModel.selectMerchantDetails("*", {
       merchant_id: submerchant_id,
     })
@@ -7034,8 +7160,8 @@ var MerchantEkyc = {
           kyc_link: process.env.MERCHANT_KYC_URL,
           match_link: match_selfie_document
             ? process.env.STATIC_URL +
-            "/static/files/" +
-            match_selfie_document.document_name
+              "/static/files/" +
+              match_selfie_document.document_name
             : "",
           merchant_id: encrypt_decrypt("encrypt", submerchant_id),
           merchant_name: merchant_details.company_name
@@ -7043,8 +7169,8 @@ var MerchantEkyc = {
             : "",
           legal_person_name: merchant_details.legal_person_first_name
             ? merchant_details.legal_person_first_name +
-            " " +
-            merchant_details.legal_person_last_name
+              " " +
+              merchant_details.legal_person_last_name
             : "",
           doc_name: match_selfie_document.sequence
             ? await helpers.get_document_type(match_selfie_document.sequence)
@@ -7076,7 +7202,7 @@ var MerchantEkyc = {
           .send(response.successdatamsg(res1, "Details fetched successfully."));
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -7189,8 +7315,8 @@ var MerchantEkyc = {
                 var id = val.rep_id;
                 var ekyc_status =
                   merchant_result.ekyc_required == 1 &&
-                    (merchant_result.ekyc_done == 1 ||
-                      merchant_result.ekyc_done == 4)
+                  (merchant_result.ekyc_done == 1 ||
+                    merchant_result.ekyc_done == 4)
                     ? "eKYC Pending"
                     : "";
               } else if (val.business_owner && val.owner_required == 1) {
@@ -7247,17 +7373,17 @@ var MerchantEkyc = {
                   : merchant_result.ekyc_required == 1 &&
                     (merchant_result.ekyc_done == 1 ||
                       merchant_result.ekyc_done == 4)
-                    ? "eKYC Pending"
-                    : merchant_result.ekyc_required == 1 &&
-                      merchant_result.ekyc_done == 2
-                      ? "eKYC Done"
-                      : merchant_result.ekyc_required == 0 &&
-                        merchant_result.onboarding_done == 1
-                        ? "Onboarding Done"
-                        : merchant_result.ekyc_required == 1 &&
-                          merchant_result.ekyc_done == 3
-                          ? "eKYC Denied"
-                          : "",
+                  ? "eKYC Pending"
+                  : merchant_result.ekyc_required == 1 &&
+                    merchant_result.ekyc_done == 2
+                  ? "eKYC Done"
+                  : merchant_result.ekyc_required == 0 &&
+                    merchant_result.onboarding_done == 1
+                  ? "Onboarding Done"
+                  : merchant_result.ekyc_required == 1 &&
+                    merchant_result.ekyc_done == 3
+                  ? "eKYC Denied"
+                  : "",
               ekyc_required: merchant_result.ekyc_required,
               psp_ekyc_required: psp_kyc > 0 ? "1" : "0",
               merchant:
@@ -7276,17 +7402,17 @@ var MerchantEkyc = {
                   : merchant_result.ekyc_required == 1 &&
                     (merchant_result.ekyc_done == 1 ||
                       merchant_result.ekyc_done == 4)
-                    ? "eKYC Pending"
-                    : merchant_result.ekyc_required == 1 &&
-                      merchant_result.ekyc_done == 2
-                      ? "eKYC Done"
-                      : merchant_result.ekyc_required == 0 &&
-                        merchant_result.onboarding_done == 1
-                        ? "Onboarding Done"
-                        : merchant_result.ekyc_required == 1 &&
-                          merchant_result.ekyc_done == 3
-                          ? "eKYC Denied"
-                          : "",
+                  ? "eKYC Pending"
+                  : merchant_result.ekyc_required == 1 &&
+                    merchant_result.ekyc_done == 2
+                  ? "eKYC Done"
+                  : merchant_result.ekyc_required == 0 &&
+                    merchant_result.onboarding_done == 1
+                  ? "Onboarding Done"
+                  : merchant_result.ekyc_required == 1 &&
+                    merchant_result.ekyc_done == 3
+                  ? "eKYC Denied"
+                  : "",
               ekyc_required: merchant_result.ekyc_required,
               psp_ekyc_required: psp_kyc > 0 ? "1" : "0",
               merchant:
@@ -7306,7 +7432,7 @@ var MerchantEkyc = {
             );
         })
         .catch((error) => {
-          logger.error(500,{message: error,stack: error.stack}); 
+          logger.error(500, { message: error, stack: error.stack });
           res.status(statusCode.internalError).send(response.errormsg(error));
         });
     } else {
@@ -7336,8 +7462,8 @@ var MerchantEkyc = {
     }
   },
   super_merchant_master: async (req, res) => {
-    console.log("req.body......",req.body);
-    
+    console.log("req.body......", req.body);
+
     let condition = {};
     if (req.user.type == "admin") {
       condition = {
@@ -7354,14 +7480,16 @@ var MerchantEkyc = {
     }
 
     if (req.bodyString("status")) {
-      condition.status = req.bodyString("status") === 'Active' ? 0 : 1;
+      condition.status = req.bodyString("status") === "Active" ? 0 : 1;
     }
     if (req.bodyString("ekyc_status")) {
       // condition.status = req.bodyString("status");
     }
     if (req.bodyString("business_address")) {
-      if(req.bodyString("business_address")?.length > 10){
-        condition.registered_business_address = enc_dec.cjs_decrypt(req.bodyString("business_address"));
+      if (req.bodyString("business_address")?.length > 10) {
+        condition.registered_business_address = enc_dec.cjs_decrypt(
+          req.bodyString("business_address")
+        );
       }
     }
     if (req.bodyString("type_of_business")) {
@@ -7413,8 +7541,8 @@ var MerchantEkyc = {
             super_merchant_mobile: val.mobile_no,
             super_merchant_email: val.email,
             status: val.status == 1 ? "Deactivated" : "Active",
-            is_user:val.user,
-            parent_id:val.super_merchant_id,
+            is_user: val.user,
+            parent_id: val.super_merchant_id,
             de_merchant_id: val?.id ? await helpers.formatNumber(val?.id) : "",
             register_at: val.register_at,
             allow_mid: val.allow_mid,
@@ -7437,7 +7565,7 @@ var MerchantEkyc = {
           );
       })
       .catch((error) => {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         res
           .status(statusCode.internalError)
           .send(response.errormsg(error.message));
@@ -7458,7 +7586,7 @@ var MerchantEkyc = {
         .status(statusCode.ok)
         .send(response.successmsg("Submerchant deactivated successfully"));
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -7481,7 +7609,7 @@ var MerchantEkyc = {
         .status(statusCode.ok)
         .send(response.successmsg("Merchant activated successfully"));
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -7508,7 +7636,7 @@ var MerchantEkyc = {
         .status(statusCode.ok)
         .send(response.successmsg("Updated successfully"));
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -7535,7 +7663,7 @@ var MerchantEkyc = {
         .status(statusCode.ok)
         .send(response.successmsg("Updated successfully"));
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -7562,7 +7690,7 @@ var MerchantEkyc = {
         .status(statusCode.ok)
         .send(response.successmsg("Updated successfully"));
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -7589,7 +7717,7 @@ var MerchantEkyc = {
         .status(statusCode.ok)
         .send(response.successmsg("Updated successfully"));
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
@@ -7661,7 +7789,7 @@ var MerchantEkyc = {
         }
       })
       .catch((error) => {
-       logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
       });
 
     // event code here
@@ -7698,13 +7826,13 @@ var MerchantEkyc = {
             // );
           })
           .catch((error) => {
-            logger.error(500,{message: error,stack: error.stack}); 
+            logger.error(500, { message: error, stack: error.stack });
             res
               .status(statusCode.internalError)
               .send(response.errormsg(error.message));
           });
       } catch (error) {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
         referralEmitter.emit("registerReferralError", error);
       }
     });
@@ -7718,7 +7846,7 @@ var MerchantEkyc = {
     referralEmitter.emit("registerReferral", { referrer_data });
     return;
   },
-  fetchSuperMerchantLogo:async(req,res)=>{
+  fetchSuperMerchantLogo: async (req, res) => {
     try {
       let super_merchant_id = enc_dec.cjs_decrypt(req.body.supermerchant_id);
       let res_send = await MerchantRegistrationModel.selectOneDyn(
@@ -7728,8 +7856,9 @@ var MerchantEkyc = {
       );
 
       if (res_send) {
-        if(res_send.logo){
-          res_send.logo = process.env.STATIC_URL+'/static/images/'+res_send.logo
+        if (res_send.logo) {
+          res_send.logo =
+            process.env.STATIC_URL + "/static/images/" + res_send.logo;
         }
         res
           .status(statusCode.ok)
@@ -7745,15 +7874,14 @@ var MerchantEkyc = {
           .send(response.errormsg("Invalid super merchant id"));
       }
     } catch (error) {
-       logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
     }
-   
   },
-  uploadSuperMerchantLogo:async(req,res)=>{
-     try {
+  uploadSuperMerchantLogo: async (req, res) => {
+    try {
       let super_merchant_id = enc_dec.cjs_decrypt(req.body.supermerchant_id);
       console.log(super_merchant_id);
       let res_send = await MerchantRegistrationModel.selectOneDyn(
@@ -7764,13 +7892,17 @@ var MerchantEkyc = {
 
       if (res_send) {
         let updateData = {
-          logo:req.all_files?.logo
-        }
-        let updateLogo = await MerchantRegistrationModel.updateDyn({id:super_merchant_id},updateData,'master_super_merchant');
+          logo: req.all_files?.logo,
+        };
+        let updateLogo = await MerchantRegistrationModel.updateDyn(
+          { id: super_merchant_id },
+          updateData,
+          "master_super_merchant"
+        );
         let response_to_send = {
-          logo:process.env.STATIC_URL+'/static/images/'+updateData.logo,
-          super_merchant_id:req.body.supermerchant_id
-        }
+          logo: process.env.STATIC_URL + "/static/images/" + updateData.logo,
+          super_merchant_id: req.body.supermerchant_id,
+        };
         res
           .status(statusCode.ok)
           .send(
@@ -7785,30 +7917,40 @@ var MerchantEkyc = {
           .send(response.errormsg("Invalid super merchant id"));
       }
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
       res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
     }
   },
-  fetchLogo:async(req,res)=>{
-    try{
-    let merchant_id = enc_dec.cjs_decrypt(req.body.sub_merchant_id);
-    let superMerchantDetails = await MerchantRegistrationModel.selectOneDyn('super_merchant_id',{id:merchant_id},'master_merchant');
-    
-    if(superMerchantDetails){
-       let res_send = await MerchantRegistrationModel.selectOneDyn(
-        "logo,id as supermerchant_id",
-        { id: superMerchantDetails.super_merchant_id },
-        "master_super_merchant"
+  fetchLogo: async (req, res) => {
+    try {
+      let merchant_id = enc_dec.cjs_decrypt(req.body.sub_merchant_id);
+      let superMerchantDetails = await MerchantRegistrationModel.selectOneDyn(
+        "super_merchant_id",
+        { id: merchant_id },
+        "master_merchant"
       );
-      if(res_send.logo){
-        res_send.logo = process.env.STATIC_URL+'/static/images/'+res_send.logo
-      }else{
-        let companyDetails = await MerchantRegistrationModel.selectOneDyn('company_logo as logo',{id:1},'company_master');
-         res_send.logo = process.env.STATIC_URL+'/static/images/'+companyDetails.logo
-      }
-       res
+
+      if (superMerchantDetails) {
+        let res_send = await MerchantRegistrationModel.selectOneDyn(
+          "logo,id as supermerchant_id",
+          { id: superMerchantDetails.super_merchant_id },
+          "master_super_merchant"
+        );
+        if (res_send.logo) {
+          res_send.logo =
+            process.env.STATIC_URL + "/static/images/" + res_send.logo;
+        } else {
+          let companyDetails = await MerchantRegistrationModel.selectOneDyn(
+            "company_logo as logo",
+            { id: 1 },
+            "company_master"
+          );
+          res_send.logo =
+            process.env.STATIC_URL + "/static/images/" + companyDetails.logo;
+        }
+        res
           .status(statusCode.ok)
           .send(
             response.successdatamsg(
@@ -7816,15 +7958,14 @@ var MerchantEkyc = {
               "Super Merchant logo fetch successfully"
             )
           );
-
-    }else{
+      } else {
         res
           .status(statusCode.badRequest)
           .send(response.errormsg("Invalid sub merchant id"));
-    }
-    }catch(error){
-       logger.error(500,{message: error,stack: error.stack}); 
-       res
+      }
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+      res
         .status(statusCode.internalError)
         .send(response.errormsg(error.message));
     }
@@ -7832,7 +7973,7 @@ var MerchantEkyc = {
   sub_merchant_details: async (req, res) => {
     console.log("req", req.params);
 
-    // 
+    //
     let submerchant_id = req.params.sub_merchant_id;
 
     // Check user exist
@@ -7850,27 +7991,37 @@ var MerchantEkyc = {
         .send(response.errormsg("Merchant not found"));
     }
 
-
     let condition = { "mm.id": submerchant_id };
     let details_result = await MerchantEkycModel.getMerchantDetails(condition);
     console.log("details_result: ", details_result);
 
-    
-    let selection = "`id`,`super_merchant_id`,`name`, `email`, `code`, `mobile_no`,`referral_code`,`register_at`";
+    let selection =
+      "`id`,`super_merchant_id`,`name`, `email`, `code`, `mobile_no`,`referral_code`,`register_at`";
 
     condition = { id: submerchant_id };
     let table_name = config.table_prefix + "master_merchant";
 
-
-    let merchant_result = await MerchantEkycModel.selectDynamicSingle(selection, condition, table_name);
+    let merchant_result = await MerchantEkycModel.selectDynamicSingle(
+      selection,
+      condition,
+      table_name
+    );
     console.log("merchant_result: ", merchant_result);
-    
+
     selection = "`company_name`,`register_business_country`";
     condition = { merchant_id: submerchant_id };
-    let merchant_details_result = await MerchantEkycModel.selectMerchantDetails(selection, condition);
+    let merchant_details_result = await MerchantEkycModel.selectMerchantDetails(
+      selection,
+      condition
+    );
 
-    let key_response = await MerchantModel.get_key({ merchant_id: submerchant_id});
-    let webhook_response = await MerchantModel.select_merchant_webhook_details("*",{ merchant_id: submerchant_id, enabled: 0});
+    let key_response = await MerchantModel.get_key({
+      merchant_id: submerchant_id,
+    });
+    let webhook_response = await MerchantModel.select_merchant_webhook_details(
+      "*",
+      { merchant_id: submerchant_id, enabled: 0 }
+    );
     console.log("webhook_response: ", webhook_response);
 
     let registrationResponse = {
@@ -7885,8 +8036,14 @@ var MerchantEkyc = {
       referral_code: details_result?.referral_code,
       // access_token: aToken,
       access: key_response,
-      webhook_key: webhook_response?.length > 0 ? webhook_response?.[0].notification_url : "",
-      webhook_secret: webhook_response?.length > 0 ? webhook_response?.[0].notification_secret : "",
+      webhook_key:
+        webhook_response?.length > 0
+          ? webhook_response?.[0].notification_url
+          : "",
+      webhook_secret:
+        webhook_response?.length > 0
+          ? webhook_response?.[0].notification_secret
+          : "",
       register_at: merchant_result?.register_at,
     };
 
@@ -7901,7 +8058,33 @@ var MerchantEkyc = {
         )
       );
   },
+  allow_descriptor: async (req, res) => {
+    try {
+      let user_id =  enc_dec.cjs_decrypt(
+        req.bodyString("submerchant_id")
+      );
 
+      let mer_details = await MerchantModel.selectOneSubMerchant(
+        "allow_statement_descriptor",
+        {
+          id: user_id,
+        }
+      );
+      let allow = mer_details.allow_statement_descriptor == 1 ? 0 : 1;
+      var insdata = {
+        allow_statement_descriptor: allow,
+      };
+      let ins_id = await MerchantEkycModel.updateDynamic({ id: user_id }, insdata,config.table_prefix+"master_merchant");
+      res
+        .status(statusCode.ok)
+        .send(response.successmsg("Updated successfully"));
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+      res
+        .status(statusCode.internalError)
+        .send(response.errormsg(error.message));
+    }
+  },
 };
 
 module.exports = MerchantEkyc;

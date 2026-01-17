@@ -335,5 +335,9 @@ var ServerResponse = {
 
     return response;
   },
+  sendSuccess:(data)=>{
+     
+    return data;
+  }
 };
 module.exports = ServerResponse;

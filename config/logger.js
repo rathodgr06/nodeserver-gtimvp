@@ -18,7 +18,7 @@ const enumerateErrorFormat = winston.format((info) => {
 });
 
 const transport = new DailyRotateFile({
-    filename: 'logs/%DATE%-app-log.log',
+    filename: 'public/logs/%DATE%-app-log.log',
     datePattern: 'YYYY-MM-DD',
     zippedArchive: true,
     maxSize: '20m',
@@ -42,7 +42,7 @@ const logger = winston.createLogger({
     // Handle exceptions and rejections
     exceptionHandlers: [
         new DailyRotateFile({
-            filename: 'logs/%DATE%-exceptions.log',
+            filename: 'public/logs/%DATE%-exceptions.log',
             datePattern: 'YYYY-MM-DD',
             zippedArchive: true,
             maxSize: '20m',
@@ -51,7 +51,7 @@ const logger = winston.createLogger({
     ],
     rejectionHandlers: [
         new DailyRotateFile({
-            filename: 'logs/%DATE%-rejections.log',
+            filename: 'public/logs/%DATE%-rejections.log',
             datePattern: 'YYYY-MM-DD',
             zippedArchive: true,
             maxSize: '20m',

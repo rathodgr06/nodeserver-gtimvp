@@ -5085,4 +5085,10 @@ app.post("/api-documentation/details", CheckHeader, CheckToken, apiDocument.deta
 app.post("/api-documentation/update", CheckHeader, CheckToken, uploadApiDoc, Validator.api_document_update, apiDocument.update);
 app.post("/api-documentation/delete", CheckHeader, CheckToken, apiDocument.delete);
 app.post("/api-documentation/change-status", CheckHeader, CheckToken, apiDocument.changeStatus);
+app.post("/store/list",CheckHeader,CheckMerchantToken,submerchant.storeList);
+app.post("/submerchant/list-export",CheckHeader,CheckMerchantToken,submerchant.listExport);
+
+app.post("/master-merchant/allow-descriptor",CheckHeader,CheckMerchantToken,MerchantEkyc.allow_descriptor);
+
+  
 module.exports = app;
