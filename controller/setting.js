@@ -96,6 +96,8 @@ var Setting = {
   },
 
   header_info: async (req, res) => {
+    console.log(`header info`);
+    console.log(req.user);
     try {
       let image_path = process.env.STATIC_URL + "/static/images/";
       let file_path = process.env.STATIC_URL + "/static/language/";
@@ -108,18 +110,13 @@ var Setting = {
           id: req.user.id,
         });
         mer_details = await merchantModel.main_merchant_details({
-          "mm.super_merchant_id": req.user.super_merchant_id
-            ? req.user.super_merchant_id
-            : req.user.id,
+          "mm.super_merchant_id": req.user.is_user==0?req.user.id:req.user.super_merchant_id
         });
 
         supermerchant_live = await merchantModel.selectOneSuperMerchant(
           "live,allow_mid,super_merchant_id,name,stores,selected_submerchant,user",
           {
-            id: supermerchant_live.user==0 ? req.user.id :user_details.super_merchant_id
-              // user_details.super_merchant_id > 0
-              //   ? req.user.super_merchant_id
-              //   : req.user.id,
+            id: req.user.is_user==0?req.user.id:req.user.super_merchant_id
           }
         );
         const today = moment();
@@ -127,8 +124,8 @@ var Setting = {
           mer_list = await merchantModel.sub_merchant_list({
             "mm.super_merchant_id":
               user_details.super_merchant_id > 0
-                ? req.user.super_merchant_id
-                : req.user.id,
+                ? req?.user?.super_merchant_id
+                : req?.user?.id,
             "mm.status": 0,
             "mm.deleted": 0,
             // "sm.super_merchant_id":0

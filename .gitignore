@@ -6,3 +6,5 @@ public/
 logs/*.json
 logs/.*.json
 controller/apidocument.js
+.DS_Store
+**/.DS_Store

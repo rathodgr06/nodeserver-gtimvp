@@ -1156,7 +1156,7 @@ app.post("/setting/header/login/info", CheckHeader, Setting.login_info);
 app.post(
   "/setting/company/details",
   CheckHeader,
-  //CheckToken,
+  CheckToken,
   Setting.company_info
 );
 app.post("/setting/smtp/details", CheckHeader, CheckToken, Setting.smtp_info);
