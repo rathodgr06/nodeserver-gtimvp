@@ -615,8 +615,8 @@ let helpers = {
       }.company_name
             FROM ${config.table_prefix + "master_merchant"}
             JOIN ${config.table_prefix + "master_merchant_details"} ON ${
-        config.table_prefix + "master_merchant"
-      }.id = ${config.table_prefix + "master_merchant_details"}.merchant_id
+              config.table_prefix + "master_merchant"
+            }.id = ${config.table_prefix + "master_merchant_details"}.merchant_id
             WHERE ${config.table_prefix + "master_merchant"}.id = ${id};
             `;
       response = await qb.query(query);
@@ -804,7 +804,7 @@ let helpers = {
     currency,
     dom_int,
     payment_methods,
-    payment_schemes
+    payment_schemes,
   ) => {
     console.log(
       "🚀 ~ getPSPByPricingPlanID: ~ id, currency, dom_int, payment_methods, payment_schemes:",
@@ -812,7 +812,7 @@ let helpers = {
       currency,
       dom_int,
       payment_methods,
-      payment_schemes
+      payment_schemes,
     );
     let qb = await pool.get_connection();
     let response;
@@ -951,7 +951,7 @@ let helpers = {
   modified_get_date_between_condition: async (
     from_date,
     to_date,
-    db_date_field
+    db_date_field,
   ) => {
     return (
       "pg_inv_invoice_master." +
@@ -1042,10 +1042,10 @@ let helpers = {
     let response = await DBRun.exec_condition(
       "file,direction,flag,name",
       condition,
-      config.table_prefix + "master_language"
+      config.table_prefix + "master_language",
     );
     const data = fs.readFileSync(
-      path.resolve("public/language/" + response?.[0]?.file)
+      path.resolve("public/language/" + response?.[0]?.file),
     );
     return {
       data: JSON.parse(data),
@@ -1059,10 +1059,10 @@ let helpers = {
       "file,direction,flag,name",
       condition,
       1,
-      config.table_prefix + "master_language"
+      config.table_prefix + "master_language",
     );
     const data = fs.readFileSync(
-      path.resolve("public/language/" + response?.[0]?.file)
+      path.resolve("public/language/" + response?.[0]?.file),
     );
     return {
       data: JSON.parse(data),
@@ -1140,7 +1140,7 @@ let helpers = {
     let response = await DBRun.exec_condition(
       "*",
       condition,
-      config.table_prefix + "company_master"
+      config.table_prefix + "company_master",
     );
     if (response?.[0]) {
       return response?.[0];
@@ -2034,7 +2034,7 @@ let helpers = {
     try {
       response = await qb
         .select(
-          "rule_id,order_id,email,mode,rule_if_fail,message,added_date,scenario"
+          "rule_id,order_id,email,mode,rule_if_fail,message,added_date,scenario",
         )
         .where({ order_id: order_id, mode: mode })
         .get(config.table_prefix1 + "request_list");
@@ -2054,7 +2054,7 @@ let helpers = {
         rule_if_fail: response?.[0].rule_if_fail,
         message: response?.[0].message,
         added_date: moment(response?.[0].added_date).format(
-          "DD-MM-YYYY HH:mm:ss"
+          "DD-MM-YYYY HH:mm:ss",
         ),
         scenario: capitalizeFirstLetter(response?.[0].scenario),
       };
@@ -2552,7 +2552,7 @@ let helpers = {
     url_,
     type,
     payload,
-    user
+    user,
   ) => {
     let apiKey = "OTk2NjE4OWItOWJhOC00MTNhLWJlYTktMDczOWQyZTBjN2I0";
     let url = "https://onesignal.com/api/v1/notifications";
@@ -2606,7 +2606,7 @@ let helpers = {
     url_ = "testing url",
     type = "testing type",
     payload = { abc: "payload object" },
-    user = "test user"
+    user = "test user",
   ) => {
     let apiKey = "MGRhMzM5N2YtNWFkYS00NjgxLTk2OTQtMDBiZjMyNTgzM2Nj";
     url = "https://onesignal.com/api/v1/notifications";
@@ -3188,7 +3188,7 @@ let helpers = {
         .join(
           config.table_prefix + "master_merchant mm",
           "md.merchant_id=mm.id",
-          "inner"
+          "inner",
         )
         .get();
     } catch (error) {
@@ -3214,7 +3214,7 @@ let helpers = {
         .join(
           config.table_prefix + "master_merchant mm",
           "md.merchant_id=mm.id",
-          "inner"
+          "inner",
         )
         .get();
     } catch (error) {
@@ -3312,8 +3312,10 @@ let helpers = {
     let response;
     try {
       let dcc_enabled = await dccStatusFetch();
+      console.log(dcc_enabled);
       if (dcc_enabled) {
         let queryStr = `SELECT *, m.id as midId FROM pg_mid m INNER JOIN pg_master_currency c ON m.currency_id = c.id WHERE m.submerchant_id = ${merchant_id} AND m.deleted = 0 AND m.env = '${mode}' AND (c.code = '${currency}' OR FIND_IN_SET('${currency}', m.supported_currency) > 0)`;
+        console.log(queryStr);
         response = await qb.query(queryStr);
       } else {
         response = await qb
@@ -3322,7 +3324,7 @@ let helpers = {
           .join(
             config.table_prefix + "master_currency c",
             "m.currency_id=c.id",
-            "inner"
+            "inner",
           )
           .where(condition)
           .get();
@@ -3357,7 +3359,7 @@ let helpers = {
           .join(
             config.table_prefix + "master_currency c",
             "m.currency_id=c.id",
-            "inner"
+            "inner",
           )
           .like("m.class", "ecom")
           // .where_in("m.class",class_)
@@ -3388,7 +3390,7 @@ let helpers = {
         .join(
           config.table_prefix + "master_currency c",
           "m.currency_id=c.id",
-          "inner"
+          "inner",
         )
         .join(config.table_prefix + "psp p", "m.psp_id=p.id", "inner")
         .like("m.payment_methods", "Apple Pay")
@@ -3467,7 +3469,7 @@ let helpers = {
       let card_number_arr = await helpers.keyByArr(response, "card_number");
       let card_number_cipher = await helpers.keyByValue(
         response,
-        "card_number"
+        "card_number",
       );
 
       let cipher_keys = await helpers.get_cipher_keys_by_ids(cipher_keys_ids);
@@ -3573,7 +3575,7 @@ let helpers = {
     try {
       response = await qb
         .select(
-          "response_code,response_details,response_type,soft_hard_decline"
+          "response_code,response_details,response_type,soft_hard_decline",
         )
         .where(condition)
         .get(config.table_prefix + "response_code");
@@ -3728,7 +3730,7 @@ let helpers = {
     initial_payment_amount,
     final_payment_amount,
     plan_billing_amount,
-    plan_id
+    plan_id,
   ) => {
     const table = [];
     const subscriptionId = subscription_id;
@@ -3748,7 +3750,7 @@ let helpers = {
       const calculatedDueDate = await calculateNextDueDate(
         nextDueDate,
         payment_interval,
-        paymentFrequencyType
+        paymentFrequencyType,
       );
       table.push({
         subscription_id: subscriptionId,
@@ -3759,7 +3761,7 @@ let helpers = {
       });
       nextDueDate = moment(calculatedDueDate).add(
         payment_interval * payment_interval_counter,
-        paymentFrequencyType
+        paymentFrequencyType,
       );
       payment_interval_counter++;
     }
@@ -3777,7 +3779,7 @@ let helpers = {
     initial_payment_amount,
     final_payment_amount,
     plan_billing_amount,
-    plan_id
+    plan_id,
   ) => {
     const table = [];
     const subscriptionId = subscription_id;
@@ -3801,7 +3803,7 @@ let helpers = {
       const calculatedDueDate = await calculateNextDueDate(
         nextDueDate,
         payment_interval,
-        paymentFrequencyType
+        paymentFrequencyType,
       );
       table.push({
         subscription_id: subscriptionId,
@@ -3812,7 +3814,7 @@ let helpers = {
       });
       nextDueDate = moment(calculatedDueDate).add(
         payment_interval * payment_interval_counter,
-        paymentFrequencyType
+        paymentFrequencyType,
       );
       payment_interval_counter++;
     }
@@ -3820,7 +3822,7 @@ let helpers = {
     const calculatedDueDate = await calculateNextDueDate(
       nextDueDate,
       payment_interval,
-      paymentFrequencyType
+      paymentFrequencyType,
     );
     table.push({
       subscription_id: subscriptionId,
@@ -3922,7 +3924,7 @@ let helpers = {
           config.table_prefix +
           "subscription_recurring" +
           " where " +
-          condition
+          condition,
       );
     } catch (error) {
       console.error("Database query failed:", error);
@@ -3946,7 +3948,7 @@ let helpers = {
           config.table_prefix +
           "subscription_recurring" +
           " where " +
-          condition
+          condition,
       );
     } catch (error) {
       console.error("Database query failed:", error);
@@ -3967,7 +3969,7 @@ let helpers = {
           "subscription_recurring" +
           " where is_paid=0  and subscription_id IN (" +
           condition_obj +
-          ")"
+          ")",
       );
     } catch (error) {
       console.error("Database query failed:", error);
@@ -3992,7 +3994,7 @@ let helpers = {
           " where " +
           condition +
           "order by id " +
-          order
+          order,
       );
     } catch (error) {
       console.error("Database query failed:", error);
@@ -4015,7 +4017,7 @@ let helpers = {
           condition +
           "order by id " +
           order +
-          " LIMIT 1"
+          " LIMIT 1",
       );
     } catch (error) {
       console.error("Database query failed:", error);
@@ -4037,7 +4039,7 @@ let helpers = {
           "subscription_recurring" +
           " where " +
           condition +
-          " and ( is_paid=1 or is_failed=1 ) order by id desc limit 1"
+          " and ( is_paid=1 or is_failed=1 ) order by id desc limit 1",
       );
     } catch (error) {
       console.error("Database query failed:", error);
@@ -4060,7 +4062,7 @@ let helpers = {
           "subscription_recurring" +
           " where " +
           condition +
-          "order by id desc"
+          "order by id desc",
       );
     } catch (error) {
       console.error("Database query failed:", error);
@@ -4226,7 +4228,7 @@ let helpers = {
     if (currency) {
       const currencyArray = currency.split(",");
       const currencyConditions = currencyArray.map(
-        (currency) => `currency LIKE '%${currency}%'`
+        (currency) => `currency LIKE '%${currency}%'`,
       );
       const currencyQuery = currencyConditions.join(" OR ");
       like_str = ` ${currencyQuery} `;
@@ -4267,7 +4269,7 @@ let helpers = {
       }
       let array_mcc = mcc_code_array.join(",");
       const currencyConditions = mcc_code_array.map(
-        (array_mcc) => ` mcc_category LIKE '%${array_mcc}%'`
+        (array_mcc) => ` mcc_category LIKE '%${array_mcc}%'`,
       );
       const currencyQuery = currencyConditions.join(" OR ");
       like_str = ` and ( ${currencyQuery} )`;
@@ -4301,7 +4303,7 @@ let helpers = {
     req,
     currency = null,
     mcc = null,
-    table
+    table,
   ) => {
     let { psp, country } = req.body.master_data;
     psp = enc_dec.cjs_decrypt(psp);
@@ -4357,7 +4359,7 @@ let helpers = {
     if (currency) {
       const currencyArray = currency.split(",");
       const currencyConditions = currencyArray.map(
-        (currency) => `currency LIKE '%${currency}%'`
+        (currency) => `currency LIKE '%${currency}%'`,
       );
       const currencyQuery = currencyConditions.join(" OR ");
       like_str = `AND (${currencyQuery})`;
@@ -4390,16 +4392,15 @@ let helpers = {
     if (currency) {
       const currencyArray = currency.split(",");
       const currencyConditions = currencyArray.map(
-        (currency) => `currency LIKE '%${currency}%'`
+        (currency) => `currency LIKE '%${currency}%'`,
       );
       const currencyQuery = currencyConditions.join(" OR ");
       like_str = `AND (${currencyQuery})`;
     }
 
     if (Object.keys(condition).length) {
-      let data_condition_str = await helpers.get_and_conditional_string(
-        condition
-      );
+      let data_condition_str =
+        await helpers.get_and_conditional_string(condition);
       if (final_cond == " where ") {
         final_cond = final_cond + data_condition_str;
       } else {
@@ -4435,9 +4436,8 @@ let helpers = {
     let like_str = "";
 
     if (Object.keys(condition).length) {
-      let data_condition_str = await helpers.get_and_conditional_string(
-        condition
-      );
+      let data_condition_str =
+        await helpers.get_and_conditional_string(condition);
       if (final_cond == " where ") {
         final_cond = final_cond + data_condition_str;
       } else {
@@ -4584,7 +4584,8 @@ let helpers = {
                     OT.psp_code,
                     OT.last_psp_txn_id,
                     OT.last_psp_ref_id,
-                    OT.last_txn_id
+                    OT.last_txn_id,
+                    OT.txn_id
                     FROM
                     (
                         SELECT
@@ -4603,12 +4604,12 @@ let helpers = {
                         order_id,paydart_category,psp_code,
                         order_reference_id AS last_psp_txn_id,
                         payment_id AS last_psp_ref_id,
-                        txn AS last_txn_id
+                        txn AS last_txn_id,txn as txn_id
                         FROM
                         pg_test_order_txn
                         WHERE
                         order_id = ${order_id} and status!='AWAIT_3DS'
-                        order by id asc limit 1
+                        order by id desc limit 1
                     ) AS OT
                     ON
                     ORR.order_id = OT.order_id;`;
@@ -4619,7 +4620,8 @@ let helpers = {
                      OT.paydart_category,
                     OT.psp_code,
                     OT.last_psp_txn_id,
-                    OT.last_psp_ref_id
+                    OT.last_psp_ref_id,
+                     OT.txn_id
                     FROM
                     (
                         SELECT
@@ -4637,7 +4639,7 @@ let helpers = {
                         SELECT
                          order_id,paydart_category,psp_code,
                          order_reference_id AS last_psp_txn_id,
-                         payment_id AS last_psp_ref_id
+                         payment_id AS last_psp_ref_id,txn as txn_id
                         FROM
                         pg_order_txn
                         WHERE
@@ -5332,23 +5334,23 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
   calculateDate: async (
     nextDueDate,
     payment_interval,
-    paymentFrequencyType
+    paymentFrequencyType,
   ) => {
     return await calculateNextDueDate(
       nextDueDate,
       payment_interval,
-      paymentFrequencyType
+      paymentFrequencyType,
     );
   },
   calculatePreDate: async (
     nextDueDate,
     payment_interval,
-    paymentFrequencyType
+    paymentFrequencyType,
   ) => {
     return await calculatePreviousDueDate(
       nextDueDate,
       payment_interval,
-      paymentFrequencyType
+      paymentFrequencyType,
     );
   },
   getCurrency: async (key, value) => {
@@ -5364,7 +5366,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
     }
 
     let sql = `SELECT GROUP_CONCAT(code SEPARATOR "','") AS currency_str FROM pg_master_currency WHERE id in (${currency_ids.join(
-      ","
+      ",",
     )})`;
 
     let qb = await pool.get_connection();
@@ -5397,7 +5399,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
     }
 
     let sql = `SELECT count(id) as total FROM pg_inv_customer WHERE submerchant_id=${submerchant_id} and deleted=0 and status=0  and id in (${cust_ids.join(
-      ","
+      ",",
     )})`;
 
     let qb = await pool.get_connection();
@@ -5430,7 +5432,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
     }
 
     let sql = `SELECT count(id) as total FROM pg_mid WHERE  submerchant_id=${submerchant_id} and deleted=0 and status=0 and env="${mode}" and currency_id IN (${curr_ids.join(
-      ","
+      ",",
     )})`;
     let qb = await pool.get_connection();
     let response;
@@ -5471,7 +5473,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
     }
 
     let sql = `SELECT count(id) as total FROM pg_master_items WHERE submerchant_id=${submerchant_id} and is_deleted=0 and status=0 and id IN (${cust_ids.join(
-      ","
+      ",",
     )})`;
 
     let qb = await pool.get_connection();
@@ -5525,7 +5527,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
     }
 
     let sql = `SELECT GROUP_CONCAT(UPPER(credentials_key) SEPARATOR "','") AS currency_str FROM pg_psp WHERE id in (${ids.join(
-      ","
+      ",",
     )})`;
 
     let qb = await pool.get_connection();
@@ -5559,7 +5561,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
     }
 
     let sql = `SELECT GROUP_CONCAT(UPPER(payment_mode) SEPARATOR "','") AS _str FROM pg_payment_mode WHERE id in (${ids.join(
-      ","
+      ",",
     )})`;
 
     let qb = await pool.get_connection();
@@ -5596,7 +5598,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
     }
 
     let sql = `SELECT GROUP_CONCAT(UPPER(card_scheme) SEPARATOR "','") AS _str FROM pg_card_scheme WHERE id in (${ids.join(
-      ","
+      ",",
     )})`;
     let qb = await pool.get_connection();
     let response;
@@ -5776,7 +5778,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
           table_name +
           " where iso2 = '" +
           code +
-          "' order by id asc limit 1"
+          "' order by id asc limit 1",
       );
     } catch (error) {
       console.error("Database query failed:", error);
@@ -5933,26 +5935,24 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
     return query;
   },
   addTransactionFailedLogs: async (data) => {
-    let query = await helpers.buildInsertQuery(
-      config.table_prefix + "order_life_cycle_logs",
+    const qb = await pool.get_connection();
+  try {
+    return await qb.insert(config.table_prefix + 'order_life_cycle_logs', data);
+  } catch (error) {
+    logger.error('DB_INSERT_ERROR', {
+      table,
+      error: error.message,
       data
-    );
-    let qb = await pool.get_connection();
-    let response;
-    try {
-      response = await qb.query(query);
-    } catch (error) {
-      console.error("Database query failed:", error);
-      logger.error(500, { message: error, stack: error?.stack });
-    } finally {
-      qb.release();
-    }
-    return response;
+    });
+    throw error;
+  } finally {
+    qb.release();
+  }
   },
   addTempCard: async (data) => {
     let query = await helpers.buildInsertQuery(
       config.table_prefix + "temp_cards",
-      data
+      data,
     );
     let qb = await pool.get_connection();
     let response;
@@ -5992,7 +5992,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
     try {
       response = await qb
         .select(
-          "card_proxy,card,cipher_id,card_holder_name,expiry,status_code,3ds_version"
+          "card_proxy,card,cipher_id,card_holder_name,expiry,status_code,3ds_version",
         )
         .from(config.table_prefix + "order_life_cycle_logs")
         .where(condition)
@@ -6502,7 +6502,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
     currency,
     transaction_type,
     page = 1,
-    per_page = 100
+    per_page = 100,
   ) => {
     const params = new URLSearchParams();
 
@@ -6553,7 +6553,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         .join(
           config.table_prefix + "master_merchant mm",
           "mid.submerchant_id=mm.id",
-          "inner"
+          "inner",
         )
         .where({ "mm.super_merchant_id": user_details.id, "mid.env": "live" })
         .get();
@@ -7002,7 +7002,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
     ];
     const normalizedName = name.trim().toLowerCase();
     const mnoItem = ghanaMNOCodes.find(
-      (item) => item.name.toLowerCase() === normalizedName
+      (item) => item.name.toLowerCase() === normalizedName,
     );
     return mnoItem ? mnoItem.code : null;
   },
@@ -7034,10 +7034,10 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
     let response;
     try {
       response = await qb.query(
-        `SELECT id FROM pg_master_super_merchant WHERE id=${super_merchant_id} AND FIND_IN_SET('${store_id}', stores) > 0`
+        `SELECT id FROM pg_master_super_merchant WHERE id=${super_merchant_id} AND FIND_IN_SET('${store_id}', stores) > 0`,
       );
       console.log(
-        `SELECT id FROM pg_master_super_merchant WHERE id=${super_merchant_id} AND FIND_IN_SET('${store_id}', stores) > 0`
+        `SELECT id FROM pg_master_super_merchant WHERE id=${super_merchant_id} AND FIND_IN_SET('${store_id}', stores) > 0`,
       );
     } catch (error) {
       console.error("Database query failed:", error);
@@ -7056,7 +7056,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
     let response;
     try {
       response = await qb.query(
-        `SELECT allow_mid FROM pg_master_super_merchant WHERE id=${super_merchant_id}`
+        `SELECT allow_mid FROM pg_master_super_merchant WHERE id=${super_merchant_id}`,
       );
     } catch (error) {
       console.error("Database query failed:", error);
@@ -7119,7 +7119,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
     content,
     template,
     staticVars = {},
-    dynamicVars = {}
+    dynamicVars = {},
   ) => {
     if (typeof content !== "string") return content;
 
@@ -7129,7 +7129,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
         allowedDynamicVars = template.dynamic_vars;
       } else if (typeof template?.dynamic_vars === "string") {
         allowedDynamicVars = JSON.parse(
-          template.dynamic_vars.replace(/[“”]/g, '"').replace(/[‘’]/g, "'")
+          template.dynamic_vars.replace(/[“”]/g, '"').replace(/[‘’]/g, "'"),
         );
       }
     } catch (err) {
@@ -7139,12 +7139,11 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
 
     let themeVars = {};
     try {
-
       if (settingModel?.selectOneByTableAndCondition) {
         const cssSetup = await settingModel.selectOneByTableAndCondition(
           "*",
           { id: 1 },
-          "css_setup"
+          "css_setup",
         );
 
         themeVars = {
@@ -7189,7 +7188,7 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
     let response;
     try {
       response = await qb.query(
-        `SELECT allow_statement_descriptor FROM pg_master_merchant WHERE id=${merchant_id}`
+        `SELECT allow_statement_descriptor FROM pg_master_merchant WHERE id=${merchant_id}`,
       );
     } catch (error) {
       console.error("Database query failed:", error);
@@ -7202,6 +7201,65 @@ WHERE CONCAT(SUBSTRING(o.expiry, 1, 4), '-', SUBSTRING(o.expiry, 6, 2))
     } else {
       return 1;
     }
+  },
+  safeBody: (req, key, def = "") => {
+    return req?.body && typeof req.body[key] !== "undefined"
+      ? req.body[key]
+      : def;
+  },
+  body: (req, key, def = "") => {
+    return req?.body && req.body[key] !== undefined ? req.body[key] : def;
+  },
+  toBoolean: (val) => {
+    return val === true || val === 1 || val === "1" || val === "true";
+  },
+
+  getClientIp: (req) => {
+    return (
+      req?.ip ||
+      req?.get?.("x-forwarded-for") ||
+      req?.socket?.remoteAddress ||
+      "unknown"
+    );
+  },
+  buildNewRes: ({
+    order_details,
+    transaction_id,
+    final_response,
+    statusObj,
+  }) => {
+    return {
+      m_order_id: order_details?.m_order_id || "",
+      p_order_id: order_details?.order_id || "",
+      p_request_id: "",
+      psp_ref_id: final_response?.data?.financialTransactionId || "",
+      psp_txn_id: "",
+      transaction_id: transaction_id?.toString() || "",
+      status: statusObj.status,
+      status_code: statusObj.status_code,
+      remark: statusObj.remark || "",
+      paydart_category: statusObj.status,
+      currency: order_details?.currency,
+      return_url: process.env.PAYMENT_URL + "/status",
+      transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+      amount: order_details?.amount?.toFixed(2) || "",
+      m_customer_id: order_details?.merchant_customer_id || "",
+      psp: order_details?.psp || "",
+      payment_method: order_details?.payment_mode || "",
+      m_payment_token: order_details?.m_payment_token || "",
+      mobile_no: final_response?.data?.payer?.partyId || "",
+      payment_method_data: {
+        scheme: "",
+        card_country: "",
+        card_type: "Mobile Wallet",
+        mask_card_number: "NA",
+      },
+      apm_name: "",
+      apm_identifier: "",
+      sub_merchant_identifier: order_details?.merchant_id
+        ? helpers.formatNumber(order_details.merchant_id)
+        : "",
+    };
   },
 };
 

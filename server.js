@@ -107,9 +107,9 @@ process.on('unhandledRejection', (reason, promise) => {
     });
     
     // Optionally exit the process
-    // server.close(() => {
-    //     process.exit(1);
-    // });
+    server.close(() => {
+        process.exit(1);
+    });
 });
 
 // Handle uncaught exceptions

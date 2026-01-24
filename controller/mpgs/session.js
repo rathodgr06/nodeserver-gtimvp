@@ -113,7 +113,7 @@ const createSession = async (req, res) => {
     order_table
   );
   const mid_details = await merchantOrderModel.selectOne(
-    "MID,password,psp_id,is3DS,autoCaptureWithinTime,allowVoid,voidWithinTime",
+    "MID,password,psp_id,is3DS,autoCaptureWithinTime,allowVoid,voidWithinTime,statementDescriptor",
     {
       terminal_id: order_details.terminal_id,
     },
@@ -276,6 +276,8 @@ const createSession = async (req, res) => {
         amount: order_details.amount,
         currency: order_details.currency,
         id: order_id,
+        reference: "PAYDART-001",
+        statementDescriptor: {},
       },
       authentication: {
         channel: "PAYER_BROWSER",
@@ -284,10 +286,37 @@ const createSession = async (req, res) => {
           "/status-mpgs/" +
           mode +
           "?page_language=" +
-          page_language,
-      },
+          page_language
+      }
     };
-    
+     let checkIfAllowDescriptor = await helpers.checkAllowDescriptorOnMerchant(
+       order_details?.merchant_id,
+     );
+     if (checkIfAllowDescriptor == 0) {
+       console.log(`type of order_details.description`);
+       console.log(order_details.description);
+       if (
+         typeof order_details?.description === "string" &&
+         order_details.description.trim() !== "" &&
+         order_details.description !== "NULL"
+       ) {
+         payload.order.statementDescriptor.name = helpers.sanitizeDescriptor(
+           order_details.description,
+         );
+       }
+     }
+     if (
+       checkIfAllowDescriptor == 1 &&
+       typeof mid_details?.statementDescriptor === "string" &&
+       mid_details.statementDescriptor.trim() !== "" &&
+       mid_details.statementDescriptor !== "NULL"
+     ) {
+       console.log(`this is statement descriptor`);
+       console.log(mid_details.statementDescriptor);
+       payload.order.statementDescriptor.name = helpers.sanitizeDescriptor(
+         mid_details.statementDescriptor,
+       );
+     }
     if (order_details.origin == "SUBSCRIPTION") {
       console.log(`inside if condition of`);
       console.log(order_details);
@@ -367,7 +396,7 @@ const createSession = async (req, res) => {
     });
   } catch (error) {
     console.log(`the error`)
-    console.log(error?.response?.data?.error);
+    console.log( error?.response?.data?.error);
      logger.error(500,{message: error,stack: error.stack}); 
     let invalidMid = false;
     if (error?.response?.status == "401") {

@@ -2580,7 +2580,7 @@ async function transformTransaction(val, params, table_name) {
       p_order_id: val?.order_id || "",
       p_request_id: trans_data[0]?.last_request_id || "",
       psp_ref_id: trans_data[0]?.last_psp_txn_id || "",
-      transaction_id: val?.payment_id || "",
+      transaction_id: trans_data[0]?.txn_id || "",
       psp_txn_id: trans_data[0]?.last_psp_ref_id || "",
       transaction_date: val?.updated_at ? moment(val.updated_at).format("DD-MM-YYYY HH:mm:ss") : "",
       transaction_status: val?.status || "",

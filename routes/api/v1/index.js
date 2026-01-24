@@ -211,6 +211,8 @@ const Banner = require("../../../controller/banner.js");
 const MailTemplate = require("../../../controller/mail_template.js");
 const apiDocument = require("../../../controller/apidocumentController.js");
 const uploadApiDoc = require("../../../uploads/uploadApiDoc.js");
+const ValidateMerchant = require("../../../utilities/tokenmanager/ValidateMerchant.js");
+const logger = require("../../../config/logger.js");
 
 
 app.post("/login", CheckHeader, Validator.login, Auth.login);
@@ -4883,6 +4885,12 @@ app.post("/status-mpgs", function (req, res, next) {
   req.body.is_s2s = true;
   next();
 }, s2s_3ds);
+app.get("/status-mpgs", function (req, res, next) {
+  req.body.order_id = req.query.order_id;
+  req.body.mode = req.query.mode;
+  req.body.is_s2s = true;
+  next();
+}, s2s_3ds);
 app.post("/enc-dec", function (req, res) {
   let text = req.bodyString("string");
   let decoded = encrypt_decrypt('decrypt', text);
@@ -5031,9 +5039,7 @@ app.post(
   CheckToken,
   Setting.dccUpdate
 );
-// app.get('/roll-out-wallet',walletRollout);
-const { seedWallets } = require('../../../scripts/seed-wallets.js');
-const ValidateMerchant = require("../../../utilities/tokenmanager/ValidateMerchant.js");
+
 app.post('/admin/seed-wallets', async (req, res) => {
   try {
     const result = await seedWallets();
@@ -5090,6 +5096,14 @@ app.post("/store/list",CheckHeader,CheckMerchantToken,submerchant.storeList);
 app.post("/submerchant/list-export",CheckHeader,CheckMerchantToken,submerchant.listExport);
 
 app.post("/master-merchant/allow-descriptor",CheckHeader,CheckMerchantToken,MerchantEkyc.allow_descriptor);
-
+// Ignore browser icon requests
+app.get([
+  '/favicon.ico',
+  '/apple-touch-icon.png',
+  '/apple-touch-icon-precompressed.png'
+], (req, res) => res.status(204).end());
+app.post('/mobile-payment/update-status',function(req,res){
+  logger.info(req.body);
+})
   
 module.exports = app;

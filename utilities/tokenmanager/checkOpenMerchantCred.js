@@ -63,7 +63,6 @@ module.exports = async (req, res, next) => {
         //console.log(response[0]?.type == "live" || response[0]?.type == "test")
         if (response[0]?.type == "live" || response[0]?.type == "test") {
             req.credentials = merchant_details;
-            console.log(`going next`);
             next();
         } else {
             res.status(StatusCode.unauthorized).send(

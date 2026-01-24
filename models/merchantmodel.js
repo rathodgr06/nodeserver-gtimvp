@@ -14,6 +14,7 @@ const merchant_key_and_secret =
 const helpers = require("../utilities/helper/general_helper");
 const date_formatter = require("../utilities/date_formatter/index");
 const { table } = require("console");
+const moment = require("moment");
 var dbModel = {
   add: async (data) => {
     let qb = await pool.get_connection();
@@ -58,7 +59,7 @@ var dbModel = {
               search_text +
               ") LIMIT " +
               limit.perpage +
-              limit.start
+              limit.start,
           );
         } else {
           response = await qb
@@ -83,7 +84,7 @@ var dbModel = {
               condition +
               " and (" +
               search_text +
-              ")"
+              ")",
           );
         } else {
           response = await qb
@@ -176,7 +177,7 @@ var dbModel = {
           merchant_details +
           " m ON s.id=m.merchant_id where " +
           condition +
-          "and m.company_name!=''"
+          "and m.company_name!=''",
       );
     } catch (error) {
       logger.error(500, { message: error, stack: error.stack });
@@ -216,7 +217,10 @@ var dbModel = {
     let qb = await pool.get_connection();
     let response;
     try {
-      response = await qb.select(selection).where(condition).get(super_merchant_table);
+      response = await qb
+        .select(selection)
+        .where(condition)
+        .get(super_merchant_table);
       console.log(qb.last_query());
     } catch (error) {
       console.log(error);
@@ -235,7 +239,7 @@ var dbModel = {
         .select(selection)
         .where(condition)
         .get(super_merchant_table);
-        console.log(qb.last_query());
+      console.log(qb.last_query());
     } catch (error) {
       logger.error(500, { message: error, stack: error.stack });
     } finally {
@@ -332,11 +336,11 @@ var dbModel = {
             condition +
             "and (" +
             search_text +
-            ")"
+            ")",
         );
       } else {
         response = await qb.query(
-          "select count('id') as count from " + dbtable + " where " + condition
+          "select count('id') as count from " + dbtable + " where " + condition,
         );
       }
     } catch (error) {
@@ -357,7 +361,7 @@ var dbModel = {
         "select count('id') as count from " +
           dbtable +
           " where super_merchant != 0 and  " +
-          condition
+          condition,
       );
     } catch (error) {
       logger.error(500, { message: error, stack: error.stack });
@@ -383,7 +387,7 @@ var dbModel = {
         "select count('id') as count from " +
           dbtable +
           " where   " +
-          condition_obj
+          condition_obj,
       );
     } catch (error) {
       logger.error(500, { message: error, stack: error.stack });
@@ -399,13 +403,13 @@ var dbModel = {
     try {
       response = await qb
         .select(
-          "mm.id,mm.super_merchant_id,mm.live,mm.email,md.company_name,mm.mode"
+          "mm.id,mm.super_merchant_id,mm.live,mm.email,md.company_name,mm.mode",
         )
         .from(config.table_prefix + "master_merchant mm")
         .join(
           config.table_prefix + "master_merchant_details md",
           "mm.id=md.merchant_id",
-          "left"
+          "left",
         )
         .where(condition)
         .order_by("mm.id", "asc")
@@ -425,18 +429,18 @@ var dbModel = {
     try {
       response = await qb
         .select(
-          "mm.id,mm.super_merchant_id,md.company_name,mm.email,sm.legal_business_name,sm.legal_business_name,mm.live"
+          "mm.id,mm.super_merchant_id,md.company_name,mm.email,sm.legal_business_name,sm.legal_business_name,mm.live",
         )
         .from(config.table_prefix + "master_merchant mm")
         .join(
           config.table_prefix + "master_merchant_details md",
           "mm.id=md.merchant_id",
-          "left"
+          "left",
         )
         .join(
           config.table_prefix + "master_super_merchant sm",
           "mm.super_merchant_id=sm.id",
-          "left"
+          "left",
         )
         .where(condition)
         .order_by("md.company_name", "asc")
@@ -599,7 +603,7 @@ var dbModel = {
           condition +
           " and end_time >='" +
           date +
-          "'"
+          "'",
       );
     } catch (error) {
       logger.error(500, { message: error, stack: error.stack });
@@ -620,7 +624,7 @@ var dbModel = {
           meeting_table +
           " where " +
           condition +
-          " and status=0  and deleted=0"
+          " and status=0  and deleted=0",
       );
     } catch (error) {
       logger.error(500, { message: error, stack: error.stack });
@@ -640,7 +644,6 @@ var dbModel = {
         .order_by("id", "asc")
         .limit(1)
         .get();
-      console.log(qb.last_query());
     } catch (error) {
       logger.error(500, { message: error, stack: error.stack });
     } finally {
@@ -649,33 +652,75 @@ var dbModel = {
     return response?.[0];
   },
   inheritPaymentMethod: async (primary_submerchant_id, new_sub_merchant_id) => {
-    let qb = await pool.get_connection();
-    let response;
+    const qb = await pool.get_connection();
     try {
-      let query = `INSERT INTO pg_merchant_payment_methods(sub_merchant_id, methods, others, sequence, is_visible, mode, created_at) SELECT ${new_sub_merchant_id}, methods, others, sequence, is_visible, mode, NOW() FROM pg_merchant_payment_methods FORCE INDEX(idx_sub_merchant_id) WHERE sub_merchant_id = ${primary_submerchant_id} LOCK IN SHARE MODE`;
-      response = await qb.query(query);
+      // 1️⃣ Read methods
+      const rows = await qb
+        .select("methods", "others", "sequence", "is_visible", "mode")
+        .where({ sub_merchant_id: primary_submerchant_id })
+        .get("pg_merchant_payment_methods");
+
+      if (!rows || rows.length === 0) {
+        return null;
+      }
+
+      // 2️⃣ Insert cloned rows
+      for (const row of rows) {
+        await qb.insert("pg_merchant_payment_methods", {
+          sub_merchant_id: new_sub_merchant_id,
+          methods: row.methods,
+          others: row.others,
+          sequence: row.sequence,
+          is_visible: row.is_visible,
+          mode: row.mode,
+          created_at: moment().format('YYYY-MM-DD HH:mm:ss')
+        });
+      }
+
+      return true;
     } catch (error) {
-      logger.error(500, { message: error, stack: error.stack });
+      logger.error(500, { message: error.message, stack: error.stack });
+      throw error;
     } finally {
       qb.release();
     }
-    return response;
   },
   inheritPaymentMethodDraft: async (
     primary_submerchant_id,
-    new_sub_merchant_id
+    new_sub_merchant_id,
   ) => {
-    let qb = await pool.get_connection();
-    let response;
+    const qb = await pool.get_connection();
     try {
-      let query = `INSERT INTO pg_merchant_draft_payment_methods(submerchant_id, methods, others, sequence, is_visible, mode, created_at) SELECT ${new_sub_merchant_id}, methods, others, sequence, is_visible, mode, NOW() FROM pg_merchant_draft_payment_methods FORCE INDEX(idx_submerchant_id) WHERE submerchant_id = ${primary_submerchant_id} LOCK IN SHARE MODE`;
-      response = await qb.query(query);
+      // 1️⃣ Read draft payment methods
+      const rows = await qb
+        .select("methods", "others", "sequence", "is_visible", "mode")
+        .where({ submerchant_id: primary_submerchant_id })
+        .get("pg_merchant_draft_payment_methods");
+
+      if (!rows || rows.length === 0) {
+        return null;
+      }
+
+      // 2️⃣ Insert cloned drafts
+      for (const row of rows) {
+        await qb.insert("pg_merchant_draft_payment_methods", {
+          submerchant_id: new_sub_merchant_id,
+          methods: row.methods,
+          others: row.others,
+          sequence: row.sequence,
+          is_visible: row.is_visible,
+          mode: row.mode,
+          created_at: moment().format('YYYY-MM-DD HH:mm:ss'),
+        });
+      }
+
+      return true;
     } catch (error) {
-      logger.error(500, { message: error, stack: error.stack });
+      logger.error(500, { message: error.message, stack: error.stack });
+      throw error;
     } finally {
       qb.release();
     }
-    return response;
   },
   selectMid: async (condition) => {
     let qb = await pool.get_connection();
@@ -683,7 +728,7 @@ var dbModel = {
     try {
       response = await qb
         .select(
-          "mid.id as mid_id,mid.psp_id,mid.MID as mid, mid.password,mid.currency_id,mid.country_id,mid.country_name,mid.mode,mid.env,psp.name as psp_name"
+          "mid.id as mid_id,mid.psp_id,mid.MID as mid, mid.password,mid.currency_id,mid.country_id,mid.country_name,mid.mode,mid.env,psp.name as psp_name",
         )
         .where(condition)
         .from(config.table_prefix + "mid mid")
@@ -702,7 +747,7 @@ var dbModel = {
     let response;
     try {
       response = await qb.query(
-        `INSERT INTO pg_mid (submerchant_id,terminal_id,psp_id,cards,MID,password,currency_id,supported_currency,payment_methods,payment_schemes,transaction_allowed_daily,status,deleted,added_at,country_id,country_name,statementDescriptor,shortenedDescriptor,is3DS,allowRefunds,allowVoid,domestic,international,voidWithinTime,autoCaptureWithinTime,minTxnAmount,maxTxnAmount,failure_url,cancel_url,success_url,mode,env,class,label,v2_telr_key,priority,is_inherited,primary_key) SELECT ${submerchant_id},${terminal_id},psp_id,cards,MID,password,currency_id,supported_currency,payment_methods,payment_schemes,transaction_allowed_daily,status,deleted,added_at,country_id,country_name,statementDescriptor,shortenedDescriptor,is3DS,allowRefunds,allowVoid,domestic,international,voidWithinTime,autoCaptureWithinTime,minTxnAmount,maxTxnAmount,failure_url,cancel_url,success_url,mode,env,class,label,v2_telr_key,priority,${true},primary_key FROM pg_mid WHERE id=${mid_id}`
+        `INSERT INTO pg_mid (submerchant_id,terminal_id,psp_id,cards,MID,password,currency_id,supported_currency,payment_methods,payment_schemes,transaction_allowed_daily,status,deleted,added_at,country_id,country_name,statementDescriptor,shortenedDescriptor,is3DS,allowRefunds,allowVoid,domestic,international,voidWithinTime,autoCaptureWithinTime,minTxnAmount,maxTxnAmount,failure_url,cancel_url,success_url,mode,env,class,label,v2_telr_key,priority,is_inherited,primary_key) SELECT ${submerchant_id},${terminal_id},psp_id,cards,MID,password,currency_id,supported_currency,payment_methods,payment_schemes,transaction_allowed_daily,status,deleted,added_at,country_id,country_name,statementDescriptor,shortenedDescriptor,is3DS,allowRefunds,allowVoid,domestic,international,voidWithinTime,autoCaptureWithinTime,minTxnAmount,maxTxnAmount,failure_url,cancel_url,success_url,mode,env,class,label,v2_telr_key,priority,${true},primary_key FROM pg_mid WHERE id=${mid_id}`,
       );
       console.log(`response of inherit mid`);
       console.log(response);
@@ -724,7 +769,7 @@ var dbModel = {
         .order_by("id", "asc")
         .get();
       console.log(
-        `selecting merchant which are onboarded through API And mid inherit`
+        `selecting merchant which are onboarded through API And mid inherit`,
       );
       console.log(qb.last_query());
     } catch (error) {
@@ -784,7 +829,7 @@ var dbModel = {
     try {
       response = await qb.insert(
         config.table_prefix + "merchants_ip_whitelist",
-        data
+        data,
       );
     } catch (error) {
       logger.error(500, { message: error, stack: error.stack });
@@ -824,7 +869,7 @@ var dbModel = {
     return response;
   },
   dropdownselect: async (condition_obj, filter, pagination) => {
-    console.log("🚀 ~ pagination:", pagination)
+    console.log("🚀 ~ pagination:", pagination);
     // console.log("🚀 ~ condition_obj:", condition_obj);
 
     // Build LIKE search condition
@@ -860,7 +905,6 @@ var dbModel = {
     let response;
 
     try {
-
       let stringQuery = `SELECT ${select}
         FROM ${dbtable} s
         INNER JOIN ${merchant_details} m 
@@ -868,10 +912,9 @@ var dbModel = {
         WHERE ${where_clause}
         ORDER BY s.id DESC
         LIMIT ${pagination?.offset}, ${pagination?.limit}`;
-        console.log("🚀 ~ stringQuery:", stringQuery)
-        
+      console.log("🚀 ~ stringQuery:", stringQuery);
+
       response = await qb.query(stringQuery);
-      
     } catch (error) {
       console.log("🚀 ~ error:", error);
       logger.error(500, { message: error, stack: error.stack });
@@ -933,7 +976,7 @@ var dbModel = {
         GROUP BY s.id
         HAVING mid_count > 0
         ORDER BY s.id DESC
-        LIMIT ${offset}, ${limit}`
+        LIMIT ${offset}, ${limit}`,
       );
       console.log("🚀 ~ query:", qb.last_query());
     } catch (error) {
@@ -980,7 +1023,7 @@ var dbModel = {
         FROM ${dbtable} s
         INNER JOIN ${merchant_details} m 
                 ON s.id = m.merchant_id
-        WHERE ${where_clause}`
+        WHERE ${where_clause}`,
       );
 
       console.log("🚀 COUNT QUERY:", qb.last_query());
@@ -1038,7 +1081,7 @@ var dbModel = {
          WHERE ${where_clause}
          GROUP BY s.id
          HAVING COUNT(mid.id) > 0
-       ) AS x`
+       ) AS x`,
       );
 
       total = rows[0]?.total || 0;
@@ -1053,20 +1096,80 @@ var dbModel = {
 
     return total;
   },
-    selectOneSubMerchant: async (selection, condition) => {
+  selectOneSubMerchant: async (selection, condition) => {
     let qb = await pool.get_connection();
     let response;
     try {
       response = await qb
         .select(selection)
         .where(condition)
-        .get(config.table_prefix+"master_merchant");
+        .get(config.table_prefix + "master_merchant");
     } catch (error) {
       logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
     return response?.[0];
+  },
+  deleteMerchant: async (condition) => {
+    let qb = await pool.get_connection();
+    let response;
+    try {
+      response = await qb
+        .from(config.table_prefix + "master_merchant")
+        .where(condition)
+        .delete();
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+    } finally {
+      qb.release();
+    }
+    return response;
+  },
+  deleteMerchantDetails: async (condition) => {
+    let qb = await pool.get_connection();
+    let response;
+    try {
+      response = await qb
+        .from(config.table_prefix + "master_merchant_details")
+        .where(condition)
+        .delete();
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+    } finally {
+      qb.release();
+    }
+    return response;
+  },
+  deleteKeys: async (condition) => {
+    let qb = await pool.get_connection();
+    let response;
+    try {
+      response = await qb
+        .from(config.table_prefix + "master_merchant_key_and_secret")
+        .where(condition)
+        .delete();
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+    } finally {
+      qb.release();
+    }
+    return response;
+  },
+  deleteWebhook: async (condition) => {
+    let qb = await pool.get_connection();
+    let response;
+    try {
+      response = await qb
+        .from(config.table_prefix + "webhook_settings")
+        .where(condition)
+        .delete();
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
+    } finally {
+      qb.release();
+    }
+    return response;
   },
 };
 module.exports = dbModel;

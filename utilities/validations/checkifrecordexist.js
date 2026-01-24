@@ -13,6 +13,7 @@ module.exports = async (conditions, table_name) => {
             .select("*")
             .where(conditions)
             .get(config.table_prefix + table_name);
+            console.log(qb.last_query());
     } catch (error) {
         console.error('Database query failed:', error);
         logger.error(500,{message: error,stack: error?.stack});

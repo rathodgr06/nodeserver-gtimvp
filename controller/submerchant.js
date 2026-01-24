@@ -450,7 +450,6 @@ var all_data = {
   /* Optimise list function is below */
   list: async (req, res) => {
     try {
-      
       // 1. Extract and validate pagination parameters
       const { perpage, page } = extractPaginationParams(req);
       const limit = calculatePagination(perpage, page);
@@ -3262,7 +3261,11 @@ var all_data = {
       let submerchant_id = enc_dec.cjs_decrypt(
         req.bodyString("submerchant_id")
       );
-
+      if (!submerchant_id) {
+        return res
+          .status(statusCode.badRequest)
+          .send(response.errormsg("Invalid submerchant_id"));
+      }
       let env = req.body.env;
 
       const condition = {
@@ -3309,7 +3312,7 @@ var all_data = {
       let resp = {
         submerchant_id: enc_dec.cjs_encrypt(req.bodyString("submerchant_id")),
 
-        merchant_name: await helpers.get_merchantdetails_name_by_id(
+         merchant_name: await helpers.get_merchantdetails_name_by_id(
           submerchant_id
         ),
 
@@ -3364,7 +3367,7 @@ var all_data = {
       }
       send_res = resp;
 
-      res
+     return res
 
         .status(statusCode.ok)
 
@@ -3373,7 +3376,7 @@ var all_data = {
         );
     } catch (error) {
       logger.error(500, { message: error, stack: error.stack });
-      res
+     return res
 
         .status(statusCode.ok)
 

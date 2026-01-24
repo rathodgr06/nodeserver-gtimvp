@@ -3062,7 +3062,7 @@ var MerchantOrder = {
     let merchant_id = merchant.merchant_id;
     let table_name = "master_merchant";
     let selection =
-      "theme,icon,logo, use_logo,we_accept_image, brand_color, accent_color,branding_language,font_name";
+      "id,theme,icon,logo, use_logo,we_accept_image, brand_color, accent_color,branding_language,font_name";
     merchantOrderModel
       .selectOne(
         selection,
@@ -3117,6 +3117,7 @@ var MerchantOrder = {
         result.register_business_country = pspCountry
           ? enc_dec.cjs_encrypt(pspCountry)
           : "";
+        result.submerchant_id = enc_dec.cjs_encrypt(result.id)  
         data.merchant_details = result;
         data.availableMobileWallet = availableMobileWallet;
 
@@ -3170,11 +3171,11 @@ var MerchantOrder = {
             // result_1.env = req.order.env;
             data.order_details = result_1;
 
-            const query = `SELECT created_at FROM pg_test_orders WHERE order_id = '${result_1?.order_id}' and created_at > NOW() - INTERVAL 20 MINUTE;`;
-            console.log("🚀 ~ .then ~ query:", query);
-            const checktime20min = await merchantOrderModel.order_query(query);
-            data.order_details["is20minExceed"] =
-              checktime20min.length === 0 ? 1 : 0;
+            // const query = `SELECT created_at FROM pg_test_orders WHERE order_id = '${result_1?.order_id}' and created_at > NOW() - INTERVAL 20 MINUTE;`;
+            // console.log("🚀 ~ .then ~ query:", query);
+            // const checktime20min = await merchantOrderModel.order_query(query);
+            // data.order_details["is20minExceed"] =
+            //   checktime20min.length === 0 ? 1 : 0;
 
             let card_details = {
               card_expiry: "",
@@ -4158,7 +4159,7 @@ var MerchantOrder = {
             m_payment_token: res_order_data?.card_id
               ? res_order_data?.card_id
               : "",
-            transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+            transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
             return_url: res_order_data.failure_url,
             payment_method_data: {
               scheme: res_order_data?.scheme ? res_order_data?.scheme : "",
@@ -4529,7 +4530,7 @@ var MerchantOrder = {
               m_payment_token: res_order_data?.card_id
                 ? res_order_data?.card_id
                 : "",
-              transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+              transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
               return_url:
                 ni_order_sale.state === "FAILED"
                   ? res_order_data.failure_url
@@ -4944,7 +4945,7 @@ var MerchantOrder = {
                   m_payment_token: res_order_data?.card_id
                     ? res_order_data?.card_id
                     : "",
-                  transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+                  transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
                   return_url:
                     ni_order_sale.state === "FAILED"
                       ? res_order_data.failure_url
@@ -5200,7 +5201,7 @@ var MerchantOrder = {
               m_payment_token: res_order_data?.card_id
                 ? res_order_data?.card_id
                 : "",
-              transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+              transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
               return_url:
                 ni_order_sale.state === "FAILED"
                   ? res_order_data.failure_url
@@ -5889,7 +5890,7 @@ var MerchantOrder = {
           m_payment_token: res_order_data?.card_id
             ? res_order_data?.card_id
             : "",
-          transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+          transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
           return_url: res_order_data.failure_url,
           payment_method_data: {
             scheme: res_order_data?.scheme ? res_order_data?.scheme : "",
@@ -6420,7 +6421,7 @@ var MerchantOrder = {
               m_payment_token: res_order_data?.card_id
                 ? res_order_data?.card_id
                 : "",
-              transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+              transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
               return_url:
                 sale_api_res.status === "A" || sale_api_res.status === "H"
                   ? res_order_data.success_url
@@ -6701,7 +6702,7 @@ var MerchantOrder = {
               paydart_category: response_category,
               currency: res_order_data.currency,
               return_url: res_order_data.failure_url,
-              transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+              transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
               amount: res_order_data.amount.toFixed(2),
               m_customer_id: res_order_data.merchant_customer_id
                 ? res_order_data.merchant_customer_id
@@ -6993,7 +6994,7 @@ var MerchantOrder = {
           m_payment_token: res_order_data?.card_id
             ? res_order_data?.card_id
             : "",
-          transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+          transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
           return_url: res_order_data.failure_url,
           payment_method_data: {
             scheme: res_order_data?.scheme ? res_order_data?.scheme : "",
@@ -7677,7 +7678,7 @@ var MerchantOrder = {
           psp: "",
           payment_method: "",
           m_payment_token: "",
-          transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+          transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
           return_url:
             res_order_data.cancel_url || process.env.DEFAULT_CANCEL_URL,
           payment_method_data: {
@@ -8141,7 +8142,7 @@ var MerchantOrder = {
           psp: result?.psp ? result?.psp : "",
           payment_method: result?.payment_mode ? result?.payment_mode : "",
           m_payment_token: result?.card_id ? result?.card_id : "",
-          transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+          transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
           payment_method_data: {
             scheme: result?.scheme ? result?.scheme : "",
             card_country: result?.card_country ? result?.card_country : "",
@@ -11028,7 +11029,7 @@ var MerchantOrder = {
               _nistatus === "FAILED"
                 ? order_data[0].failure_url
                 : order_data[0].success_url,
-            transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+            transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
             amount: order_data[0]?.amount
               ? order_data[0]?.amount.toFixed(2)
               : "",
@@ -11791,7 +11792,7 @@ var MerchantOrder = {
                 _nistatus === "FAILED"
                   ? order_data[0].failure_url
                   : order_data[0].success_url,
-              transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+              transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
               amount: order_data[0]?.amount
                 ? order_data[0]?.amount.toFixed(2)
                 : "",
@@ -12028,7 +12029,7 @@ var MerchantOrder = {
                     paydart_category: void_message,
                     currency: res_order_data.currency,
                     return_url: order_data[0].failure_url,
-                    transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+                    transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
                     amount: order_data[0]?.amount.toFixed(2) || "",
                     m_customer_id: order_data[0]?.m_customer_id || "",
                     psp: order_data[0]?.psp || "",
@@ -13110,7 +13111,7 @@ var MerchantOrder = {
           paydart_category: response_category?.category,
           currency: order_details.currency,
           return_url: order_details.success_url,
-          transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+          transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
           amount: order_details.amount.toFixed(2),
           m_customer_id: order_details.merchant_customer_id
             ? order_details.merchant_customer_id
@@ -13248,7 +13249,7 @@ var MerchantOrder = {
               paydart_category: response_category_fraud?.category,
               currency: order_details.currency,
               return_url: order_details.failure_url,
-              transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+              transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
               amount: order_details.amount.toFixed(2),
               m_customer_id: order_details.merchant_customer_id || "",
               psp: order_details.psp,
@@ -13484,7 +13485,7 @@ var MerchantOrder = {
           paydart_category: response_category?.category,
           currency: order_details.currency,
           return_url: order_details.failure_url,
-          transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+          transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
           amount: order_details.amount.toFixed(2),
           m_customer_id: order_details.merchant_customer_id
             ? order_details.merchant_customer_id
@@ -14359,7 +14360,11 @@ var MerchantOrder = {
           p_order_id: order_id,
           m_order_id: order_details.m_order_id,
           p_request_id: p_request_id,
-          order_creation_date: moment(created_at).format("DD/MM/YYYY HH:mm:ss"),
+          order_creation_date: moment(
+            created_at,
+            "YYYY-MM-DD HH:mm:ss",
+            true,
+          ).format("DD/MM/YYYY HH:mm:ss"),
           amount: order_details.currency + " " + order_details.amount,
           payment_link:
             process.env.PAYMENT_URL + "initiate/" + order_id + "/" + token,
@@ -14905,8 +14910,15 @@ var MerchantOrder = {
           currency: order_details?.currency,
           return_url: process.env.PAYMENT_URL + "/status", //process.env.PAYMENT_URL + "/status",
           transaction_time: txn_data?.created_at
-            ? moment(txn_data.created_at).format("DD-MM-YYYY hh:mm:ss")
-            : moment(order_details?.created_at).format("DD-MM-YYYY hh:mm:ss"),
+            ? moment(txn_data.created_at, "YYYY-MM-DD HH:mm:ss", true).format(
+                "DD-MM-YYYY HH:mm:ss",
+              )
+            : moment(
+                order_details?.created_at,
+                "YYYY-MM-DD HH:mm:ss",
+                true,
+              ).format("DD-MM-YYYY HH:mm:ss"),
+
           amount: order_details?.amount.toFixed(2) || "",
           m_customer_id: order_details?.merchant_customer_id || "",
           psp: order_details?.psp || "",
@@ -15320,7 +15332,7 @@ async function telr_pay(req) {
             m_payment_token: res_order_data?.card_id
               ? res_order_data?.card_id
               : "",
-            transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+            transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
             return_url:
               sale_api_res.status === "A"
                 ? res_order_data.success_url
@@ -15620,7 +15632,7 @@ let voidNi = async (
           paydart_category: fraudResponse.message,
           currency: res_order_data.currency,
           return_url: order_data[0].failure_url,
-          transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+          transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
           amount: order_data[0]?.amount.toFixed(2) || "",
           m_customer_id: order_data[0]?.m_customer_id || "",
           psp: order_data[0]?.psp || "",
@@ -15702,6 +15714,24 @@ async function confirmMTN(order_id, mode) {
     { order_id: order_id },
     order_txn_table
   );
+  if (!order_txn_details || !order_txn_details.payment_id) {
+    logger.error("MTN Confirm failed: Missing payment_id", {
+      order_id,
+      mode,
+      order_txn_details,
+    });
+
+    return {
+      message: "Transaction reference not found",
+      data: {
+        order_id,
+        status: "FAILED",
+        reason: "Missing payment_id for MTN confirmation",
+      },
+      status: "FAILED",
+    };
+  }
+
   // mtn momo confirm
   try {
     const username = `${mid_details.MID}`;
@@ -15816,7 +15846,7 @@ async function confirmMTN(order_id, mode) {
         paydart_category: mtnTxnStatus.status,
         currency: order_details.currency,
         return_url: process.env.PAYMENT_URL + "/status", //process.env.PAYMENT_URL + "/status",
-        transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+        transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
         amount: order_details?.amount.toFixed(2) || "",
         m_customer_id: order_details?.merchant_customer_id || "",
         psp: order_details?.psp || "",
@@ -15977,7 +16007,7 @@ async function confirmMTN(order_id, mode) {
         paydart_category: "FAILED",
         currency: order_details?.currency,
         return_url: process.env.PAYMENT_URL + "/status", //order_data?.[0]?.failure_url,
-        transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+        transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
         amount: order_data?.[0]?.amount.toFixed(2) || "",
         m_customer_id: order_data?.[0]?.m_customer_id || "",
         psp: order_data?.[0]?.psp || "",
@@ -16193,7 +16223,7 @@ async function confirmOrange(order_id, mode) {
         paydart_category: orangeTxnStatus.status,
         currency: order_details.currency,
         return_url: process.env.PAYMENT_URL + "/status", //process.env.PAYMENT_URL + "/status",
-        transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+        transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
         amount: order_details?.amount.toFixed(2) || "",
         m_customer_id: order_details?.merchant_customer_id || "",
         psp: order_details?.psp || "",
@@ -16367,7 +16397,7 @@ async function confirmOrange(order_id, mode) {
         paydart_category: "FAILED",
         currency: order_details?.currency,
         return_url: process.env.PAYMENT_URL + "/status", //order_data?.[0]?.failure_url,
-        transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+        transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
         amount: order_data?.[0]?.amount.toFixed(2) || "",
         m_customer_id: order_data?.[0]?.m_customer_id || "",
         psp: order_data?.[0]?.psp || "",
@@ -16589,7 +16619,7 @@ async function confirmALPAY(order_id, mode) {
         remark: "",
         currency: order_details.currency,
         return_url: process.env.PAYMENT_URL + "/status", //process.env.PAYMENT_URL + "/status",
-        transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+        transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
         amount: order_details?.amount.toFixed(2) || "",
         m_customer_id: order_details?.merchant_customer_id || "",
         psp: order_details?.psp || "",
@@ -16753,7 +16783,7 @@ async function confirmALPAY(order_id, mode) {
         paydart_category: "FAILED",
         currency: order_details?.currency,
         return_url: process.env.PAYMENT_URL + "/status", //order_data?.[0]?.failure_url,
-        transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+        transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
         amount: order_data?.[0]?.amount.toFixed(2) || "",
         m_customer_id: order_data?.[0]?.m_customer_id || "",
         psp: order_data?.[0]?.psp || "",
@@ -16978,7 +17008,7 @@ async function confirmMTNSandbox(order_id, mode) {
         paydart_category: mtnTxnStatus.status,
         currency: order_details.currency,
         return_url: process.env.PAYMENT_URL + "/status", //process.env.PAYMENT_URL + "/status",
-        transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+        transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
         amount: order_details.amount.toFixed(2),
         m_customer_id: order_details?.merchant_customer_id || "",
         psp: order_details?.psp || "",
@@ -17139,7 +17169,7 @@ async function confirmMTNSandbox(order_id, mode) {
         paydart_category: "FAILED",
         currency: order_details?.currency,
         return_url: process.env.PAYMENT_URL + "/status", //order_data?.[0]?.failure_url,
-        transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+        transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
         amount: order_data?.[0]?.amount.toFixed(2) || "",
         m_customer_id: order_data?.[0]?.m_customer_id || "",
         psp: order_data?.[0]?.psp || "",
@@ -17356,7 +17386,7 @@ async function confirmOrangeSandbox(order_id, mode) {
         paydart_category: orangeTxnStatus.status,
         currency: order_details.currency,
         return_url: process.env.PAYMENT_URL + "/status", //process.env.PAYMENT_URL + "/status",
-        transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+        transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
         amount: order_details?.amount.toFixed(2) || "",
         m_customer_id: order_details?.merchant_customer_id || "",
         psp: order_details?.psp || "",
@@ -17530,7 +17560,7 @@ async function confirmOrangeSandbox(order_id, mode) {
         paydart_category: "FAILED",
         currency: order_details?.currency,
         return_url: process.env.PAYMENT_URL + "/status", //order_data?.[0]?.failure_url,
-        transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
+        transaction_time: moment().format("DD-MM-YYYY HH:mm:ss"),
         amount: order_data?.[0]?.amount.toFixed(2) || "",
         m_customer_id: order_data?.[0]?.m_customer_id || "",
         psp: order_data?.[0]?.psp || "",
