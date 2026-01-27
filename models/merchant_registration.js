@@ -807,7 +807,7 @@ var MerchantRegistrationModel = {
     let qb = await pool.get_connection();
     let response;
     try {
-      const query = `SELECT sm.merchant_id as sub_merchant_id, mm.super_merchant_id, sm.company_name, con.country_name, con.country_code as register_business_country, mm.email, mm.code, mm.mobile_no, mm.referral_code FROM ${details_table} sm JOIN pg_master_merchant mm ON mm.id = sm.merchant_id JOIN pg_country con ON sm.register_business_country = con.id WHERE sm.merchant_id = ${merchant_id}`;
+      const query = `SELECT sm.merchant_id as sub_merchant_id, mm.super_merchant_id, sm.company_name, con.country_name, con.country_code as register_business_country, mm.email, mm.code, mm.mobile_no, mm.referral_code FROM ${details_table} sm JOIN pg_master_merchant mm ON mm.id = sm.merchant_id JOIN pg_country con ON sm.register_business_country = con.id WHERE sm.merchant_id = '${merchant_id}'`;
       response = await qb.query(query);
     } catch (error) {
       console.error("Error in addDefaultDraftsBatch:", error);

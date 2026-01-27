@@ -134,7 +134,7 @@ const Verify = async (req, res) => {
     });
 
     return res
-      .status(statusCode.badGateway)
+      .status(statusCode.ok)
       .send(ServerResponse.errorMsgWithData("Unable to verify", []));
   }
 };

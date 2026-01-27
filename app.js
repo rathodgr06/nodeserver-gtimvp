@@ -10,7 +10,7 @@ const httpStatus = require('http-status');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./helper/ApiError');
 const requestResponseLogger = require('./middlewares/requestResponseLogger');
-app.set('trust proxy', 1); 
+app.set('trust proxy', true); 
 app.use(morgan("short", { stream: winston.stream }));
 var useragent = require('express-useragent');
 

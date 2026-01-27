@@ -349,7 +349,7 @@ var wallet = {
   let super_merchant_id = req.bodyString("super_merchant_id");
   let currency = req.bodyString("currency");
   let page = req.bodyString("page");
-  let per_page = 50;
+  let per_page = req.bodyString("per_page");
   
   try {
     let limit = {

@@ -4181,13 +4181,17 @@ let helpers = {
     }
   },
 
-  get_country_code_by_name: async (id) => {
+  get_country_code_by_name: async (name) => {
+    if (!name) {
+      return "";
+    }
     let qb = await pool.get_connection();
     let response;
     try {
+      
       response = await qb
         .select("country_code")
-        .where({ "LOWER(country_name)": id })
+        .where({ "LOWER(country_name)": name })
         .get(config.table_prefix + "country");
     } catch (error) {
       console.error("Database query failed:", error);

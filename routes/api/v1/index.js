@@ -206,7 +206,7 @@ const verifyAlPay = require('../../../controller/AlPay/Verify.js');
 const payAlPay = require("../../../controller/AlPay/Pay.js");
 const confirmAlpay = require("../../../controller/AlPay/confirm.js");
 const superMerchantLogoUpload = require("../../../uploads/merchantLogoUpload.js")
-const { apiRateLimiter } = require('../../../utilities/api-ratelimiter/index.js');
+const  apiRateLimiter  = require('../../../utilities/api-ratelimiter/index.js');
 const Banner = require("../../../controller/banner.js");
 const MailTemplate = require("../../../controller/mail_template.js");
 const apiDocument = require("../../../controller/apidocumentController.js");
@@ -4908,7 +4908,7 @@ app.post("/confirm/mtn-momo", CheckHeader, MtnMomoValidator.confirm, confirm_pay
 app.post("/mtn-verify", CheckHeader, verify);
 app.post(
   "/fetch-wallet-balance",
-  apiRateLimiter,
+  apiRateLimiter(),
   WalletValidator.validate_user,
   charges_invoice_controller.walletBalance
 );
@@ -4958,7 +4958,7 @@ app.post(
   WalletValidator.create_wallet,
   wallet.create
 );
-app.post("/wallet-list", apiRateLimiter, WalletValidator.wallet_list, wallet.list);
+app.post("/wallet-list", apiRateLimiter(), WalletValidator.wallet_list, wallet.list);
 app.post("/manage-wallet", CheckHeader, WalletValidator.manage, wallet.manage);
 app.get("/get-wallet-by-id/:id", WalletValidator.get_wallet_by_id, wallet.get_wallet_details_by_id);
 app.post('/roll-out-wallet', wallet.rollout_wallets);
@@ -4976,7 +4976,7 @@ app.post('/verify-bulk-funding-details', APIAuth, CheckHeader, fundingDetials.ve
 app.post("/confirm-payment", CheckMerchantCred, MerchantOrder.confirm_wallet_payment);
 app.post("/orders/expire-details", MerchantOrder.fetchOrderDetails);
 app.post("/unload-wallet", WalletValidator.unload_wallet, wallet.unload_wallet);
-app.post("/get-wallet-statement", apiRateLimiter, WalletValidator.get_wallet_statement, wallet.get_wallet_statement);
+app.post("/get-wallet-statement", apiRateLimiter(), WalletValidator.get_wallet_statement, wallet.get_wallet_statement);
 app.post("/get-snapshot-balance", WalletValidator.get_wallet_snapshots, wallet.get_snapshot_balance);
 app.post("/merchant-webhook-details", CheckHeader, webHook.details);
 app.post("/get-submerchant-details", CheckHeader, submerchant.get_submerchant_details);
