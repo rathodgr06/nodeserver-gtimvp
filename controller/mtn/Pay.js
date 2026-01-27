@@ -1,342 +1,238 @@
 const axios = require("axios");
-const credentials = require("../../config/credientials");
-const helpers = require("../../utilities/helper/general_helper");
-const merchantOrderModel = require("../../models/merchantOrder");
 const moment = require("moment");
-const order_transactionModel = require("../../models/order_transaction");
-const enc_dec = require("../../utilities/decryptor/decryptor");
-const statusCode = require("../../utilities/statuscode/index");
-const Server_response = require("../../utilities/response/ServerResponse");
 const { v4: uuidv4 } = require("uuid");
-const { countryToAlpha3 } = require("country-to-iso");
+const merchantOrderModel = require("../../models/merchantOrder");
+const order_transactionModel = require("../../models/order_transaction");
+const helpers = require("../../utilities/helper/general_helper");
+const credentials = require("../../config/credientials");
+const statusCode = require("../../utilities/statuscode");
+const ServerResponse = require("../../utilities/response/ServerResponse");
+const logger = require("../../config/logger");
 const { send_webhook_data } = require("../webhook_settings");
-const PspModel = require("../../models/psp");
-const credientials = require("../../config/credientials");
-const logger = require('../../config/logger');
-const Pay = async (req, res,is_internal=true) => {
-  let payment_id;
-  const order_id = req.body.order_id;
-  const mode = req.body.mode;
-  let psp = req.bodyString('psp');
-  let order_table = mode == "live" ? "orders" : "test_orders";
-  let txn_table = mode == "live" ? "order_txn" : "test_order_txn";
-  let txn_response_dump =
-    mode == "live" ? "txn_response_dump" : "test_txn_response_dump";
 
-  var updated_at = moment().format("YYYY-MM-DD HH:mm:ss");
-  let card_no = "";
-  let enc_customer_id = "";
-  let card_details;
-  let full_card_no = "";
-  let name_on_card = "";
-  let expiry = "";
-  let generate_request_id_table = mode === 'live' ? 'generate_request_id' : 'test_generate_request_id';
-
-  // fetch psp id
-  const psp_details = await merchantOrderModel.selectOne(
-    "id,name",
-    {
-      credentials_key: psp,
-       deleted:0
-    },
-    "psp"
-  );
-  if (!psp_details) {
-    res
-      .status(statusCode.badRequest)
-      .send(Server_response.errormsg("No Psp Available"));
-  }
-  // fetch order details
-  const order_details = await merchantOrderModel.selectOne(
-    "*",
-    {
-      order_id: order_id,
-    },
-    order_table
-  );
-  // fetch mid details 
-  const mid_details = await merchantOrderModel.selectOne(
-    "MID,password,psp_id,is3DS,autoCaptureWithinTime,allowVoid,voidWithinTime,terminal_id,statementDescriptor,shortenedDescriptor,primary_key",
-    {
-      psp_id: psp_details.id,
-      submerchant_id: order_details.merchant_id,
-      deleted:0,
-      env:mode
-    },
-    "mid"
-  );
-  if (!mid_details) {
-    res
-      .status(statusCode.badRequest)
-      .send(Server_response.errormsg("No Terminal Available"));
-  }
-
-
-
-  let order_data = {
-    browser: req.headers.browser,
-    psp_id: psp_details.id,
-    browser_version: req.headers["x-browser-version"],
-    os: req.headers.os,
-    ip: req.headers.ip,
-    ip_country: req.headers.ipcountry,
-    card_no: '',
-    cid: enc_customer_id,
-    card_id: "",
-    updated_at: updated_at,
-    card_country: await helpers.get_country_name_by_dial_code(req.bodyString("country_code")),
-    cardType: 'NA',
-    scheme: '',
-    pan: `${req.bodyString("country_code")}${req.bodyString("mobile_no")}`,
-    cardholderName: 'NA',
-    expiry: 'NA',
-    psp: psp_details.name,
-    terminal_id: mid_details.terminal_id,
-    payment_mode: 'Mobile Wallet'
-  };
-  const order_date_update = await merchantOrderModel.updateDynamic(
-    order_data,
-    {
-      order_id: order_id,
-    },
-    order_table
-  );
-  const username = mid_details.MID;
-  const password = mid_details.password;
-  const basicAuthToken = await helpers.createBasicAuthToken(username, password);
-
-
+const Pay = async (req, res, is_internal = true) => {
+  let payment_id = null;
+  const mode = req?.body?.mode;
+  let generate_request_id_table =
+    mode === "live" ? "generate_request_id" : "test_generate_request_id";
   try {
-    console.log(psp)
-    console.log(credentials['mtn-momo']);
-    let url = mode == "live" ? credentials[psp].base_url : credentials[psp].test_url;
-    const config1 = {
-      method: "post",
-      url: url + `collection/token/`,
-      headers: {
-        Authorization: basicAuthToken,
-        "Content-Type": "application/json",
-        "Ocp-Apim-Subscription-Key": mid_details.primary_key
+    /* ───────── SAFE INPUT READS ───────── */
+    const orderId = req?.body?.order_id;
+  
+    const psp = req?.bodyString?.("psp");
+    const countryCode = req?.bodyString?.("country_code");
+    const mobileNo = req?.bodyString?.("mobile_no");
+
+    if (!orderId || !mode || !psp || !countryCode || !mobileNo) {
+      return res
+        .status(statusCode.badRequest)
+        .send(ServerResponse.errormsg("Missing required parameters"));
+    }
+
+    const orderTable = mode === "live" ? "orders" : "test_orders";
+    const txnTable = mode === "live" ? "order_txn" : "test_order_txn";
+
+    /* ───────── PSP VALIDATION ───────── */
+    const pspDetails = await merchantOrderModel.selectOne(
+      "id,name",
+      { credentials_key: psp, deleted: 0 },
+      "psp"
+    );
+
+    if (!pspDetails) {
+      return res
+        .status(statusCode.badRequest)
+        .send(ServerResponse.errormsg("No PSP available"));
+    }
+
+    /* ───────── ORDER VALIDATION ───────── */
+    const orderDetails = await merchantOrderModel.selectOne(
+      "*",
+      { order_id: orderId },
+      orderTable
+    );
+
+    if (!orderDetails) {
+      return res
+        .status(statusCode.badRequest)
+        .send(ServerResponse.errormsg("Invalid order"));
+    }
+
+    /* ───────── MID VALIDATION ───────── */
+    const midDetails = await merchantOrderModel.selectOne(
+      "MID,password,terminal_id,primary_key,statementDescriptor,shortenedDescriptor",
+      {
+        psp_id: pspDetails.id,
+        submerchant_id: orderDetails.merchant_id,
+        deleted: 0,
+        env: mode
       },
-    };
-    const response = await axios(config1);
-    const token = response.data.access_token;
-    console.log(`token`);
-    console.log(token);
+      "mid"
+    );
 
-    // const session = { session: token };
-    // const condition = {
-    //   order_id: order_id,
-    // };
+    if (!midDetails) {
+      return res
+        .status(statusCode.badRequest)
+        .send(ServerResponse.errormsg("No terminal available"));
+    }
 
-    // const session_update = await merchantOrderModel.updateDynamic(
-    //   session,
-    //   condition,
-    //   order_table
-    // );
-    // if (!session_update) {
-    //   res
-    //     .status(statusCode.badRequest)
-    //     .send(Server_response.errormsg("Session update failed"));
-    // }
+    if (!credentials?.[psp]) {
+      logger.error("PSP config missing", { psp });
+      return res
+        .status(statusCode.internalError)
+        .send(ServerResponse.errormsg("Configuration error"));
+    }
+
+    /* ───────── UPDATE ORDER META ───────── */
+    await merchantOrderModel.updateDynamic(
+      {
+        updated_at: moment().format("YYYY-MM-DD HH:mm:ss"),
+        psp: pspDetails.name,
+        terminal_id: midDetails.terminal_id,
+        payment_mode: "Mobile Wallet"
+      },
+      { order_id: orderId },
+      orderTable
+    );
+
+    /* ───────── AUTH TOKEN ───────── */
+    const basicAuthToken = await helpers.createBasicAuthToken(
+      midDetails.MID,
+      midDetails.password
+    );
+
+    const baseUrl =
+      mode === "live"
+        ? credentials[psp].base_url
+        : credentials[psp].test_url;
+
+    const tokenRes = await axios.post(
+      `${baseUrl}collection/token/`,
+      {},
+      {
+        headers: {
+          Authorization: basicAuthToken,
+          "Ocp-Apim-Subscription-Key": midDetails.primary_key
+        },
+        timeout: 10000
+      }
+    );
+
+    const token = tokenRes?.data?.access_token;
+    if (!token) {
+      throw new Error("Token generation failed");
+    }
+
+    /* ───────── PAYMENT REQUEST ───────── */
     payment_id = await helpers.make_sequential_no(
-      mode == "test" ? "TST_TXN" : "TXN"
+      mode === "test" ? "TST_TXN" : "TXN"
     );
-    const pay_request_id = await helpers.make_sequential_no(
-      mode == "test" ? "TST_REQ" : "REQ"
-    );
-    let x_ref_id = uuidv4();
-    let payload = {
-      amount: order_details.amount,
-      currency: order_details.currency,
-      externalId:order_id,
+
+    const xRefId = uuidv4();
+
+    const payload = {
+      amount: orderDetails.amount,
+      currency: orderDetails.currency,
+      externalId: orderId,
       payer: {
         partyIdType: "MSISDN",
-        partyId: `${req.bodyString("country_code")}${req.bodyString("mobile_no")}`
+        partyId: `${countryCode}${mobileNo}`
       },
-      payerMessage: mid_details.statementDescriptor,
-      payeeNote: mid_details.shortenedDescriptor
+      payerMessage: midDetails.statementDescriptor,
+      payeeNote: midDetails.shortenedDescriptor
     };
-    console.log(`payload we are sending to mtn momo`);
-    console.log(JSON.stringify(payload));
-    let headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        "Ocp-Apim-Subscription-Key":  mid_details.primary_key,
-        "X-Target-Environment": mode == 'test' ? "sandbox" : "mtnliberia",
-        "X-Reference-Id": x_ref_id,
-        // "X-Callback-Url":process.env.STATIC_URL+'/api/v1/mobile-payment/update-status'
-    };
-    // if(mode=='test'){
-    //   delete headers['X-Callback-Url'];
-    // }
-    let data = JSON.stringify(payload);
-    let config = {
-      method: "post",
-      url: `${url}collection/v1_0/requesttopay`,
-      headers:headers,
-      data: data,
-    };
-    const final_response = await axios(config);
-    console.log(`the response is here`);
-    console.log(JSON.stringify(final_response.data));
-    // Call updateDynamic to store sessionId in the database
-    await merchantOrderModel.updateDynamic(
-      { payment_id: payment_id, },
-      { order_id: order_id },
-      order_table
-    );
-    const insertFunction =
-      mode === "live"
-        ? order_transactionModel.add
-        : order_transactionModel.test_txn_add;
-    const insert_to_txn_table = await insertFunction({
-      order_id: order_id,
-      txn: payment_id.toString(),
-      type: order_details.action.toUpperCase(),
-      status: "AWAIT_3DS",
-      amount: order_details.amount,
-      currency: order_details.currency,
-      created_at: moment().format("YYYY-MM-DD HH:mm:ss"),
-      payment_id: x_ref_id,
-    });
-    if (!insert_to_txn_table) {
-      res
-        .status(statusCode.badRequest)
-        .send(response.errormsg("Transaction insertion failed"));
-    }
 
-    
-    return res.json({
-      data: {
-        transaction_ref_id: x_ref_id, // from meps api
-        order_id: order_id, // paydart order id
-        transaction_id: payment_id.toString(), //paydart txn id, make an entry in txn table with AUTH/SALE,depending upon MID action
-       mode:mode
-      },
-      status: "success",
-    });
-  } catch (error) {
-    logger.error(500,{message: error,stack: error.stack}); 
-    let invalidMid = false;
-    if (error?.response?.status == "401") {
-      invalidMid = true;
-    }
-    await merchantOrderModel.updateDynamic(
-      { status: "FAILED", "3ds_status": "NA" },
-      { order_id: order_id },
-      order_table
+    await axios.post(
+      `${baseUrl}collection/v1_0/requesttopay`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Ocp-Apim-Subscription-Key": midDetails.primary_key,
+          "X-Target-Environment": mode === "test" ? "sandbox" : "mtnliberia",
+          "X-Reference-Id": xRefId
+        },
+        timeout: 10000
+      }
     );
-    const insertFunction =
+
+    /* ───────── TXN INSERT ───────── */
+    const insertTxn =
       mode === "live"
         ? order_transactionModel.add
         : order_transactionModel.test_txn_add;
-    payment_id = await helpers.make_sequential_no(
-      mode == "test" ? "TST_TXN" : "TXN"
-    );
-    await insertFunction({
-      order_id: order_id,
+
+    await insertTxn({
+      order_id: orderId,
       txn: payment_id.toString(),
-      type: order_details.action.toUpperCase(),
-      status: "FAILED",
-      amount: order_details.amount,
-      currency: order_details.currency,
+      type: orderDetails.action.toUpperCase(),
+      status: "PENDING",
+      amount: orderDetails.amount,
+      currency: orderDetails.currency,
       created_at: moment().format("YYYY-MM-DD HH:mm:ss"),
-      payment_id: "",
+      payment_id: xRefId
     });
+    /* ───────── Store request details ───────── */
     let paydart_req_id = await helpers.make_sequential_no(mode == 'test' ? 'TST_REQ' : 'REQ');
     let order_req = {
-      merchant_id: order_details.merchant_id,
-      order_id: order_details?.order_id,
+      merchant_id: orderDetails.merchant_id,
+      order_id: orderDetails?.order_id,
       request_id: paydart_req_id,
       request: JSON.stringify(req.body),
     };
     await helpers.common_add(order_req, generate_request_id_table);
 
-    let txnFailedLog = {
-      order_id: order_details.order_id,
-      terminal: order_details?.terminal_id,
-      req: JSON.stringify(req.body),
-      res: '',
-      psp: psp_details.name,
-      status_code: "01",
-      description: invalidMid ? 'Invalid credentials' : "",
-      activity: `Transaction FAILED with MTN-MOMO`,
-      status: 1,
-      mode: mode,
-      card_holder_name: order_details.cardholderName || '',
-      card: `${full_card_no.substring(0, 6)}****${full_card_no.substring(
-        full_card_no.length - 4
-      )}`,
-      expiry: expiry,
-      cipher_id: 0,
-      txn: payment_id.toString(),
-      card_proxy: "",
-      "3ds_version": "0",
-      created_at: moment().format("YYYY-MM-DD HH:mm:ss"),
-    };
-    await helpers.addTransactionFailedLogs(txnFailedLog);
-    const res_obj = {
-      message: "Transaction FAILED",
-      order_status: "FAILED",
-      payment_id: "",
-      order_id: order_details.order_id,
-      amount: order_details.amount,
-      currency: order_details.currency,
-      remark: error.response ? error.response.data : "",
-      new_res: {
-        m_order_id: order_details?.merchant_order_id || "",
-        p_order_id: order_details?.order_id || "",
-        p_request_id: "",
-        psp_ref_id: "",
-        psp_txn_id: payment_id || "",
-        transaction_id: payment_id.toString() || "",
-        status: "FAILED",
-        status_code: "01",
-        remark: invalidMid ? 'Access Denied' : 'Transaction Failed',
-        paydart_category: 'FAILED',
-        currency: order_details?.currency,
-        return_url:process.env.PAYMENT_URL + '/status', //order_details?.failure_url,//process.env.PAYMENT_URL + '/status',//order_data?.[0]?.failure_url,
-        transaction_time: moment().format("DD-MM-YYYY hh:mm:ss"),
-        amount: order_details?.amount.toFixed(2) || "",
-        m_customer_id: order_details?.m_customer_id || "",
-        psp: order_details?.psp || "",
-        payment_method: order_details?.payment_mode || "",
-        m_payment_token: order_details?.m_payment_token || "",
-        mobile_no:`${req.bodyString("country_code")}${req.bodyString("mobile_no")}`,
-        payment_method_data: {
-          scheme: order_details?.scheme || "",
-          card_country: order_details?.card_country || "",
-          card_type: "Mobile Wallet",
-          mask_card_number: `NA`,
-          
-        },
-        apm_name: "",
-        apm_identifier: "",
-        sub_merchant_identifier: order_details?.merchant_id
-          ? await helpers.formatNumber(order_details?.merchant_id)
-          : "",
-      }
-    };
-    // web  hook starting
-    let hook_info = await helpers.get_data_list("*", "webhook_settings", {
-      merchant_id: order_details.merchant_id,
+    return res.status(statusCode.ok).send({
+      data: {
+        transaction_ref_id: xRefId,
+        order_id: orderId,
+        transaction_id: payment_id.toString(),
+        mode
+      },
+      status: "success"
     });
-    let web_hook_res = Object.assign({}, res_obj.new_res);
-    delete web_hook_res?.return_url;
-    delete web_hook_res?.paydart_category;
-    if (hook_info[0]) {
-      if (hook_info[0].enabled === 0 && hook_info[0].notification_url != '') {
-        let url = hook_info[0].notification_url;
-        let webhook_res = await send_webhook_data(
-          url,
-          web_hook_res,
-          hook_info[0].notification_secret
+
+  } catch (err) {
+    logger.error("MTN Pay failed", {
+      message: err.message,
+      stack: err.stack,
+      payment_id
+    });
+
+    // Best-effort failure logging (no crash)
+    try {
+      if (payment_id) {
+        const insertTxn =
+          mode === "live"
+            ? order_transactionModel.add
+            : order_transactionModel.test_txn_add;
+
+        await insertTxn({
+          order_id: req?.body?.order_id,
+          txn: payment_id.toString(),
+          status: "FAILED",
+          created_at: moment().format("YYYY-MM-DD HH:mm:ss"),
+        });
+        /* ───────── Store request details ───────── */
+        let paydart_req_id = await helpers.make_sequential_no(
+          mode == "test" ? "TST_REQ" : "REQ",
         );
+        let order_req = {
+          merchant_id: orderDetails.merchant_id,
+          order_id: orderDetails?.order_id,
+          request_id: paydart_req_id,
+          request: JSON.stringify(req.body),
+        };
+        await helpers.common_add(order_req, generate_request_id_table);
       }
+    } catch (e) {
+      logger.error("Failed to log failed txn", e);
     }
-    return res.status(statusCode.ok).send(Server_response.errorMsgWithData(res_obj.message, res_obj));
-  } 
+
+    return res
+      .status(statusCode.internalError)
+      .send(ServerResponse.errorMsgWithData("Transaction failed", []));
+  }
 };
 
 module.exports = Pay;

@@ -867,6 +867,8 @@ const transaction = {
   },
 
   payment_mode_list: async (req, res) => {
+    console.log(`req user`);
+    console.log(req.user);
     try{
     let limit = {
       perpage: 0,
@@ -906,7 +908,9 @@ const transaction = {
     );
     let send_res = [];
     let total_count = 0;
-    for (let val of result) {
+    console.log(env);
+    if(req.user.type=="admin"){
+      for (let val of result) {
       let testmode = val?.payment_mode.toLowerCase();
       if (env !== "" && payment_result.includes(testmode)) {
         let res = {
@@ -930,6 +934,33 @@ const transaction = {
         );
       }
     }
+    }else{
+    for (let val of result) {
+      let testmode = val?.payment_mode.toLowerCase();
+      if (env == "test" ) {
+        let res = {
+          mode_id: enc_dec.cjs_encrypt(val.id),
+          payment_mode: val.payment_mode,
+        };
+
+        send_res.push(res);
+      }
+
+      if (env == "live") {
+        let res = {
+          mode_id: enc_dec.cjs_encrypt(val.id),
+          payment_mode: val.payment_mode,
+        };
+
+        send_res.push(res);
+
+        total_count = await maintenanceModule.get_counts_payment_mode(
+          like_search
+        );
+      }
+    }
+    
+  }
 
     res
       .status(statusCode.ok)

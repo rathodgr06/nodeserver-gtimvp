@@ -1259,6 +1259,7 @@ var dbModel = {
         .where(condition)
         .get(mid_dbtable);
     } catch (error) {
+      console.log(error);
       logger.error(500,{message: error,stack: error.stack}); 
     } finally {
       qb.release();

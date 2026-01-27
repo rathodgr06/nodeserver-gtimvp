@@ -9,7 +9,8 @@ const { prettyString } = require("./utilities/logmanager/utils");
 const httpStatus = require('http-status');
 const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./helper/ApiError');
-
+const requestResponseLogger = require('./middlewares/requestResponseLogger');
+app.set('trust proxy', true); 
 app.use(morgan("short", { stream: winston.stream }));
 var useragent = require('express-useragent');
 
@@ -30,6 +31,7 @@ app.use(require('sanitize').middleware);
 app.use(useragent.express());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: '50mb' }))
+app.use(requestResponseLogger);
 app.use(function (req, res, next) {
    var type = req.get('Content-Type');
     if (isMultipart.test(type)){
@@ -38,7 +40,7 @@ app.use(function (req, res, next) {
     } 
     return urlencodedMiddleware(req, res, next); 
 });
-app.set('trust proxy', 1); 
+
 // app.use(sanitizeReqBody);
 app.use((req, res, next) => {
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');

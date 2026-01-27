@@ -107,9 +107,9 @@ process.on('unhandledRejection', (reason, promise) => {
     });
     
     // Optionally exit the process
-    // server.close(() => {
-    //     process.exit(1);
-    // });
+    server.close(() => {
+        process.exit(1);
+    });
 });
 
 // Handle uncaught exceptions
@@ -131,6 +131,7 @@ process.on('SIGTERM', () => {
     logger.info('SIGTERM signal received: closing HTTP server');
     server.close(() => {
         logger.info('HTTP server closed');
+        process.exit(0);
     });
 });
 

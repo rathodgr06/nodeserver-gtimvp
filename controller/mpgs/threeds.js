@@ -116,37 +116,49 @@ const threeds = async (req, res) => {
         transaction_id = await helpers.make_sequential_no(mode == 'test' ? "TST_TXN" : "TXN");
 
         let payload = {
-            "apiOperation": order_details.action.toUpperCase() === 'AUTH' ? 'AUTHORIZE' : 'PAY',
-            "authentication": {
-                "transactionId": req.body.transaction_id
-            },
+          apiOperation:
+            order_details.action.toUpperCase() === "AUTH" ? "AUTHORIZE" : "PAY",
+          
+          authentication: {
+            transactionId: req.body.transaction_id,
+          },
 
-            "sourceOfFunds": {
-                "type": "CARD",
-                "provided": {
-                    "card": {
-                        "number": card_number,
-                        "expiry": {
-                            "month": month,
-                            "year": year.slice(-2)
-                        },
-                        "securityCode": cvv,
-                        "storedOnFile": "NOT_STORED"
-                    }
-                }
+          sourceOfFunds: {
+            type: "CARD",
+            provided: {
+              card: {
+                number: card_number,
+                expiry: {
+                  month: month,
+                  year: year.slice(-2),
+                },
+                securityCode: cvv,
+                storedOnFile: "NOT_STORED",
+              },
             },
-            "transaction": {
-                "reference": uuidv4(),
-                "source": "INTERNET"
-            },
-            "order": {
-                "amount": order_details.amount,
-                "currency": order_details.currency,
-                "statementDescriptor": {},
-                "reference": uuidv4()
-            },
-
-
+          },
+          transaction: {
+            reference: uuidv4(),
+            source: "INTERNET",
+          },
+          order: {
+            amount: order_details.amount,
+            currency: order_details.currency,
+            statementDescriptor: {},
+            reference: uuidv4(),
+            // subMerchant:{
+            //     address:"ABC",
+            //     bankIndustryCode:"",
+            //     disputeContactPhone:"",
+            //     email:"",
+            //     governmentCountryCode:"",
+            //     identifier:"",
+            //     marketplaceId:"",
+            //     registeredName:"ABC",
+            //     tradingName:"ABC",
+            //     websiteUrl:"https://paydart.co"
+            // }
+          },
         };
         let payment_token_id = '';
          let checkIfAllowDescriptor =

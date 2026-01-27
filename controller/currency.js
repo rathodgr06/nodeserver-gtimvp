@@ -98,7 +98,6 @@ var currency = {
             req.bodyString("submerchant_id")
         );
 
-        submerchant_id = req?.user?.id;
 
         condition["env"] = req.bodyString("env");
 
@@ -115,6 +114,8 @@ var currency = {
             condition,
             'mid'
         );
+        console.log(`mid_currency`)
+        console.log(mid_currency);
         CurrencyModel.select_mid_currency(filter_arr, mid_currency.currency_ids)
             .then(async (result) => {
 

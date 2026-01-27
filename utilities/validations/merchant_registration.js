@@ -16,278 +16,266 @@ const logger = require('../../config/logger');
 
 const MerchantRegister = {
   api_register: async (req, res, next) => {
-    const schema = Joi.object().keys({
+    const schema = Joi.object({
       email: Joi.string()
         .email()
         .required()
-        .error(() => {
-          return new Error("Valid email required");
-        }),
+        .error(() => new Error("Valid email required")),
+
       mobile_no: Joi.string()
         .pattern(/^[0-9]+$/)
         .required()
-        .error(() => {
-          return new Error("Valid mobile required");
-        }),
+        .error(() => new Error("Valid mobile required")),
+
       code: Joi.string()
         .required()
-        .error(() => {
-          return new Error("Valid mobile code required");
-        }),
+        .error(() => new Error("Valid mobile code required")),
+
       registered_business_address: Joi.string()
         .required()
-        .error(() => {
-          return new Error("Business registered country required");
-        }),
+        .error(() => new Error("Business registered country required")),
+
       legal_business_name: Joi.string()
         .required()
-        .error(() => {
-          return new Error("Business name required");
-        }),
+        .error(() => new Error("Business name required")),
+
       referral_code: Joi.string()
         .optional()
         .allow("")
-        .error(() => {
-          return new Error("Invalid referral code");
-        }),
-      webhook_url: Joi.string().uri().optional().allow("").error(() => {
-        return new Error("Valid webhook url required");
-      })
+        .error(() => new Error("Invalid referral code")),
+
+      webhook_url: Joi.string()
+        .uri()
+        .optional()
+        .allow("")
+        .error(() => new Error("Valid webhook url required")),
     });
 
     try {
-      const result = schema.validate(req.body);
-      if (result.error) {
-        res
+      /* ───── Joi Validation ───── */
+      const { error } = schema.validate(req.body);
+      if (error) {
+        return res
           .status(StatusCode.ok)
-          .send(ServerResponse.errormsg(result.error.message));
-      } else {
-        let referral_exist = true;
-        let check_expire = false;
-        if (req.bodyString("referral_code")) {
-          referral_exist = await checkifrecordexist(
-            {
-              referral_code: req.bodyString("referral_code"),
-              status: 0,
-              deleted: 0,
-            },
-            "referrers"
+          .send(ServerResponse.errormsg(error.message));
+      }
+
+      const email = req.bodyString("email");
+      const mobileNo = req.bodyString("mobile_no");
+      const code = req.bodyString("code");
+      const referralCode = req.bodyString("referral_code");
+
+      /* ───── Referral Code Hard Validation (SECURITY FIX) ───── */
+      if (referralCode && !/^[A-Za-z0-9_-]+$/.test(referralCode)) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Invalid referral code"));
+      }
+
+      /* ───── Validate Mobile Country ───── */
+      const code_country = await validate_mobile(code, "country", mobileNo);
+      if (!code_country.status) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse(code_country.message));
+      }
+
+      /* ───── Email Exists Check ───── */
+      const emailExists = await checkifrecordexist(
+        {
+          email,
+          mobile_no_verified: 0,
+          email_verified: 1,
+        },
+        "master_super_merchant",
+      );
+
+      if (emailExists) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(
+            ServerResponse.validationResponse(
+              `Merchant with email ${email} already exits`,
+            ),
           );
-          check_expire = await check_expiry(
-            req.bodyString("referral_code"),
-            "referrers"
-          );
+      }
+
+      /* ───── Referral Validation (Only if Provided) ───── */
+      if (referralCode) {
+        const referralExists = await checkifrecordexist(
+          {
+            referral_code: referralCode,
+            status: 0,
+            deleted: 0,
+          },
+          "referrers",
+        );
+
+        if (!referralExists) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(ServerResponse.validationResponse("Invalid referral code"));
         }
 
-        let email_exits = await checkifrecordexist(
-          {
-            email: req.bodyString("email"),
-            mobile_no_verified: 0,
-            email_verified: 1,
-          },
-          "master_super_merchant"
-        );
-
-        let mobile_exits = false;
-        let code_country = await validate_mobile(
-          req.bodyString("code"),
-          "country",
-          req.bodyString("mobile_no")
-        );
-
-        if (
-          email_exits ||
-          mobile_exits ||
-          !code_country.status ||
-          !referral_exist
-        ) {
-          if (email_exits) {
-            res
-              .status(StatusCode.badRequest)
-              .send(
-                ServerResponse.validationResponse(
-                  `Merchant with email ${req.bodyString("email")} already exits`
-                )
-              );
-          } else if (!code_country.status) {
-            res
-              .status(StatusCode.badRequest)
-              .send(ServerResponse.validationResponse(code_country.message));
-          } else if (mobile_exits) {
-            res
-              .status(StatusCode.badRequest)
-              .send(
-                ServerResponse.validationResponse(
-                  `Merchant with mobile no ${req.bodyString(
-                    "mobile_no"
-                  )} already exits`
-                )
-              );
-          } else if (!referral_exist) {
-            res
-              .status(StatusCode.badRequest)
-              .send(ServerResponse.validationResponse(`Invalid referral code`));
-          } else if (check_expire) {
-            res
-              .status(StatusCode.badRequest)
-              .send(
-                ServerResponse.validationResponse(`Referral code has expired`)
-              );
-          }
-        } else {
-          next();
+        const referralExpired = await check_expiry(referralCode, "referrers");
+        if (referralExpired) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(
+              ServerResponse.validationResponse("Referral code has expired"),
+            );
         }
       }
+
+      /* ───── All checks passed ───── */
+      return next();
     } catch (error) {
-                logger.error(400,{message: error,stack: error?.stack});
-      res
+      logger.error("API_REGISTER_VALIDATION_FAILED", {
+        message: error.message,
+        stack: error.stack,
+      });
+
+      return res
         .status(StatusCode.badRequest)
-        .send(ServerResponse.validationResponse(error));
+        .send(ServerResponse.validationResponse("Invalid request"));
     }
   },
   register: async (req, res, next) => {
-    const schema = Joi.object().keys({
+    const schema = Joi.object({
       email: Joi.string()
         .email()
         .required()
-        .error(() => {
-          return new Error("Valid email required");
-        }),
+        .error(() => new Error("Valid email required")),
+
       mobile_no: Joi.string()
         .pattern(/^[0-9]+$/)
         .required()
-        .error(() => {
-          return new Error("Valid mobile required");
-        }),
+        .error(() => new Error("Valid mobile required")),
+
       code: Joi.string()
         .required()
-        .error(() => {
-          return new Error("Valid mobile code required");
-        }),
+        .error(() => new Error("Valid mobile code required")),
+
       registered_business_address: Joi.string()
         .required()
-        .error(() => {
-          return new Error("Business registered country required");
-        }),
+        .error(() => new Error("Business registered country required")),
+
       legal_business_name: Joi.string()
         .required()
-        .error(() => {
-          return new Error("Business name required");
-        }),
+        .error(() => new Error("Business name required")),
+
       referral_code: Joi.string()
         .optional()
         .allow("")
-        .error(() => {
-          return new Error("Invalid referral code");
-        }),
+        .error(() => new Error("Invalid referral code")),
     });
 
     try {
-      const result = schema.validate(req.body);
-      if (result.error) {
-        res
+      /* ───── Joi Validation ───── */
+      const { error } = schema.validate(req.body);
+      if (error) {
+        return res
           .status(StatusCode.ok)
-          .send(ServerResponse.errormsg(result.error.message));
-      } else {
-        let referral_exist = true;
-        let check_expire = false;
-        if (req.bodyString("referral_code")) {
-          referral_exist = await checkifrecordexist(
-            {
-              referral_code: req.bodyString("referral_code"),
-              status: 0,
-              deleted: 0,
-            },
-            "referrers"
+          .send(ServerResponse.errormsg(error.message));
+      }
+
+      const email = req.bodyString("email");
+      const mobileNo = req.bodyString("mobile_no");
+      const code = req.bodyString("code");
+      const referralCode = req.bodyString("referral_code");
+
+      /* ───── Referral Code HARD BLOCK (SECURITY) ───── */
+      if (referralCode && !/^[A-Za-z0-9_-]+$/.test(referralCode)) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Invalid referral code"));
+      }
+
+      /* ───── Validate Mobile Country ───── */
+      const code_country = await validate_mobile(code, "country", mobileNo);
+      if (!code_country.status) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse(code_country.message));
+      }
+
+      /* ───── Email Checks ───── */
+      const emailExists = await checkifrecordexist(
+        {
+          email,
+          mobile_no_verified: 0,
+          email_verified: 1,
+        },
+        "master_super_merchant",
+      );
+
+      if (emailExists) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(
+            ServerResponse.validationResponse(
+              `Merchant with email ${email} already exists`,
+            ),
           );
-          check_expire = await check_expiry(
-            req.bodyString("referral_code"),
-            "referrers"
+      }
+
+      const verifyLinkPending = await checkifrecordexist(
+        {
+          email,
+          mobile_no_verified: 1,
+          email_verified: 1,
+        },
+        "master_super_merchant",
+      );
+
+      if (verifyLinkPending) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(
+            ServerResponse.validationResponse(
+              "This email is pending for verification, please check your email inbox",
+            ),
           );
+      }
+
+      /* ───── Referral Checks (ONLY if provided) ───── */
+      if (referralCode) {
+        const referralExists = await checkifrecordexist(
+          {
+            referral_code: referralCode,
+            status: 0,
+            deleted: 0,
+          },
+          "referrers",
+        );
+
+        if (!referralExists) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(ServerResponse.validationResponse("Invalid referral code"));
         }
 
-        let email_exits = await checkifrecordexist(
-          {
-            email: req.bodyString("email"),
-            mobile_no_verified: 0,
-            email_verified: 1,
-          },
-          "master_super_merchant"
-        );
-        let verify_link = await checkifrecordexist(
-          {
-            email: req.bodyString("email"),
-            mobile_no_verified: 1,
-            email_verified: 1,
-          },
-          "master_super_merchant"
-        );
-        let mobile_exits = false;
-        // let mobile_exits = await checkifrecordexist({ mobile_no: req.bodyString('mobile_no') }, 'master_super_merchant');
-        let code_country = await validate_mobile(
-          req.bodyString("code"),
-          "country",
-          req.bodyString("mobile_no")
-        );
-
-        if (
-          email_exits ||
-          mobile_exits ||
-          !code_country.status ||
-          !referral_exist ||
-          check_expire ||
-          verify_link
-        ) {
-          if (email_exits) {
-            res
-              .status(StatusCode.badRequest)
-              .send(
-                ServerResponse.validationResponse(
-                  `Merchant with email ${req.bodyString("email")} already exits`
-                )
-              );
-          } else if (!code_country.status) {
-            res
-              .status(StatusCode.badRequest)
-              .send(ServerResponse.validationResponse(code_country.message));
-          } else if (mobile_exits) {
-            res
-              .status(StatusCode.badRequest)
-              .send(
-                ServerResponse.validationResponse(
-                  `Merchant with mobile no ${req.bodyString(
-                    "mobile_no"
-                  )} already exits`
-                )
-              );
-          } else if (!referral_exist) {
-            res
-              .status(StatusCode.badRequest)
-              .send(ServerResponse.validationResponse(`Invalid referral code`));
-          } else if (check_expire) {
-            res
-              .status(StatusCode.badRequest)
-              .send(
-                ServerResponse.validationResponse(`Referral code has expired`)
-              );
-          } else if (verify_link) {
-            res
-              .status(StatusCode.badRequest)
-              .send(
-                ServerResponse.validationResponse(
-                  `This email is pending for verification, please check your email inbox`
-                )
-              );
-          }
-        } else {
-          next();
+        const referralExpired = await check_expiry(referralCode, "referrers");
+        if (referralExpired) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(
+              ServerResponse.validationResponse("Referral code has expired"),
+            );
         }
       }
+
+      /* ───── All validations passed ───── */
+      return next();
     } catch (error) {
-            logger.error(400,{message: error,stack: error?.stack});
-      res
+      logger.error("REGISTER_VALIDATION_FAILED", {
+        message: error.message,
+        stack: error.stack,
+      });
+
+      return res
         .status(StatusCode.badRequest)
-        .send(ServerResponse.validationResponse(error));
+        .send(ServerResponse.validationResponse("Invalid request"));
     }
   },
   resend_link: async (req, res, next) => {
@@ -308,20 +296,20 @@ const MerchantRegister = {
       } else {
         let email_exits = await checkifrecordexist(
           { email: req.bodyString("email") },
-          "master_super_merchant"
+          "master_super_merchant",
         );
         if (!email_exits) {
           res
             .status(StatusCode.badRequest)
             .send(
               ServerResponse.validationResponse(
-                `Merchant with email ${req.bodyString("email")} is not exits`
-              )
+                `Merchant with email ${req.bodyString("email")} is not exits`,
+              ),
             );
         } else {
           let rec_exits = await checkifrecordexist(
             { email: req.bodyString("email"), password: "" },
-            "master_super_merchant"
+            "master_super_merchant",
           );
           if (rec_exits) {
             next();
@@ -331,15 +319,15 @@ const MerchantRegister = {
               .send(
                 ServerResponse.validationResponse(
                   `Merchant with email ${req.bodyString(
-                    "email"
-                  )} has already set password. Please Login.`
-                )
+                    "email",
+                  )} has already set password. Please Login.`,
+                ),
               );
           }
         }
       }
     } catch (error) {
-            logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -362,13 +350,13 @@ const MerchantRegister = {
       } else {
         let link_valid = await checkifrecordexistandexpiration(
           { token: req.bodyString("token"), is_expired: 0 },
-          "master_merchant_password_reset"
+          "master_merchant_password_reset",
         );
         if (link_valid) {
           res
             .status(StatusCode.ok)
             .send(
-              ServerResponse.successmsg("link is valid, please reset password")
+              ServerResponse.successmsg("link is valid, please reset password"),
             );
         } else {
           res
@@ -377,7 +365,7 @@ const MerchantRegister = {
         }
       }
     } catch (error) {
-            logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -391,8 +379,8 @@ const MerchantRegister = {
         .required()
         .pattern(
           new RegExp(
-            /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$_!%*?&])[A-Za-z\d$@$_!%*#?&]{8,}$/
-          )
+            /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$_!%*?&])[A-Za-z\d$@$_!%*#?&]{8,}$/,
+          ),
         )
         .messages({
           "string.pattern.base":
@@ -423,7 +411,7 @@ const MerchantRegister = {
       } else {
         let link_valid = await checkifrecordexistandexpiration(
           { token: req.bodyString("token"), is_expired: 0 },
-          "master_merchant_password_reset"
+          "master_merchant_password_reset",
         );
         if (link_valid) {
           next();
@@ -434,7 +422,7 @@ const MerchantRegister = {
         }
       }
     } catch (error) {
-            logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -459,22 +447,22 @@ const MerchantRegister = {
       } else {
         let email_exits = await checkifrecordexist(
           { email: req.bodyString("email") },
-          "master_super_merchant"
+          "master_super_merchant",
         );
         if (!email_exits) {
           res
             .status(StatusCode.badRequest)
             .send(
               ServerResponse.successmsg(
-                `If your account is identified, you will be receiving an email to change your password.`
-              )
+                `If your account is identified, you will be receiving an email to change your password.`,
+              ),
             );
         } else {
           next();
         }
       }
     } catch (error) {
-            logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -498,22 +486,22 @@ const MerchantRegister = {
       } else {
         let email_exits = await checkifrecordexist(
           { email: req.bodyString("email") },
-          "master_super_merchant"
+          "master_super_merchant",
         );
         if (!email_exits) {
           res
             .status(StatusCode.badRequest)
             .send(
               ServerResponse.successmsg(
-                `If your account is identified, you will be receiving an email to reset 2fa.`
-              )
+                `If your account is identified, you will be receiving an email to reset 2fa.`,
+              ),
             );
         } else {
           next();
         }
       }
     } catch (error) {
-            logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -536,7 +524,7 @@ const MerchantRegister = {
       } else {
         let link_valid = await checkifrecordexistandexpiration(
           { token: req.bodyString("token"), is_expired: 0 },
-          "twofa_authenticator"
+          "twofa_authenticator",
         );
         if (link_valid) {
           next();
@@ -547,7 +535,7 @@ const MerchantRegister = {
         }
       }
     } catch (error) {
-            logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
@@ -577,7 +565,7 @@ const MerchantRegister = {
       } else {
         let link_valid = await checkifrecordexistandexpiration(
           { token: req.bodyString("token"), is_expired: 0 },
-          "twofa_authenticator"
+          "twofa_authenticator",
         );
         if (link_valid) {
           next();
@@ -588,207 +576,174 @@ const MerchantRegister = {
         }
       }
     } catch (error) {
-            logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
     }
   },
   api_register_submerchant: async (req, res, next) => {
-    const schema = Joi.object().keys({
-      email: Joi.string()
-        .email()
-        .required()
-        .error(() => {
-          return new Error("Valid email required");
-        }),
-      mobile_no: Joi.string()
-        .pattern(/^[0-9]+$/)
-        .required()
-        .error(() => {
-          return new Error("Valid mobile required");
-        }),
-      code: Joi.string()
-        .required()
-        .error(() => {
-          return new Error("Valid mobile code required");
-        }),
-      registered_business_address: Joi.string()
-        .required()
-        .error(() => {
-          return new Error("Business registered country required");
-        }),
-      full_address: Joi.string()
-        .allow("")
-        .optional()
-        .error(() => {
-          return new Error("Business full address");
-        }),
-      legal_business_name: Joi.string()
-        .required()
-        .error(() => {
-          return new Error("Business name required");
-        }),
-      referral_code: Joi.string()
-        .optional()
-        .allow("")
-        .error(() => {
-          return new Error("Invalid referral code");
-        }),
-      webhook_url: Joi.string().uri().optional().allow("").error(() => {
-        return new Error("Valid webhook url required");
-      }),
-      super_merchant_id: Joi.string().required().error(() => {
-        return new Error("Valid supermerchant id required");
-      }),
-      inherit_mid: Joi.boolean().truthy('1').truthy('true').truthy(1).falsy('0').falsy('false').falsy(0).required().error(() => 
-        new Error("Inherit mid is required"))
+    try {
+      const schema = Joi.object({
+        email: Joi.string().email().required(),
+        mobile_no: Joi.string()
+          .pattern(/^[0-9]+$/)
+          .required(),
+        code: Joi.string().required(),
+        registered_business_address: Joi.string().required(),
+        full_address: Joi.string().allow("").optional(),
+        legal_business_name: Joi.string().required(),
+        referral_code: Joi.string().allow("").optional(),
+        webhook_url: Joi.string().uri().allow("").optional(),
+        super_merchant_id: Joi.string().required(),
+        inherit_mid: Joi.boolean()
+          .truthy("1", "true", 1)
+          .falsy("0", "false", 0)
+          .required(),
       });
 
-    try {
-      const result = schema.validate(req.body);
-      if (result.error) {
-        res
-          .status(StatusCode.ok)
-          .send(ServerResponse.errormsg(result.error.message));
-      } else {
-        let referral_exist = true;
-        let check_expire = false;
-        if (req.bodyString("referral_code")) {
-          referral_exist = await checkifrecordexist(
-            {
-              referral_code: req.bodyString("referral_code"),
-              status: 0,
-              deleted: 0,
-            },
-            "referrers"
+      const { error } = schema.validate(req.body, { abortEarly: true });
+      if (error) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse(error.message));
+      }
+
+      // SAFE reads
+      const email = helpers.safeBody(req, "email");
+      const mobileNo = helpers.safeBody(req, "mobile_no");
+      const code = helpers.safeBody(req, "code");
+      const referralCode = helpers.safeBody(req, "referral_code");
+      const superMerchantId = helpers.safeBody(req, "super_merchant_id");
+
+      // Super merchant validation
+      const validSuperMerchantId = await checkifrecordexist(
+        { id: superMerchantId },
+        "master_super_merchant",
+      );
+      if (!validSuperMerchantId) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(ServerResponse.validationResponse("Invalid super merchant id"));
+      }
+
+      // Email check
+      const emailExists = await checkifrecordexist(
+        { email },
+        "master_merchant",
+      );
+      if (emailExists) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(
+            ServerResponse.validationResponse(
+              `Merchant with email ${email} already exists`,
+            ),
           );
-          check_expire = await check_expiry(
-            req.bodyString("referral_code"),
-            "referrers"
+      }
+
+      // Mobile validation
+      const codeCountry = await validate_mobile(code, "country", mobileNo);
+      if (!codeCountry?.status) {
+        return res
+          .status(StatusCode.badRequest)
+          .send(
+            ServerResponse.validationResponse(
+              codeCountry?.message || "Invalid mobile",
+            ),
           );
+      }
+
+      // Referral validation
+      if (referralCode) {
+        const referralExists = await checkifrecordexist(
+          { referral_code: referralCode, status: 0, deleted: 0 },
+          "referrers",
+        );
+        if (!referralExists) {
+          return res
+            .status(StatusCode.badRequest)
+            .send(ServerResponse.validationResponse("Invalid referral code"));
         }
 
-        let email_exits = await checkifrecordexist(
-          {
-            email: req.bodyString("email")
-          },
-          "master_merchant"
-        );
-
-        let validSuperMerchantId = await checkifrecordexist({ id: req.bodyString('super_merchant_id') }, 'master_super_merchant')
-
-        let mobile_exits = false;
-        let code_country = await validate_mobile(
-          req.bodyString("code"),
-          "country",
-          req.bodyString("mobile_no")
-        );
-        if (!validSuperMerchantId) {
-          res
+        const isExpired = await check_expiry(referralCode, "referrers");
+        if (isExpired) {
+          return res
             .status(StatusCode.badRequest)
             .send(
-              ServerResponse.validationResponse(
-                `Invalid super merchhant id`
-              ));
-        }
-        if (
-          email_exits ||
-          mobile_exits ||
-          !code_country.status ||
-          !referral_exist
-        ) {
-          if (email_exits) {
-            res
-              .status(StatusCode.badRequest)
-              .send(
-                ServerResponse.validationResponse(
-                  `Merchant with email ${req.bodyString("email")} already exits`
-                )
-              );
-          } else if (!code_country.status) {
-            res
-              .status(StatusCode.badRequest)
-              .send(ServerResponse.validationResponse(code_country.message));
-          } else if (mobile_exits) {
-            res
-              .status(StatusCode.badRequest)
-              .send(
-                ServerResponse.validationResponse(
-                  `Merchant with mobile no ${req.bodyString(
-                    "mobile_no"
-                  )} already exits`
-                )
-              );
-          } else if (!referral_exist) {
-            res
-              .status(StatusCode.badRequest)
-              .send(ServerResponse.validationResponse(`Invalid referral code`));
-          } else if (check_expire) {
-            res
-              .status(StatusCode.badRequest)
-              .send(
-                ServerResponse.validationResponse(`Referral code has expired`)
-              );
-          }
-        } else {
-          next();
+              ServerResponse.validationResponse("Referral code has expired"),
+            );
         }
       }
-    } catch (error) {
-            logger.error(400,{message: error,stack: error?.stack});
-      res
-        .status(StatusCode.badRequest)
-        .send(ServerResponse.validationResponse(error));
+
+      // ✔ All validations passed
+      return next();
+    } catch (err) {
+      // NEVER crash from validation
+      logger.error("Submerchant validation failed", {
+        message: err?.message,
+        stack: err?.stack,
+      });
+
+      return res
+        .status(StatusCode.internalError)
+        .send(ServerResponse.errormsg("Unable to process request"));
     }
   },
   add_mid: async (req, res, next) => {
     const schema = Joi.object().keys({
-      mid_id: Joi.string().optional()
+      mid_id: Joi.string()
+        .optional()
         .allow("")
         .error(() => {
           return new Error("Valid mid id required");
         }),
       psp: Joi.alternatives().conditional("mid_id", {
-        is: "", then: Joi.string().required().error(
-          () => {
+        is: "",
+        then: Joi.string()
+          .required()
+          .error(() => {
             return new Error("valid psp required");
-          }
-        )
-        , otherwise: Joi.optional("")
+          }),
+        otherwise: Joi.optional(""),
       }),
       key: Joi.alternatives().conditional("mid_id", {
-        is: "", then: Joi.string().required().error(
-          () => {
+        is: "",
+        then: Joi.string()
+          .required()
+          .error(() => {
             return new Error("valid key required");
-          }
-        ),
-        otherwise: Joi.optional("")
+          }),
+        otherwise: Joi.optional(""),
       }),
       secret: Joi.alternatives().conditional("mid_id", {
-        is: "", then: Joi.string().required().error(
-          () => {
+        is: "",
+        then: Joi.string()
+          .required()
+          .error(() => {
             return new Error("valid secret required");
-          }
-        ),
-        otherwise: Joi.optional("")
+          }),
+        otherwise: Joi.optional(""),
       }),
       currency: Joi.alternatives().conditional("mid_id", {
-        is: "", then: Joi.string().currency().required().error(
-          () => {
+        is: "",
+        then: Joi.string()
+          .currency()
+          .required()
+          .error(() => {
             return new Error("valid currency required");
-          }
-        )
-        , otherwise: Joi.optional("")
+          }),
+        otherwise: Joi.optional(""),
       }),
       country: Joi.alternatives().conditional("mid_id", {
-        is: "", then: Joi.string().required().error(
-          () => {
+        is: "",
+        then: Joi.string()
+          .required()
+          .error(() => {
             return new Error("valid country required");
-          }
-        ),
-        otherwise: Joi.optional("")
-      })
+          }),
+        otherwise: Joi.optional(""),
+      }),
     });
 
     try {
@@ -799,14 +754,14 @@ const MerchantRegister = {
           .send(ServerResponse.errormsg(result.error.message));
       } else {
         if (req.bodyString("mid_id") != "") {
-          let mid_exits = await checkifrecordexist({ id: req.bodyString('mid_id'), status: 0, deleted: 0 }, 'mid');
+          let mid_exits = await checkifrecordexist(
+            { id: req.bodyString("mid_id"), status: 0, deleted: 0 },
+            "mid",
+          );
           if (!mid_exits) {
             res
               .status(StatusCode.badRequest)
-              .send(
-                ServerResponse.validationResponse(
-                  `mid id is not valid`
-                ));
+              .send(ServerResponse.validationResponse(`mid id is not valid`));
           } else {
             next();
           }
@@ -815,69 +770,68 @@ const MerchantRegister = {
         }
       }
     } catch (error) {
-            logger.error(400,{message: error,stack: error?.stack});
+      logger.error(400, { message: error, stack: error?.stack });
       console.log(error);
       res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
     }
   },
-  updateProfile:async(req,res,next)=>{
-     const subMerchantSchema = Joi.object({
-        sub_merchant_id: Joi.string().pattern(/^\d+$/).required().messages({
-          "string.pattern.base": "Sub merchant ID must contain only numbers",
-          "any.required": "Sub merchant ID is required",
+  updateProfile: async (req, res, next) => {
+    const subMerchantSchema = Joi.object({
+      sub_merchant_id: Joi.string().pattern(/^\d+$/).required().messages({
+        "string.pattern.base": "Sub merchant ID must contain only numbers",
+        "any.required": "Sub merchant ID is required",
+      }),
+      legal_business_name: Joi.string()
+        .trim()
+        .min(2)
+        .max(100)
+        .required()
+        .messages({
+          "string.empty": "Legal business name is required",
+          "string.min":
+            "Legal business name must be at least 2 characters long",
+          "string.max": "Legal business name cannot exceed 100 characters",
         }),
-        legal_business_name: Joi.string()
-          .trim()
-          .min(2)
-          .max(100)
-          .required()
-          .messages({
-            "string.empty": "Legal business name is required",
-            "string.min":
-              "Legal business name must be at least 2 characters long",
-            "string.max": "Legal business name cannot exceed 100 characters",
-          }),
-        registered_business_address: Joi.string()
-          .trim()
-          .min(3)
-          .max(3)
-          .required()
-          .messages({
-            "string.empty": "Registered business address is required",
-            "string.min": "Address must be at least 3 characters long",
-            "string.max": "Address cannot exceed 3 characters",
-          }),
-           full_address: Joi.string()
+      registered_business_address: Joi.string()
+        .trim()
+        .min(3)
+        .max(3)
+        .required()
+        .messages({
+          "string.empty": "Registered business address is required",
+          "string.min": "Address must be at least 3 characters long",
+          "string.max": "Address cannot exceed 3 characters",
+        }),
+      full_address: Joi.string()
         .allow("")
         .optional()
         .error(() => {
           return new Error("Business full address");
-      }),  
-        email: Joi.string().email().required().messages({
-          "string.email": "Email must be a valid email address",
-          "any.required": "Email is required",
         }),
-        code: Joi.string()
-          .pattern(/^\d{1,4}$/)
-          .required()
-          .messages({
-            "string.pattern.base":
-              "Code must be a valid country code (e.g., 91)",
-            "any.required": "Code is required",
-          }),
-        mobile_no: Joi.string()
-          .pattern(/^\d{7,15}$/)
-          .required()
-          .messages({
-            "string.pattern.base":
-              "Mobile number must be between 7 and 15 digits",
-            "any.required": "Mobile number is required",
-          }),
-      });
+      email: Joi.string().email().required().messages({
+        "string.email": "Email must be a valid email address",
+        "any.required": "Email is required",
+      }),
+      code: Joi.string()
+        .pattern(/^\d{1,4}$/)
+        .required()
+        .messages({
+          "string.pattern.base": "Code must be a valid country code (e.g., 91)",
+          "any.required": "Code is required",
+        }),
+      mobile_no: Joi.string()
+        .pattern(/^\d{7,15}$/)
+        .required()
+        .messages({
+          "string.pattern.base":
+            "Mobile number must be between 7 and 15 digits",
+          "any.required": "Mobile number is required",
+        }),
+    });
     try {
-       const result = subMerchantSchema.validate(req.body);
+      const result = subMerchantSchema.validate(req.body);
       if (result.error) {
         res
           .status(StatusCode.ok)
@@ -886,12 +840,11 @@ const MerchantRegister = {
         next();
       }
     } catch (error) {
-            logger.error(400,{message: error,stack: error?.stack});
-       res
+      logger.error(400, { message: error, stack: error?.stack });
+      res
         .status(StatusCode.badRequest)
         .send(ServerResponse.validationResponse(error));
     }
-  }
-
+  },
 };
 module.exports = MerchantRegister;

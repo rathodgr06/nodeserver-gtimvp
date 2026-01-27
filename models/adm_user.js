@@ -282,7 +282,7 @@ var dbModel = {
     } finally {
       qb.release();
     }
-    return response[0];
+    return response?.[0];
   },
   addPasswordLogs: async (data) => {
     let qb = await pool.get_connection();

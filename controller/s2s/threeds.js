@@ -19,9 +19,6 @@
     const calculateTransactionCharges = require("../../utilities/charges/transaction-charges/index");
     const logger = require('../../config/logger');
     const s2s_3ds = async (req, res) => {
-        console.log(`req body after 3ds`)
-        console.log(req.body);
-        console.log(req.card);
         let order_id;
         let mode;
         let order_table;

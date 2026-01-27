@@ -1234,225 +1234,163 @@ var MerchantRegistration = {
     }
   },
   register_submerchant: async (req, res) => {
-    try {
-      // add into master merchant
-      let password = (Math.random() + 1).toString(36).substring(7);
-      let inheritMid = req.bodyString("inherit_mid");
-      let shouldInherit = false;
-      if (inheritMid.toLowerCase() === "true" || inheritMid == 1) {
-        shouldInherit = true;
-      }
-      let first_submerchant_details =
-        await MerchantModel.selectFistSubmentchant({
-          super_merchant_id: req.bodyString("super_merchant_id"),
-        });
-      let mer_obj = {
-        email: req.bodyString("email"),
-        super_merchant_id: req.bodyString("super_merchant_id"),
-        code: req.bodyString("code"),
-        mobile_no: req.bodyString("mobile_no"),
-        register_at: moment().format("YYYY-MM-DD HH:mm:ss"),
-        mode: "test",
-        password: enc_dec.cjs_encrypt(password),
-        ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
-        email_verified: 1,
-        mobile_no_verified: 1,
-        live: 0,
-        status: 0,
-        deleted: 0,
-        mode: "test",
-        onboarding_done: 1,
-        inherit_mid: shouldInherit ? 1 : 0,
-        video_kyc_done: 1,
-        ekyc_done: 3,
-        onboarded_through_api: 1,
-        brand_color: shouldInherit
-          ? first_submerchant_details.brand_color
-          : "#FFFFFF",
-        accent_color: shouldInherit
-          ? first_submerchant_details.accent_color
-          : "#4c64e6",
-        font_name: shouldInherit ? first_submerchant_details.font_name : "",
-      };
-      let master_merchant_inserted_obj = await MerchantModel.add(mer_obj);
-      // add into master merchant details
-      let registered_business_address =
-        await helpers.get_busi_address_country_id_by_code(
-          req.bodyString("registered_business_address")
-        );
-      let mer_obj_details = {
-        merchant_id: master_merchant_inserted_obj.insertId,
-        company_name: req.bodyString("legal_business_name"),
-        register_business_country: registered_business_address
-          ? registered_business_address
-          : 0,
-        address_line1: req.bodyString("full_address"),
-        last_updated: moment().format("YYYY-MM-DD HH:mm:ss"),
-      };
-      let merc_id_details =
-        await MerchantRegistrationModel.insertMerchantDetails(mer_obj_details);
-      // add key and secret
-      let test_key_data = {
-        super_merchant_id: req.bodyString("super_merchant_id"),
-        merchant_id: master_merchant_inserted_obj.insertId,
-        type: "test",
-        merchant_key: await helpers.make_order_number("test-"),
-        merchant_secret: await helpers.make_order_number("sec-"),
+  let merchantId = null;
+
+  try {
+    const inheritMid = helpers.toBoolean(helpers.body(req, "inherit_mid"));
+    const superMerchantId = helpers.body(req, "super_merchant_id");
+    const firstSubMerchant = await MerchantModel.selectFistSubmentchant({
+      super_merchant_id: superMerchantId,
+    });
+
+    if (!firstSubMerchant) {
+      return res
+        .status(statusCode.badRequest)
+        .send(response.validationResponse("Invalid super merchant"));
+    }
+
+    const password = Math.random().toString(36).slice(-8);
+
+    // STEP 1: create merchant
+    const merchant = await MerchantModel.add({
+      email: helpers.body(req, "email"),
+      super_merchant_id: superMerchantId,
+      code: helpers.body(req, "code"),
+      mobile_no: helpers.body(req, "mobile_no"),
+      register_at: moment().format("YYYY-MM-DD HH:mm:ss"),
+      password: enc_dec.cjs_encrypt(password),
+      ip: helpers.getClientIp(req),
+      email_verified: 1,
+      mobile_no_verified: 1,
+      status: 0,
+      deleted: 0,
+      mode: "test",
+      onboarding_done: 1,
+      inherit_mid: inheritMid ? 1 : 0,
+      video_kyc_done: 1,
+      ekyc_done: 3,
+      onboarded_through_api: 1,
+      brand_color: inheritMid ? firstSubMerchant.brand_color : "#FFFFFF",
+      accent_color: inheritMid ? firstSubMerchant.accent_color : "#4c64e6",
+      font_name: inheritMid ? firstSubMerchant.font_name : "",
+    });
+
+    merchantId = merchant.insertId;
+
+    // STEP 2: details
+    const countryId = await helpers.get_busi_address_country_id_by_code(
+      helpers.body(req, "registered_business_address"),
+    );
+
+    await MerchantRegistrationModel.insertMerchantDetails({
+      merchant_id: merchantId,
+      company_name: helpers.body(req, "legal_business_name"),
+      register_business_country: countryId || 0,
+      address_line1: helpers.body(req, "full_address"),
+      last_updated: moment().format("YYYY-MM-DD HH:mm:ss"),
+    });
+
+    // STEP 3: keys
+    await MerchantModel.add_key({
+      super_merchant_id: superMerchantId,
+      merchant_id: merchantId,
+      type: "test",
+      merchant_key: await helpers.make_order_number("test-"),
+      merchant_secret: await helpers.make_order_number("sec-"),
+      created_at: moment().format("YYYY-MM-DD HH:mm:ss"),
+    });
+
+    await MerchantModel.add_key({
+      super_merchant_id: superMerchantId,
+      merchant_id: merchantId,
+      type: "live",
+      merchant_key: await helpers.make_order_number("live-"),
+      merchant_secret: await helpers.make_order_number("sec-"),
+      created_at: moment().format("YYYY-MM-DD HH:mm:ss"),
+    });
+
+    // STEP 4: webhook
+    let webhookSecret = "";
+    const webhookUrl = helpers.body(req, "webhook_url");
+    if (webhookUrl) {
+      webhookSecret = uuid.v4();
+      await MerchantModel.addWebhook({
+        enabled: 0,
+        merchant_id: merchantId,
+        notification_url: webhookUrl,
+        notification_secret: webhookSecret,
         created_at: moment().format("YYYY-MM-DD HH:mm:ss"),
-      };
-      await MerchantModel.add_key(test_key_data);
-      let live_key_data = {
-        super_merchant_id: req.bodyString("super_merchant_id"),
-        merchant_id: master_merchant_inserted_obj.insertId,
-        type: "live",
-        merchant_key: await helpers.make_order_number("live-"),
-        merchant_secret: await helpers.make_order_number("sec-"),
-        created_at: moment().format("YYYY-MM-DD HH:mm:ss"),
-      };
-      await MerchantModel.add_key(live_key_data);
-      // add webhook
-      let webhook_token = "";
-      if (req.bodyString("webhook_url") != "") {
-        const uuid = new SequenceUUID({
-          valid: true,
-          dashes: false,
-          unsafeBuffer: true,
-        });
-        webhook_token = uuid.generate();
-        let webhook_data = {
-          enabled: 0,
-          merchant_id: master_merchant_inserted_obj.insertId,
-          notification_url: req.bodyString("webhook_url"),
-          notification_secret: webhook_token,
-          created_at: moment().format("YYYY-MM-DD hh:mm:ss"),
-        };
-        let insertWebhook = await MerchantModel.addWebhook(webhook_data);
-      }
-      // fetch key and secret details
-      let key_response = await MerchantModel.get_key({
-        merchant_id: master_merchant_inserted_obj.insertId,
       });
-      // fetch mid details
-      /* Test mid */
-      let test_mid = await MerchantModel.selectMid({
-        "mid.submerchant_id": first_submerchant_details.id,
+    }
+    // Fetch access keys (IMPORTANT)
+    const accessKeys = await MerchantModel.get_key({
+      merchant_id: merchantId,
+    });
+    let midsResponse = { test: [], live: [] };
+
+    // STEP 5: inherit logic
+    if (inheritMid) {
+      await inheritMerchantResources(
+        firstSubMerchant.id,
+        merchantId,
+        superMerchantId,
+      );
+      const testMid = await MerchantModel.selectMid({
+        "mid.submerchant_id": merchantId,
         "mid.env": "test",
         "mid.status": 0,
         "mid.deleted": 0,
       });
-      /* Live Mid*/
-      let live_mid = await MerchantModel.selectMid({
-        "mid.submerchant_id": first_submerchant_details.id,
+
+      const liveMid = await MerchantModel.selectMid({
+        "mid.submerchant_id": merchantId,
         "mid.env": "live",
         "mid.status": 0,
         "mid.deleted": 0,
       });
 
-      if (shouldInherit) {
-        if (live_mid.length > 0) {
-          let dataLive = {
-            live: 1,
-          };
-          await MerchantRegistrationModel.updateDyn(
-            { id: master_merchant_inserted_obj.insertId },
-            dataLive,
-            "master_merchant"
-          );
-        }
-        let all_mids = [...test_mid, ...live_mid];
-        for (let mid of all_mids) {
-          console.log(mid);
-          let terminal_id = await helpers.cerate_terminalid();
-          let createMid = await MerchantModel.inheritMid(
-            mid.mid_id,
-            master_merchant_inserted_obj.insertId,
-            terminal_id
-          );
-          let currency_code = await helpers.get_currency_name_by_id(
-            mid.currency_id
-          );
-          let qr_id = uuid.v1();
-          let timeStamp = moment().format("YYYY-MM-DD hh:mm:ss");
-          let qr_data = {
-            mid_id: createMid?.insert_id,
-            merchant_id: req.bodyString("super_merchant_id") || 0,
-            sub_merchant_id: master_merchant_inserted_obj.insertId,
-            currency: currency_code,
-            qr_id: qr_id,
-            created_at: timeStamp,
-            type_of_qr_code: "Static_QR",
-            mode: mid.env,
-          };
-          let added_qr = await qrGenerateModel.add(qr_data);
-          let logs_data = {
-            merchant_id: req.bodyString("super_merchant_id") || 0,
-            sub_merchant_id: master_merchant_inserted_obj.insertId,
-            currency: currency_code,
-            qr_id: added_qr.insertId,
-            created_at: timeStamp,
-            updated_at: timeStamp,
-            type_of_qr_code: "Static_QR",
-            activity: "Created",
-            created_by: 0,
-          };
-          let qr_logs = await qrGenerateModel.add_logs(logs_data);
-        }
-        //add merchant payment method
-        let supported_payment_method = await MerchantModel.inheritPaymentMethod(
-          first_submerchant_details.id,
-          master_merchant_inserted_obj.insertId
-        );
-        // add merchant draft payment method
-        let addSupportedMasterMerchantDraft =
-          await MerchantModel.inheritPaymentMethodDraft(
-            first_submerchant_details.id,
-            master_merchant_inserted_obj.insertId
-          );
-        // add master merchant draft
-        let addMasterMerchantDraft =
-          await MerchantRegistrationModel.addDefaultDraftInherited(
-            master_merchant_inserted_obj.insertId,
-            first_submerchant_details.id
-          );
-      }
-
-      // send response
-      let registrationResponse = {
-        merchant_id: helpers.formatNumber(
-          master_merchant_inserted_obj.insertId + ""
-        ),
-        sub_merchant_id: master_merchant_inserted_obj.insertId,
-        super_merchant_id: req.bodyString("super_merchant_id"),
-        business_name: req.bodyString("legal_business_name"),
-        business_address: req.bodyString("registered_business_address"),
-        full_address: req.bodyString("full_address"),
-        business_email: req.bodyString("email"),
-        business_country_code: req.bodyString("code"),
-        business_mobile_no: req.bodyString("mobile_no"),
-        referral_code: req.bodyString("referral_code"),
-        access: key_response,
-        mids: shouldInherit
-          ? {
-              test: test_mid,
-              live: live_mid,
-            }
-          : {},
-        webhook_secret: webhook_token,
+      midsResponse = {
+        test: testMid || [],
+        live: liveMid || [],
       };
-      res
-        .status(statusCode.ok)
-        .send(
-          response.registrationDataResponse(
-            registrationResponse,
-            "Register successfully!"
-          )
-        );
-    } catch (error) {
-      logger.error(500, { message: error, stack: error.stack });
-      res
-        .status(statusCode.internalError)
-        .send(response.errormsg(error.message));
     }
+    const registrationResponse = {
+      merchant_id: helpers.formatNumber(String(merchantId)),
+      sub_merchant_id: merchantId,
+      super_merchant_id: superMerchantId,
+      business_name: helpers.body(req, "legal_business_name"),
+      business_address: helpers.body(req, "registered_business_address"),
+      business_email: helpers.body(req, "email"),
+      business_country_code: helpers.body(req, "code"),
+      business_mobile_no: helpers.body(req, "mobile_no"),
+      referral_code: helpers.body(req, "referral_code") || "",
+      access: accessKeys,
+      mids: midsResponse,
+      webhook_secret: webhookSecret,
+    };
+    // SUCCESS
+    return res
+      .status(statusCode.ok)
+      .send(
+        response.registrationDataResponse(
+          registrationResponse,
+          "Register successfully!",
+        ),
+      );
+  } catch (err) {
+    // MANUAL ROLLBACK
+    await rollbackMerchant(merchantId);
+
+    logger.error('Register submerchant failed', {
+      message: err.message,
+      stack: err.stack,
+      merchantId
+    });
+
+    return res
+      .status(statusCode.internalError)
+      .send(response.errormsg('Unable to register merchant'));
+  }
   },
   get_receiver_details: async (req, res) => {
     const { sub_merchant_id } = req.body;
@@ -1687,3 +1625,135 @@ async function addTestMid(merchant_id, super_merchant_id) {
     return false;
   }
 }
+async function rollbackMerchant(merchantId) {
+  try {
+    if (!merchantId) return;
+
+    await MerchantModel.deleteMerchant({ id: merchantId });
+    await MerchantModel.deleteMerchantDetails({ merchant_id: merchantId });
+    await MerchantModel.deleteKeys({ merchant_id: merchantId });
+    await MerchantModel.deleteWebhook({ merchant_id: merchantId });
+
+    logger.warn('Rolled back merchant creation', { merchantId });
+  } catch (err) {
+    logger.error('Rollback failed', {
+      merchantId,
+      error: err.message
+    });
+  }
+}
+async function inheritMerchantResources(
+  sourceSubMerchantId,
+  newMerchantId,
+  superMerchantId
+) {
+  try {
+    // STEP 1: fetch MIDs
+    const testMids = await MerchantModel.selectMid({
+      'mid.submerchant_id': sourceSubMerchantId,
+      'mid.env': 'test',
+      'mid.status': 0,
+      'mid.deleted': 0
+    });
+
+    const liveMids = await MerchantModel.selectMid({
+      'mid.submerchant_id': sourceSubMerchantId,
+      'mid.env': 'live',
+      'mid.status': 0,
+      'mid.deleted': 0
+    });
+
+    // STEP 2: update merchant live flag if live MID exists
+    if (liveMids.length > 0) {
+      await MerchantRegistrationModel.updateDyn(
+        { id: newMerchantId },
+        { live: 1 },
+        'master_merchant'
+      );
+    }
+
+    const allMids = [...testMids, ...liveMids];
+
+    // STEP 3: inherit each MID
+    for (const mid of allMids) {
+      if (!mid?.mid_id || !mid?.currency_id) continue;
+
+      const terminalId = await helpers.cerate_terminalid();
+
+      const inheritedMid = await MerchantModel.inheritMid(
+        mid.mid_id,
+        newMerchantId,
+        terminalId
+      );
+
+      if (!inheritedMid?.insert_id) continue;
+
+      // STEP 4: generate QR
+      const currencyCode = await helpers.get_currency_name_by_id(
+        mid.currency_id
+      );
+
+      const qrId = uuid.v4();
+      const timeStamp = moment().format('YYYY-MM-DD HH:mm:ss');
+
+      const qrData = {
+        mid_id: inheritedMid.insert_id,
+        merchant_id: superMerchantId || 0,
+        sub_merchant_id: newMerchantId,
+        currency: currencyCode,
+        qr_id: qrId,
+        created_at: timeStamp,
+        type_of_qr_code: 'Static_QR',
+        mode: mid.env
+      };
+
+      const addedQr = await qrGenerateModel.add(qrData);
+
+      // STEP 5: QR logs
+      if (addedQr?.insertId) {
+        await qrGenerateModel.add_logs({
+          merchant_id: superMerchantId || 0,
+          sub_merchant_id: newMerchantId,
+          currency: currencyCode,
+          qr_id: addedQr.insertId,
+          created_at: timeStamp,
+          updated_at: timeStamp,
+          type_of_qr_code: 'Static_QR',
+          activity: 'Created',
+          created_by: 0
+        });
+      }
+    }
+
+    // STEP 6: inherit payment methods
+    await MerchantModel.inheritPaymentMethod(
+      sourceSubMerchantId,
+      newMerchantId
+    );
+
+    // STEP 7: inherit payment method drafts
+    await MerchantModel.inheritPaymentMethodDraft(
+      sourceSubMerchantId,
+      newMerchantId
+    );
+
+    // STEP 8: inherit merchant draft
+    await MerchantRegistrationModel.addDefaultDraftInherited(
+      newMerchantId,
+      sourceSubMerchantId
+    );
+
+    return true;
+
+  } catch (err) {
+    logger.error('inheritMerchantResources failed', {
+      sourceSubMerchantId,
+      newMerchantId,
+      message: err.message,
+      stack: err.stack
+    });
+
+    throw err; // IMPORTANT: let caller handle rollback
+  }
+}
+

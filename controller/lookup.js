@@ -457,6 +457,7 @@ var lookup = {
           findcard.card_number,
           findcard.cipher_id
         );
+        console.log(card_no);
         bin_number = card_no.substring(0, 6);
       } else {
         card_no = req.body.card;

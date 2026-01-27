@@ -14,6 +14,7 @@ const referrer = config.table_prefix + "referrers";
 const helpers = require("../utilities/helper/general_helper");
 const { selectOneDynamic } = require("./subs_plan_model");
 const meeting_table = config.table_prefix + "merchant_meetings";
+const moment = require("moment");
 var MerchantRegistrationModel = {
   register: async (data) => {
     let qb = await pool.get_connection();
@@ -22,7 +23,7 @@ var MerchantRegistrationModel = {
       response = await qb.returning("id").insert(super_merchant_table, data);
       console.log(qb.last_query());
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -34,7 +35,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.returning("id").insert(details_table, data);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -46,7 +47,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.returning("id").insert(tc_accepted, data);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -58,7 +59,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.returning("id").insert(reset_table, data);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -73,7 +74,7 @@ var MerchantRegistrationModel = {
         .where(condition)
         .get(reset_table);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -88,7 +89,7 @@ var MerchantRegistrationModel = {
         .where(condition)
         .get(super_merchant_table);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -100,11 +101,11 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.query(
         "SELECT count(id) as count FROM `pg_master_merchant` WHERE `super_merchant_id` = " +
-        id +
-        " "
+          id +
+          " ",
       );
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -116,7 +117,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.set(data).where(condition).update(db_table);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -128,7 +129,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.set(data).where(condition).update(referrer);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -144,7 +145,7 @@ var MerchantRegistrationModel = {
         .where(condition)
         .update(super_merchant_table);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -156,7 +157,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.set(data).where(condition).update(reset_table);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -168,7 +169,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.returning("id").insert(two_fa_table, data);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -186,7 +187,7 @@ var MerchantRegistrationModel = {
         .get();
       // console.log("Query Ran: " + qb.last_query());
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -198,7 +199,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.set(data).where(condition).update(two_fa_table);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -213,61 +214,60 @@ var MerchantRegistrationModel = {
     if (limit.perpage) {
       try {
         if (Object.keys(filter).length) {
-          if(search==''){
+          if (search == "") {
             response = await qb.query(
-            "select * from " +
-            super_merchant_table +
-            " where " +
-            condition +
-            "and (" +
-            search_text +
-            ") order by id desc LIMIT " +
-            limit.perpage +
-            limit.start
-          );
-          }else{
+              "select * from " +
+                super_merchant_table +
+                " where " +
+                condition +
+                "and (" +
+                search_text +
+                ") order by id desc LIMIT " +
+                limit.perpage +
+                limit.start,
+            );
+          } else {
             response = await qb.query(
-            "select * from " +
-            super_merchant_table +
-            " where " +
-            condition +
-            "and (" +
-            search +
-            ") and (" +
-            search_text +
-            ") order by id desc LIMIT " +
-            limit.perpage +
-            limit.start
-          );
+              "select * from " +
+                super_merchant_table +
+                " where " +
+                condition +
+                "and (" +
+                search +
+                ") and (" +
+                search_text +
+                ") order by id desc LIMIT " +
+                limit.perpage +
+                limit.start,
+            );
           }
-          
         } else {
-          if(search==''){
-             response = await qb.query(
-            "select * from " +
-            super_merchant_table +
-            " where " +
-            condition +
-            "order by id desc LIMIT " +
-            limit.perpage +
-            limit.start
-          );
-          }else{
+          if (search == "") {
             response = await qb.query(
-            "select * from " +
-            super_merchant_table +
-            " where " +
-            condition +
-            "and (" +
-            search +
-            ") order by id desc LIMIT " +
-            limit.perpage +
-            limit.start
-          );
-          } 
-        } 
+              "select * from " +
+                super_merchant_table +
+                " where " +
+                condition +
+                "order by id desc LIMIT " +
+                limit.perpage +
+                limit.start,
+            );
+          } else {
+            response = await qb.query(
+              "select * from " +
+                super_merchant_table +
+                " where " +
+                condition +
+                "and (" +
+                search +
+                ") order by id desc LIMIT " +
+                limit.perpage +
+                limit.start,
+            );
+          }
+        }
       } catch (error) {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
       } finally {
         qb.release();
       }
@@ -276,28 +276,28 @@ var MerchantRegistrationModel = {
         if (Object.keys(filter).length) {
           response = await qb.query(
             "select * from " +
-            super_merchant_table +
-            " where " +
-            condition +
-            " and (" +
-            search +
-            ")  and (" +
-            search_text +
-            ") order by id desc"
+              super_merchant_table +
+              " where " +
+              condition +
+              " and (" +
+              search +
+              ")  and (" +
+              search_text +
+              ") order by id desc",
           );
         } else {
           response = await qb.query(
             "select * from " +
-            super_merchant_table +
-            " where " +
-            condition +
-            " and (" +
-            search +
-            ") order by id desc "
+              super_merchant_table +
+              " where " +
+              condition +
+              " and (" +
+              search +
+              ") order by id desc ",
           );
         }
       } catch (error) {
-        logger.error(500,{message: error,stack: error.stack}); 
+        logger.error(500, { message: error, stack: error.stack });
       } finally {
         qb.release();
       }
@@ -312,53 +312,51 @@ var MerchantRegistrationModel = {
     let qb = await pool.get_connection();
     try {
       if (Object.keys(filter).length) {
-        if(search==''){
-            response = await qb.query(
-          "select count('id') as count from " +
-          super_merchant_table +
-          " where " +
-          condition +
-          "and (" +
-          search_text +
-          ")"
-        );
-        }else{
-           response = await qb.query(
-          "select count('id') as count from " +
-          super_merchant_table +
-          " where " +
-          condition +
-          "and (" +
-          search_text +
-          ") and (" +
-          search +
-          ")"
-        );
+        if (search == "") {
+          response = await qb.query(
+            "select count('id') as count from " +
+              super_merchant_table +
+              " where " +
+              condition +
+              "and (" +
+              search_text +
+              ")",
+          );
+        } else {
+          response = await qb.query(
+            "select count('id') as count from " +
+              super_merchant_table +
+              " where " +
+              condition +
+              "and (" +
+              search_text +
+              ") and (" +
+              search +
+              ")",
+          );
         }
-       
       } else {
-        if(search==""){
-           response = await qb.query(
-          "select count('id') as count from " +
-          super_merchant_table +
-          " where " +
-          condition
-        );
-        }else{
-           response = await qb.query(
-          "select count('id') as count from " +
-          super_merchant_table +
-          " where " +
-          condition +
-          "and (" +
-          search +
-          ")"
-        );
+        if (search == "") {
+          response = await qb.query(
+            "select count('id') as count from " +
+              super_merchant_table +
+              " where " +
+              condition,
+          );
+        } else {
+          response = await qb.query(
+            "select count('id') as count from " +
+              super_merchant_table +
+              " where " +
+              condition +
+              "and (" +
+              search +
+              ")",
+          );
         }
-       
       }
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -372,7 +370,7 @@ var MerchantRegistrationModel = {
       qb.where(condition);
       response = await qb.get(super_merchant_table);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -388,7 +386,7 @@ var MerchantRegistrationModel = {
         .order_by("id", "desc")
         .get(super_merchant_table);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -403,7 +401,7 @@ var MerchantRegistrationModel = {
         .where(condition)
         .update(super_merchant_table);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -415,7 +413,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.returning("id").insert(details_table, data);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -453,10 +451,10 @@ var MerchantRegistrationModel = {
         .returning("id")
         .insert(
           config.table_prefix + "merchant_payment_methods",
-          merchantPaymentMethodData
+          merchantPaymentMethodData,
         );
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -469,7 +467,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.set(data).where(condition).update(meeting_table);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -481,7 +479,7 @@ var MerchantRegistrationModel = {
     try {
       response = await qb.set(data).where(condition).update(meeting_table);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -494,13 +492,13 @@ var MerchantRegistrationModel = {
       let condition = await helpers.get_conditional_string(condition_obj);
       response = await qb.query(
         "select count('id') as count from " +
-        meeting_table +
-        " where " +
-        condition +
-        " and status=0  and deleted=0"
+          meeting_table +
+          " where " +
+          condition +
+          " and status=0  and deleted=0",
       );
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -512,7 +510,7 @@ var MerchantRegistrationModel = {
       "apple_pay",
       "stored_card",
       "pay_vault",
-      "mobile_wallet"
+      "mobile_wallet",
     ];
     let merchantPaymentMethodData = [];
     let i = 1;
@@ -522,7 +520,7 @@ var MerchantRegistrationModel = {
         methods: method,
         sequence: i,
         is_visible: 1,
-        mode: 'test'
+        mode: "test",
       };
       merchantPaymentMethodData.push(temp);
       i++;
@@ -534,7 +532,7 @@ var MerchantRegistrationModel = {
         methods: method,
         sequence: i,
         is_visible: 1,
-        mode: 'live'
+        mode: "live",
       };
       merchantPaymentMethodData.push(temp);
       i++;
@@ -546,10 +544,10 @@ var MerchantRegistrationModel = {
         .returning("id")
         .insert(
           config.table_prefix + "merchant_payment_methods",
-          merchantPaymentMethodData
+          merchantPaymentMethodData,
         );
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -561,12 +559,12 @@ var MerchantRegistrationModel = {
     let response;
     try {
       response = await qb
-        .select('super_merchant_id')
+        .select("super_merchant_id")
         .where(condition)
         .order_by("id", "desc")
         .get(config.table_prefix + "master_merchant");
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -581,56 +579,77 @@ var MerchantRegistrationModel = {
       payment_methods: "",
       icon: "",
       font_name: "Proxima Nova Regular",
-    }
+    };
     let qb = await pool.get_connection();
     let response;
     try {
       response = await qb
         .returning("id")
-        .insert(
-          config.table_prefix + "master_merchant_draft",
-          data
-        );
+        .insert(config.table_prefix + "master_merchant_draft", data);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
     return response;
   },
-    addDefaultDraftInherited: async (merchant_id,immediate_sub_merchant_id) => {
-    let data = {
-      submerchant_id: merchant_id,
-      brand_color: "#FFFFFF",
-      accent_color: "#4c64e6",
-      language: 1,
-      payment_methods: "",
-      icon: "",
-      font_name: "Proxima Nova Regular",
-    }
-    let qb = await pool.get_connection();
-    let response;
-      try {
-        let query = `INSERT INTO pg_master_merchant_draft 
-(submerchant_id, brand_color, accent_color, language, payment_methods, card_show, font_name, card_payment, stored_card, created_at, test_card_payment_scheme, test_stored_card_scheme)
-SELECT  ${merchant_id}, brand_color, accent_color, language, payment_methods, card_show, font_name, card_payment, stored_card, NOW(),
-    test_card_payment_scheme, test_stored_card_scheme FROM pg_master_merchant_draft FORCE INDEX(idx_master_submerchant_id)
-WHERE submerchant_id = ${immediate_sub_merchant_id} LOCK IN SHARE MODE`
-        response = await qb.query(query);
+  addDefaultDraftInherited: async (merchant_id, immediate_sub_merchant_id) => {
+    const qb = await pool.get_connection();
+    try {
+      // 1️⃣ Read source draft
+      const rows = await qb
+        .select(
+          "brand_color",
+          "accent_color",
+          "language",
+          "payment_methods",
+          "card_show",
+          "font_name",
+          "card_payment",
+          "stored_card",
+          "test_card_payment_scheme",
+          "test_stored_card_scheme",
+        )
+        .where({ submerchant_id: immediate_sub_merchant_id })
+        .get("pg_master_merchant_draft");
+
+      if (!rows || rows.length === 0) {
+        return null;
+      }
+
+      // 2️⃣ Insert cloned draft
+      const row = rows[0];
+
+      const insertData = {
+        submerchant_id: merchant_id,
+        brand_color: row.brand_color,
+        accent_color: row.accent_color,
+        language: row.language,
+        payment_methods: row.payment_methods,
+        card_show: row.card_show,
+        font_name: row.font_name,
+        card_payment: row.card_payment,
+        stored_card: row.stored_card,
+        test_card_payment_scheme: row.test_card_payment_scheme,
+        test_stored_card_scheme: row.test_stored_card_scheme,
+        created_at: moment().format('YYYY-MM-DD HH:mm:ss')
+      };
+
+      return await qb.insert("pg_master_merchant_draft", insertData);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error.message, stack: error.stack });
+      throw error;
     } finally {
       qb.release();
     }
-    return response;
   },
-   get_receiver_details: async (sub_merchant_id) => {
+  get_receiver_details: async (sub_merchant_id) => {
     let condition = {
-      merchant_id: sub_merchant_id
-    }
+      merchant_id: sub_merchant_id,
+    };
     let data = {
-      merchant_id: sub_merchant_id
-    }
+      merchant_id: sub_merchant_id,
+    };
     let qb = await pool.get_connection();
     let response;
     try {
@@ -647,21 +666,21 @@ WHERE submerchant_id = ${immediate_sub_merchant_id} LOCK IN SHARE MODE`
         ])
         .join(
           "pg_master_merchant_details",
-          "pg_master_merchant.id = pg_master_merchant_details.merchant_id"
+          "pg_master_merchant.id = pg_master_merchant_details.merchant_id",
         )
         .join(
           "pg_country",
-          "pg_country.id = pg_master_merchant_details.register_business_country"
+          "pg_country.id = pg_master_merchant_details.register_business_country",
         )
         .join(
           "pg_city",
-          "pg_city.ref_state = pg_master_merchant_details.province"
+          "pg_city.ref_state = pg_master_merchant_details.province",
         )
         .where(condition)
         .order_by("pg_master_merchant.id", "desc")
         .get("pg_master_merchant");
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -698,23 +717,20 @@ WHERE submerchant_id = ${immediate_sub_merchant_id} LOCK IN SHARE MODE`
         ])
         .join(
           "pg_master_merchant_details",
-          "pg_master_merchant.id = pg_master_merchant_details.merchant_id"
+          "pg_master_merchant.id = pg_master_merchant_details.merchant_id",
         )
         .join(
           "pg_country",
-          "pg_country.id = pg_master_merchant_details.register_business_country"
+          "pg_country.id = pg_master_merchant_details.register_business_country",
         )
-        .join(
-          "pg_city",
-          "pg_city.id = pg_master_merchant_details.city"
-        )
+        .join("pg_city", "pg_city.id = pg_master_merchant_details.city")
         .where(condition)
         .order_by("pg_master_merchant.id", "desc")
         .limit(limit)
         .offset(offset)
         .get("pg_master_merchant");
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -726,15 +742,15 @@ WHERE submerchant_id = ${immediate_sub_merchant_id} LOCK IN SHARE MODE`
         .select("COUNT(*) as total", false) // <-- this disables escaping
         .join(
           "pg_master_merchant_details",
-          "pg_master_merchant.id = pg_master_merchant_details.merchant_id"
+          "pg_master_merchant.id = pg_master_merchant_details.merchant_id",
         )
         .join(
           "pg_country",
-          "pg_country.id = pg_master_merchant_details.register_business_country"
+          "pg_country.id = pg_master_merchant_details.register_business_country",
         )
         .join(
           "pg_city",
-          "pg_city.ref_state = pg_master_merchant_details.province"
+          "pg_city.ref_state = pg_master_merchant_details.province",
         )
         .where({ "pg_master_merchant.deleted": 0 })
         .get("pg_master_merchant");
@@ -754,75 +770,77 @@ WHERE submerchant_id = ${immediate_sub_merchant_id} LOCK IN SHARE MODE`
     };
     return fullResponse;
   },
-    addDefaultDraftsBatch:async(merchantIds)=> {
-        if (!merchantIds || merchantIds.length === 0) {
-            return null;
-        }
+  addDefaultDraftsBatch: async (merchantIds) => {
+    if (!merchantIds || merchantIds.length === 0) {
+      return null;
+    }
 
-        try {
-            // Assuming default draft structure - adjust based on your actual table schema
-            const placeholders = merchantIds.map(() => '(?, ?, NOW(), NOW())').join(', ');
-            const values = [];
+    try {
+      // Assuming default draft structure - adjust based on your actual table schema
+      const placeholders = merchantIds
+        .map(() => "(?, ?, NOW(), NOW())")
+        .join(", ");
+      const values = [];
 
-            merchantIds.forEach(merchantId => {
-                values.push(
-                    merchantId,
-                    'default' // or whatever your default draft status/type is
-                );
-            });
+      merchantIds.forEach((merchantId) => {
+        values.push(
+          merchantId,
+          "default", // or whatever your default draft status/type is
+        );
+      });
 
-            const query = `
+      const query = `
                 INSERT INTO merchant_drafts 
                 (submerchant_id, status, created_at, updated_at) 
                 VALUES ${placeholders}
             `;
 
-            const result = await db.query(query, values);
-            console.log(`Batch inserted ${merchantIds.length} default drafts`);
-            return result;
-        } catch (error) {
-            console.error('Error in addDefaultDraftsBatch:', error);
-            throw error;
-        }
-    },
-    get_submerchant_details:async(merchant_id)=> {
-      let qb = await pool.get_connection();
-      let response;
-        try {
-          const query = `SELECT sm.merchant_id as sub_merchant_id, mm.super_merchant_id, sm.company_name, con.country_name, con.country_code as register_business_country, mm.email, mm.code, mm.mobile_no, mm.referral_code FROM ${details_table} sm JOIN pg_master_merchant mm ON mm.id = sm.merchant_id JOIN pg_country con ON sm.register_business_country = con.id WHERE sm.merchant_id = ${merchant_id}`;
-          response = await qb.query(query);
-        } catch (error) {
-          console.error("Error in addDefaultDraftsBatch:", error);
-        }finally{
-          qb.release();
-        }
-        return response?.[0];
-    },
-    selectOneDyn: async (selection, condition,table_name) => {
+      const result = await db.query(query, values);
+      console.log(`Batch inserted ${merchantIds.length} default drafts`);
+      return result;
+    } catch (error) {
+      console.error("Error in addDefaultDraftsBatch:", error);
+      throw error;
+    }
+  },
+  get_submerchant_details: async (merchant_id) => {
     let qb = await pool.get_connection();
     let response;
     try {
-      response = await qb
-        .select(selection)
-        .where(condition)
-        .get(config.table_prefix+table_name);
+      const query = `SELECT sm.merchant_id as sub_merchant_id, mm.super_merchant_id, sm.company_name, con.country_name, con.country_code as register_business_country, mm.email, mm.code, mm.mobile_no, mm.referral_code FROM ${details_table} sm JOIN pg_master_merchant mm ON mm.id = sm.merchant_id JOIN pg_country con ON sm.register_business_country = con.id WHERE sm.merchant_id = '${merchant_id}'`;
+      response = await qb.query(query);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      console.error("Error in addDefaultDraftsBatch:", error);
     } finally {
       qb.release();
     }
     return response?.[0];
   },
-   selectAllDyn: async (selection, condition,table_name) => {
+  selectOneDyn: async (selection, condition, table_name) => {
     let qb = await pool.get_connection();
     let response;
     try {
       response = await qb
         .select(selection)
         .where(condition)
-        .get(config.table_prefix+table_name);
+        .get(config.table_prefix + table_name);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
+    } finally {
+      qb.release();
+    }
+    return response?.[0];
+  },
+  selectAllDyn: async (selection, condition, table_name) => {
+    let qb = await pool.get_connection();
+    let response;
+    try {
+      response = await qb
+        .select(selection)
+        .where(condition)
+        .get(config.table_prefix + table_name);
+    } catch (error) {
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
@@ -832,28 +850,32 @@ WHERE submerchant_id = ${immediate_sub_merchant_id} LOCK IN SHARE MODE`
     let qb = await pool.get_connection();
     let response;
     try {
-      response = await qb.returning("id").insert(config.table_prefix+'merchant_profile_history', data);
+      response = await qb
+        .returning("id")
+        .insert(config.table_prefix + "merchant_profile_history", data);
       console.log(response);
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
     return response;
   },
-  updateDyn: async (condition, data,table) => {
+  updateDyn: async (condition, data, table) => {
     let qb = await pool.get_connection();
     let response;
     try {
-      response = await qb.set(data).where(condition).update(config.table_prefix+table);
+      response = await qb
+        .set(data)
+        .where(condition)
+        .update(config.table_prefix + table);
       console.log(qb.last_query());
     } catch (error) {
-      logger.error(500,{message: error,stack: error.stack}); 
+      logger.error(500, { message: error, stack: error.stack });
     } finally {
       qb.release();
     }
     return response;
   },
-
 };
 module.exports = MerchantRegistrationModel;
